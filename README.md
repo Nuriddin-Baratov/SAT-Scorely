@@ -1,4 +1,4 @@
-# Scorely — Digital SAT tayyorgarlik platformasi
+# SAT-Scorely — Digital SAT tayyorgarlik platformasi
 
 Next.js 16 (App Router, Cache Components), TypeScript, Tailwind CSS v4, [FSD](https://feature-sliced.design) arxitekturasi.
 Interfeys uch tilda: o'zbek, rus, ingliz (`/uz`, `/ru`, `/en`).
@@ -78,4 +78,3 @@ src/
    export { AboutPage as default } from "@/pages/about";
    ```
 3. Sarlavha va matnlarni uchala lug'atga qo'shing (`meta.pages.about`).
-# SAT-Scorely
