@@ -78,3 +78,4 @@ src/
    export { AboutPage as default } from "@/pages/about";
    ```
 3. Sarlavha va matnlarni uchala lug'atga qo'shing (`meta.pages.about`).
+# SAT-Scorely
