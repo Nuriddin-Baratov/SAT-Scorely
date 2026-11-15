@@ -1,17 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
-  },
+  // Ma'lumotlar bazasi drayverlari (PGlite WASM fayllari bilan) bundle qilinmaydi.
+  serverExternalPackages: ["@electric-sql/pglite", "postgres"],
+  // Tailwind CSS postcss.config.mjs orqali ulanadi (Next.js tavsiya qilgan usul).
 };
 
 export default nextConfig;

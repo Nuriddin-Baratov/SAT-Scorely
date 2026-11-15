@@ -1,0 +1,274 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --surface-2: #f0eee8;
+  --border: #e6e3db;
+  --fg: #12111a;
+  --muted: #6a6775;
+  --accent: #5b4cf5;
+  --accent-2: #8b7dff;
+  --accent-fg: #ffffff;
+  --accent-soft: #eeecff;
+  --gold: #a87a26;
+  --gold-soft: #f8efdd;
+  --success: #15803d;
+  --success-soft: #e4f5e9;
+  --warning: #b45309;
+  --warning-soft: #fdf1e3;
+  --danger: #b91c1c;
+  --danger-soft: #fdecec;
+  --ink: #0b0a1d;
+  --ink-2: #14122e;
+  --shadow: 0 1px 2px rgb(18 17 26 / 0.04), 0 10px 30px -12px rgb(18 17 26 / 0.12);
+  --shadow-lg: 0 2px 4px rgb(18 17 26 / 0.04), 0 30px 60px -20px rgb(40 30 120 / 0.28);
+  color-scheme: light;
+}
+
+/* Tungi rejim: tizim sozlamasi (agar foydalanuvchi "light" tanlamagan bo'lsa) yoki aniq tanlov */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #08080f;
+    --surface: #101018;
+    --surface-2: #181822;
+    --border: #24242f;
+    --fg: #f3f2f8;
+    --muted: #9b99ab;
+    --accent: #7a6bff;
+    --accent-2: #a99dff;
+    --accent-fg: #ffffff;
+    --accent-soft: #1c1940;
+    --gold: #e3b866;
+    --gold-soft: #2a2213;
+    --success: #4ade80;
+    --success-soft: #0f2a1a;
+    --warning: #f5a54a;
+    --warning-soft: #2b1d0c;
+    --danger: #f87171;
+    --danger-soft: #2d1212;
+    --ink: #0d0c22;
+    --ink-2: #161436;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -12px rgb(0 0 0 / 0.7);
+    --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.4), 0 30px 60px -20px rgb(0 0 0 / 0.8);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+    --bg: #08080f;
+    --surface: #101018;
+    --surface-2: #181822;
+    --border: #24242f;
+    --fg: #f3f2f8;
+    --muted: #9b99ab;
+    --accent: #7a6bff;
+    --accent-2: #a99dff;
+    --accent-fg: #ffffff;
+    --accent-soft: #1c1940;
+    --gold: #e3b866;
+    --gold-soft: #2a2213;
+    --success: #4ade80;
+    --success-soft: #0f2a1a;
+    --warning: #f5a54a;
+    --warning-soft: #2b1d0c;
+    --danger: #f87171;
+    --danger-soft: #2d1212;
+    --ink: #0d0c22;
+    --ink-2: #161436;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -12px rgb(0 0 0 / 0.7);
+    --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.4), 0 30px 60px -20px rgb(0 0 0 / 0.8);
+    color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-jakarta);
+  --font-serif: var(--font-instrument-serif);
+  --shadow-card: var(--shadow);
+  --shadow-lift: var(--shadow-lg);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+}
+
+@layer base {
+  h1, h2, h3, .font-display {
+    font-family: var(--font-jakarta), var(--font-sans), system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  .font-serif {
+    letter-spacing: -0.01em;
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+/* ---------- Dekorativ fonlar ---------- */
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--fg) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--fg) 6%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+
+.bg-grid-dark {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 30%, transparent 100%);
+}
+
+.noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.glow {
+  background:
+    radial-gradient(40% 50% at 30% 10%, color-mix(in oklab, var(--accent) 24%, transparent), transparent 70%),
+    radial-gradient(35% 45% at 75% 0%, color-mix(in oklab, var(--gold) 20%, transparent), transparent 70%);
+}
+
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.aurora > span {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+.aurora > span:nth-child(1) { width: 46%; height: 60%; left: -8%; top: -18%; background: #5b4cf5; }
+.aurora > span:nth-child(2) { width: 36%; height: 50%; right: -6%; top: -10%; background: #c58b2c; opacity: 0.35; animation-duration: 22s; }
+.aurora > span:nth-child(3) { width: 40%; height: 55%; left: 35%; bottom: -35%; background: #8a3ffc; opacity: 0.35; animation-duration: 26s; }
+
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(6%, 8%, 0) scale(1.12); }
+}
+
+/* ---------- Matn va chegaralar ---------- */
+
+.text-gradient {
+  background: linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 45%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-light {
+  background: linear-gradient(100deg, #b7adff 0%, #ffffff 45%, #f1cf8b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-border {
+  position: relative;
+  isolation: isolate;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--accent), transparent 40%, transparent 60%, var(--gold));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glass {
+  background: rgb(255 255 255 / 0.06);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+dialog::backdrop {
+  background: rgb(9 9 15 / 0.55);
+  backdrop-filter: blur(4px);
+}
+
+/* ---------- Animatsiyalar ---------- */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-fade-up { animation: fade-up 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-marquee { animation: marquee 50s linear infinite; }
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: fade-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-fade-up, .animate-float, .animate-marquee, .reveal, .aurora > span { animation: none; }
+}
