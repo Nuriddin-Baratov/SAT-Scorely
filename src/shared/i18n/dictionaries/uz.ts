@@ -918,6 +918,8 @@ export const uz = {
     wrong: "Noto'g'ri",
   },
 
+  notFound: { title: "Sahifa topilmadi", text: "Bu manzil mavjud emas yoki o'chirilgan. Bosh sahifaga qayting yoki testlardan birini ishlang." },
+
   switcher: { label: "Tilni tanlash" },
 };
 

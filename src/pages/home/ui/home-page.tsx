@@ -435,7 +435,7 @@ export function HomePage({ locale }: { locale: Locale }) {
       <section className="px-3">
         <div className="noise relative overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#2a1f9e] via-[#5b4cf5] to-[#8a3ffc] px-6 py-24 text-center text-white">
           <div className="bg-grid-dark pointer-events-none absolute inset-0" aria-hidden />
-          <div className="pointer-events-none absolute -right-20 -bottom-40 size-[28rem] rounded-full bg-[#f1cf8b]/30 blur-3xl" aria-hidden />
+          <div className="pointer-events-none absolute -right-20 -bottom-40 size-[28rem] rounded-full bg-[radial-gradient(closest-side,rgb(241_207_139/0.35),transparent)]" aria-hidden />
           <div className="relative mx-auto max-w-2xl">
             <h2 className="text-4xl leading-tight font-bold sm:text-6xl">
               {h.cta.titleA}

@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useEffectEvent, useState } from "react";
+import { useState } from "react";
 
 import { MathTools, QuestionCard, isAnswered, type AnswerValue, type Question } from "@/entities/practice-test";
 import { useI18n } from "@/shared/i18n";
-import { cn, formatDuration } from "@/shared/lib";
+import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Icon } from "@/shared/ui/icon";
 import { Card } from "@/shared/ui/primitives";
+
+import { Countdown } from "./countdown";
 
 export interface ModuleResult {
   answers: AnswerValue[];
@@ -42,18 +44,16 @@ export function ModuleRunner({
   const [times, setTimes] = useState<number[]>(() => questions.map(() => 0));
   const [marked, setMarked] = useState<Set<number>>(() => new Set());
   const [index, setIndex] = useState(0);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [enteredAt, setEnteredAt] = useState<number | null>(null);
-  const [now, setNow] = useState<number | null>(null);
+  const [startedAt] = useState(() => Date.now());
+  const [enteredAt, setEnteredAt] = useState(() => Date.now());
   const [done, setDone] = useState(false);
 
-  const remainingMs = startedAt && now ? Math.max(0, limitMs - (now - startedAt)) : limitMs;
   const unanswered = answers.filter((a) => !isAnswered(a)).length;
   const q = questions[index];
 
   function commitTime() {
     const current = Date.now();
-    const spent = enteredAt ? Math.round((current - enteredAt) / 1000) : 0;
+    const spent = Math.round((current - enteredAt) / 1000);
     setEnteredAt(current);
     const next = times.map((sec, i) => (i === index ? sec + spent : sec));
     setTimes(next);
@@ -70,21 +70,6 @@ export function ModuleRunner({
     setDone(true);
     onFinish({ answers, times: commitTime(), timedOut });
   }
-
-  const onTick = useEffectEvent(() => {
-    const current = Date.now();
-    setNow(current);
-    if (startedAt === null) {
-      setStartedAt(current - 1000);
-      setEnteredAt(current - 1000);
-    } else if (current - startedAt >= limitMs) finish(true);
-  });
-
-  useEffect(() => {
-    if (done) return;
-    const id = window.setInterval(onTick, 1000);
-    return () => window.clearInterval(id);
-  }, [done]);
 
   function toggleMark() {
     setMarked((prev) => {
@@ -107,17 +92,7 @@ export function ModuleRunner({
               {subtitle} · {t.runner.question} {index + 1} {t.runner.of} {questions.length}
             </p>
           </div>
-          <div
-            className={cn(
-              "flex items-center gap-2 rounded-full px-3.5 py-1.5 font-mono text-sm font-semibold tabular-nums",
-              remainingMs <= 60_000 ? "bg-danger-soft text-danger" : "bg-surface-2",
-            )}
-            role="timer"
-            aria-label={t.runner.timeLeft}
-          >
-            <Icon name="clock" className="size-4" />
-            {formatDuration(Math.ceil(remainingMs / 1000))}
-          </div>
+          <Countdown startedAt={startedAt} limitMs={limitMs} onExpire={() => finish(true)} />
         </Card>
 
         <QuestionCard

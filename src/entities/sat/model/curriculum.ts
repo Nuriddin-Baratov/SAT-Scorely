@@ -255,10 +255,6 @@ export const domains: Domain[] = [
   },
 ];
 
-export function getSection(id: SectionId): Section {
-  return sections.find((section) => section.id === id)!;
-}
-
 export function getDomainsBySection(id: SectionId): Domain[] {
   return domains.filter((domain) => domain.sectionId === id);
 }

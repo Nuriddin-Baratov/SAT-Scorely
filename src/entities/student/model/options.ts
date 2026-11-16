@@ -32,10 +32,3 @@ export const scoreSourceOptions: { value: ScoreSource; label: string }[] = [
 
 export const sessionLengthOptions = [30, 45, 60, 90, 120] as const;
 
-export const ratingLabels: Record<number, string> = {
-  1: "Umuman bilmayman",
-  2: "Qiynalaman",
-  3: "O'rtacha",
-  4: "Yaxshi",
-  5: "Juda yaxshi",
-};

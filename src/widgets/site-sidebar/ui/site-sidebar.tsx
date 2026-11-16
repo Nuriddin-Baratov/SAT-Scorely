@@ -215,7 +215,7 @@ export function SiteSidebar() {
 
       {/* Mobil yuqori panel */}
       <div className="sticky top-0 z-40 px-3 pt-3 lg:hidden">
-        <div className="flex h-14 items-center justify-between rounded-full border border-border/80 bg-surface/80 pr-2 pl-4 shadow-card backdrop-blur-xl">
+        <div className="flex h-14 items-center justify-between rounded-full border border-border/80 bg-surface/95 pr-2 pl-4 shadow-card">
           <Logo />
           <div className="flex items-center gap-1">
             <LocaleSwitcher />
@@ -239,7 +239,7 @@ export function SiteSidebar() {
         aria-hidden={!open}
       >
         <div
-          className={cn("absolute inset-0 bg-ink/50 backdrop-blur-sm transition-opacity duration-300", open ? "opacity-100" : "opacity-0")}
+          className={cn("absolute inset-0 bg-ink/60 transition-opacity duration-300", open ? "opacity-100" : "opacity-0")}
           onClick={() => setOpen(false)}
         />
         <aside

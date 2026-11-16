@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fsd": "steiger ./src",
-    "telegram:webhook": "node --env-file=.env.local scripts/telegram-webhook.mjs"
+    "telegram:webhook": "node --env-file=.env.local scripts/telegram-webhook.mjs",
+    "start:lan": "next start -H 0.0.0.0 -p 3000",
+    "serve": "next build && next start -H 0.0.0.0 -p 3000"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.16",

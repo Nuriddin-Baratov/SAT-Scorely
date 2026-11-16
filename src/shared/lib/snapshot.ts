@@ -42,12 +42,16 @@ export function applySnapshot(snapshot: Snapshot): number {
   return count;
 }
 
-/** Barcha Scorely ma'lumotlarini o'chiradi (mavzu sozlamasidan tashqari). */
+/**
+ * Shu qurilmadagi barcha Scorely ma'lumotlarini o'chiradi (mavzu sozlamasidan tashqari).
+ * Sinxronizatsiya belgisi ham o'chiriladi — aks holda bo'sh holat bulutga yozilib,
+ * bulutdagi progress ham yo'qolardi. Endi keyingi ochilishda bulutdan tiklash taklif qilinadi.
+ */
 export function clearSnapshot() {
   const keys: string[] = [];
   for (let i = 0; i < window.localStorage.length; i++) {
     const key = window.localStorage.key(i);
-    if (key?.startsWith(STORAGE_PREFIX) && !LOCAL_ONLY.has(key)) keys.push(key);
+    if (key?.startsWith(STORAGE_PREFIX) && key !== "scorely.theme.v1") keys.push(key);
   }
   keys.forEach((key) => window.localStorage.removeItem(key));
 }

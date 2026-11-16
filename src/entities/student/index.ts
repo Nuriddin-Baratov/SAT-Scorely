@@ -3,7 +3,6 @@ export {
   englishOptions,
   gradeOptions,
   levelOptions,
-  ratingLabels,
   scoreSourceOptions,
   sessionLengthOptions,
 } from "./model/options";

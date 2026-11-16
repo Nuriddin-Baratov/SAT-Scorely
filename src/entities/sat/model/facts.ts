@@ -1,10 +1,3 @@
-export const examFacts = [
-  { value: "2 s 14 daq", label: "Umumiy davomiylik" },
-  { value: "98", label: "Savollar soni" },
-  { value: "400–1600", label: "Ball shkalasi" },
-  { value: "2 × 2", label: "Bo'lim × modul" },
-] as const;
-
 export const scoreBands = [
   { range: "1500–1600", percentile: "99+", label: "Elita", note: "Ivy League, MIT, Stanford darajasidagi universitetlar uchun raqobatbardosh." },
   { range: "1400–1490", percentile: "94–98", label: "A'lo", note: "Top-50 universitetlar va katta grantlar uchun kuchli natija." },

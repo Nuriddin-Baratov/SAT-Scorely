@@ -3,12 +3,11 @@ export {
   domains,
   getDomain,
   getDomainsBySection,
-  getSection,
   getSkill,
   sections,
   totalSkills,
 } from "./model/curriculum";
-export { examFacts, faq, satTimeline, scoreBands, strategies, testDayChecklist } from "./model/facts";
+export { faq, satTimeline, scoreBands, strategies, testDayChecklist } from "./model/facts";
 export {
   estimatePercentile,
   requiredAccuracy,

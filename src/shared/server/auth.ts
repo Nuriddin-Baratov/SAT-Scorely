@@ -1,6 +1,6 @@
 import "server-only";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { hashPassword, newId, randomToken, sha256, verifyPassword } from "./crypto";
 import { query, queryOne } from "./db";
@@ -77,11 +77,19 @@ export async function startSession(userId: string) {
   const jar = await cookies();
   jar.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    // https bo'lsa — Secure. Lokal tarmoqdagi http (telefondan 192.168.x.x orqali) ham ishlashi uchun
+    // bayroqni muhitga emas, so'rovning haqiqiy protokoliga qarab qo'yamiz.
+    secure: await isHttps(),
     sameSite: "lax",
     path: "/",
     expires,
   });
+}
+
+async function isHttps() {
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? (h.get("origin")?.startsWith("https://") ? "https" : "http");
+  return proto.split(",")[0].trim() === "https";
 }
 
 export async function endSession() {

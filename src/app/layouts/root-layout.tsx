@@ -6,6 +6,7 @@ import { siteConfig } from "@/shared/config";
 import { getDictionary, languageAlternates, localizePath, resolveLocale, type Locale } from "@/shared/i18n";
 import { themeInitScript } from "@/features/toggle-theme";
 import { AchievementToaster } from "@/widgets/achievement-toaster";
+import { InlineScript } from "@/shared/ui/inline-script";
 import { SiteFooter } from "@/widgets/site-footer";
 import { SiteSidebar } from "@/widgets/site-sidebar";
 import { Providers } from "../providers";
@@ -51,7 +52,7 @@ export function RootLayout({ children, locale }: Readonly<{ children: ReactNode;
       className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${jakarta.variable} h-full antialiased`}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <InlineScript html={themeInitScript} />
       </head>
       <body className="min-h-full">
         <Providers locale={locale}>

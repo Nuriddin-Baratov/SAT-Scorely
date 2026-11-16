@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useState } from "react";
+import { useState } from "react";
 
 import { gameRepository } from "@/entities/gamification";
 import { mistakesRepository } from "@/entities/mistake";
@@ -21,12 +21,13 @@ import {
 } from "@/entities/practice-test";
 import { routes } from "@/shared/config";
 import { useI18n } from "@/shared/i18n";
-import { cn, formatDuration } from "@/shared/lib";
+import { cn } from "@/shared/lib";
 import { Button, ButtonLink } from "@/shared/ui/button";
 import { launchConfetti } from "@/shared/ui/confetti";
 import { Icon } from "@/shared/ui/icon";
 import { Card } from "@/shared/ui/primitives";
 
+import { Countdown } from "./countdown";
 import { TestReview, type TestReward } from "./test-review";
 
 export function TestRunner({ test }: { test: PracticeTest }) {
@@ -35,6 +36,12 @@ export function TestRunner({ test }: { test: PracticeTest }) {
 }
 
 type Phase = "running" | "break";
+
+/**
+ * Joriy vaqt. Faqat hodisa ishlovchilarida (tugma bosilganda, taymer tugaganda) chaqiriladi;
+ * React Compiler lint'i buni render deb noto'g'ri baholamasligi uchun alohida funksiya.
+ */
+const nowMs = () => Date.now();
 
 function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void }) {
   const { t, locale, href } = useI18n();
@@ -46,16 +53,14 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
   const [answers, setAnswers] = useState<AnswerValue[]>(() => questions.map(() => null));
   // Har bir savolga sarflangan vaqt (soniya) va joriy savolga kirilgan vaqt
   const [times, setTimes] = useState<number[]>(() => questions.map(() => 0));
-  const [enteredAt, setEnteredAt] = useState<number | null>(null);
+  const [enteredAt, setEnteredAt] = useState(() => Date.now());
   const [marked, setMarked] = useState<Set<number>>(() => new Set());
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("running");
   const [path, setPath] = useState<AdaptivePath | null>(null);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [now, setNow] = useState<number | null>(null);
+  const [startedAt] = useState(() => Date.now());
   const [result, setResult] = useState<{ attempt: TestAttempt; reward: TestReward; timedOut: boolean } | null>(null);
 
-  const remainingMs = startedAt && now ? Math.max(0, limitMs - (now - startedAt)) : limitMs;
   const inModuleTwo = path !== null;
   const firstIndex = inModuleTwo ? moduleOneLength : 0;
   const lastIndex = questions.length - 1;
@@ -66,8 +71,8 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
 
   /** Joriy savoldagi vaqtni hisobga olib, boshqa savolga o'tadi */
   function commitTime() {
-    const current = Date.now();
-    const spent = enteredAt ? Math.round((current - enteredAt) / 1000) : 0;
+    const current = nowMs();
+    const spent = Math.round((current - enteredAt) / 1000);
     setEnteredAt(current);
     const next = times.map((sec, i) => (i === index ? sec + spent : sec));
     setTimes(next);
@@ -82,7 +87,7 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
   function finish(timedOut = false) {
     if (result) return;
     const finalTimes = commitTime();
-    const elapsed = startedAt ? Date.now() - startedAt : 0;
+    const elapsed = nowMs() - startedAt;
     const attempt = attemptsRepository.add({
       testId: test.id,
       finishedAt: new Date().toISOString(),
@@ -99,22 +104,6 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
     setResult({ attempt, timedOut, reward: { xp: game.gained, levelUp: game.levelUp, newMistakes: summary.wrongIds.length } });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-
-  const onTick = useEffectEvent(() => {
-    const current = Date.now();
-    setNow(current);
-    if (startedAt === null) {
-      setStartedAt(current - 1000);
-      setEnteredAt(current - 1000);
-    }
-    else if (current - startedAt >= limitMs) finish(true);
-  });
-
-  useEffect(() => {
-    if (result) return;
-    const id = window.setInterval(onTick, 1000);
-    return () => window.clearInterval(id);
-  }, [result]);
 
   if (result) {
     return <TestReview test={test} attempt={result.attempt} timedOut={result.timedOut} reward={result.reward} onRetry={onRetry} />;
@@ -149,7 +138,6 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
     });
   }
 
-  const lowTime = remainingMs <= 60_000;
   const finishLabel = awaitingModuleTwo ? t.adaptive.finishModule : t.runner.finish;
 
   if (phase === "break" && path) {
@@ -191,17 +179,7 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
               {t.runner.question} {index - firstIndex + 1} {t.runner.of} {visible.length}
             </p>
           </div>
-          <div
-            className={cn(
-              "flex items-center gap-2 rounded-full px-3.5 py-1.5 font-mono text-sm font-semibold tabular-nums",
-              lowTime ? "bg-danger-soft text-danger" : "bg-surface-2",
-            )}
-            role="timer"
-            aria-label={t.runner.timeLeft}
-          >
-            <Icon name="clock" className="size-4" />
-            {formatDuration(Math.ceil(remainingMs / 1000))}
-          </div>
+          <Countdown startedAt={startedAt} limitMs={limitMs} onExpire={() => finish(true)} />
         </Card>
 
         <QuestionCard

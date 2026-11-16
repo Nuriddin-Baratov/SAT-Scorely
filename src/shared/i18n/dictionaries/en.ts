@@ -918,5 +918,7 @@ export const en: Dictionary = {
     wrong: "Incorrect",
   },
 
+  notFound: { title: "Page not found", text: "This address doesn't exist or was removed. Go back home or try one of the tests." },
+
   switcher: { label: "Choose language" },
 };

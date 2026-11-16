@@ -400,7 +400,7 @@ function NextSessionCard({ session, today, onOpen }: { session: PlanSession; tod
         </div>
         <ol className="relative space-y-2 before:absolute before:top-5 before:bottom-5 before:left-[1.35rem] before:w-px before:bg-border">
           {session.blocks.map((b, i) => (
-            <li key={b.label} className="relative flex items-center gap-4 rounded-2xl border border-border bg-surface/80 px-3 py-3 backdrop-blur">
+            <li key={b.label} className="relative flex items-center gap-4 rounded-2xl border border-border bg-surface px-3 py-3">
               <span className="relative z-10 grid size-7 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-white">{i + 1}</span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold">{b.label}</p>
