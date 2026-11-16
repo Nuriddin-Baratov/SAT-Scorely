@@ -1,6 +1,7 @@
 import "server-only";
 
 import { AuthError } from "./auth";
+import { DatabaseUnavailableError } from "./db";
 
 /** JSON javob */
 export function json(data: unknown, status = 200) {
@@ -14,6 +15,7 @@ export function handleError(error: unknown) {
     return json({ error: error.code }, status);
   }
   if (error instanceof SyntaxError) return json({ error: "invalid" }, 400);
+  if (error instanceof DatabaseUnavailableError) return json({ error: "no-database" }, 503);
   console.error(error);
   return json({ error: "server" }, 500);
 }

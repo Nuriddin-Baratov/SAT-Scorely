@@ -6,12 +6,31 @@ import { SCHEMA } from "./schema";
  * Ma'lumotlar bazasi: `DATABASE_URL` berilgan bo'lsa — haqiqiy Postgres (Vercel Postgres / Neon / o'zingizniki),
  * aks holda lokal ishlab chiqish uchun PGlite (Postgres WASM, `.data/pglite` papkasida saqlanadi).
  */
+/** Vercel/Neon integratsiyasi ba'zan faqat POSTGRES_URL ni qo'shadi — ikkalasini ham qabul qilamiz */
+function databaseUrl() {
+  return process.env.DATABASE_URL || process.env.POSTGRES_URL || "";
+}
+
+/**
+ * Baza mavjudmi: haqiqiy Postgres URL bor, yoki lokal kompyuter (PGlite).
+ * Vercel kabi serverless muhitda fayl tizimi faqat o'qish uchun — u yerda PGlite ishlamaydi.
+ */
+export function databaseConfigured() {
+  return !!databaseUrl() || !process.env.VERCEL;
+}
+
+export class DatabaseUnavailableError extends Error {
+  constructor() {
+    super("DATABASE_URL is not configured");
+  }
+}
+
 interface Db {
   query<T>(text: string, params?: unknown[]): Promise<T[]>;
 }
 
 async function connect(): Promise<Db> {
-  const url = process.env.DATABASE_URL;
+  const url = databaseUrl();
   if (url) {
     const { default: postgres } = await import("postgres");
     const local = /localhost|127\.0\.0\.1/.test(url);
@@ -21,6 +40,7 @@ async function connect(): Promise<Db> {
         (await sql.unsafe(text, params as never[])) as unknown as T[],
     };
   }
+  if (!databaseConfigured()) throw new DatabaseUnavailableError();
   const { PGlite } = await import("@electric-sql/pglite");
   const { mkdir } = await import("node:fs/promises");
   const dir = process.env.PGLITE_DIR ?? ".data/pglite";

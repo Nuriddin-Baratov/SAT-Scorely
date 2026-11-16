@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import {
   assertSameOrigin,
+  databaseConfigured,
   deleteAccount,
   getCurrentUser,
   handleError,
@@ -17,6 +18,8 @@ export async function GET() {
   // Har doim so'rov vaqtida bajariladi (prerender qilinmaydi)
   await connection();
   try {
+    // Baza ulanmagan — sayt brauzer rejimida ishlaydi (kirish/reyting o'chiq)
+    if (!databaseConfigured()) return json({ user: null, database: false });
     const user = await getCurrentUser();
     if (!user) return json({ user: null });
     const link = await linkStatus(user.id);

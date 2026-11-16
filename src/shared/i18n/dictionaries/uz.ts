@@ -824,6 +824,7 @@ export const uz = {
     wait: "Kuting…",
     privacy: "Parolingiz shifrlangan holda saqlanadi. Ma'lumotlaringiz uchinchi shaxslarga berilmaydi.",
     errors: {
+      "no-database": "Ma'lumotlar bazasi ulanmagan. Administrator DATABASE_URL ni sozlashi kerak.",
       invalid: "Email yoki parol noto'g'ri.",
       exists: "Bu email bilan akkaunt allaqachon bor.",
       weak: "Parol kamida 8 ta belgidan iborat bo'lsin.",

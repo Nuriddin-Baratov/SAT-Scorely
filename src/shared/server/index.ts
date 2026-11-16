@@ -15,7 +15,7 @@ export {
   type PublicUser,
   type Role,
 } from "./auth";
-export { query, queryOne } from "./db";
+export { DatabaseUnavailableError, databaseConfigured, query, queryOne } from "./db";
 export { assertSameOrigin, handleError, json, rateLimit, readJson } from "./http";
 export {
   createClass,

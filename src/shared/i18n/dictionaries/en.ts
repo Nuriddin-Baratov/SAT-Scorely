@@ -824,6 +824,7 @@ export const en: Dictionary = {
     wait: "Please wait…",
     privacy: "Your password is stored encrypted. Your data is never shared with third parties.",
     errors: {
+      "no-database": "The database isn't connected. The administrator needs to set DATABASE_URL.",
       invalid: "Incorrect email or password.",
       exists: "An account with this email already exists.",
       weak: "The password must be at least 8 characters.",

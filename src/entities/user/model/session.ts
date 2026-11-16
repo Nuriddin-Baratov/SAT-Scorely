@@ -40,8 +40,14 @@ function set(next: SessionState) {
 export function refreshSession() {
   inflight ??= fetch("/api/auth/me", { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-    .then((data: { user: User | null; telegram?: TelegramStatus }) =>
-      set(data.user ? { status: "user", user: data.user, telegram: data.telegram! } : { status: "guest" }),
+    .then((data: { user: User | null; telegram?: TelegramStatus; database?: boolean }) =>
+      set(
+        data.database === false
+          ? { status: "offline" }
+          : data.user
+            ? { status: "user", user: data.user, telegram: data.telegram! }
+            : { status: "guest" },
+      ),
     )
     // Server/baza mavjud bo'lmasa — sayt baribir brauzer rejimida ishlaydi
     .catch(() => set({ status: "offline" }))
