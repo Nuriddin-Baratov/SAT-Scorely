@@ -43,3 +43,11 @@ next-env.d.ts
 
 # lokal ma'lumotlar bazasi (PGlite)
 /.data
+
+# Android ilova: yig'ish natijalari va imzo kaliti (maxfiy!)
+/android/build/
+/android/dist/
+/android/keystore/
+
+.vercel
+.env*
