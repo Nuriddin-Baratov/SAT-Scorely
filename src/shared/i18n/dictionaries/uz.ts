@@ -42,6 +42,7 @@ export const uz = {
     settings: "Sozlamalar",
     vocabulary: "Lug'at",
     practice: "Savollar banki",
+    practiceShort: "Mashq",
     mistakes: "Xatolar daftari",
     achievements: "Yutuqlar",
     groups: { learn: "O'rganish", practice: "Mashq", personal: "Shaxsiy" },

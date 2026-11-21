@@ -7,12 +7,15 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
 import android.util.Base64;
 import android.view.View;
+import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -60,17 +63,34 @@ public class MainActivity extends Activity {
         "if(a&&grab(a))e.preventDefault();},true);" +
         "window.print=function(){SATProApp.print(document.title||'SAT Pro');};" +
         "try{if(navigator.clipboard){navigator.clipboard.writeText=function(t){SATProApp.copy(String(t));return Promise.resolve();};}}catch(e){}" +
+        // Status bar va pastki panel rangi — sahifa mavzusi (yorug'/qorong'i) bo'yicha
+        "function bars(){try{var c=getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();" +
+        "if(c)SATProApp.setBars(c);}catch(e){}}" +
+        "bars();setTimeout(bars,300);" +
+        "new MutationObserver(bars).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme','style']});" +
+        "try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',bars);}catch(e){}" +
         "})();";
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        int bg = getResources().getColor(R.color.bg);
+        applyBars(bg);
         web = new WebView(this);
-        web.setBackgroundColor(0xFF0B0F1A);
+        web.setBackgroundColor(bg);
+        // Ilova hissi: chetdagi "rezina" effekti va aylantirish chiziqlari yo'q
+        web.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        web.setVerticalScrollBarEnabled(false);
+        web.setHorizontalScrollBarEnabled(false);
         setContentView(web);
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
+        // Barmoq bilan kattalashtirish o'chiq; telefondagi katta shrift sozlamasi sahifani buzmasin
+        s.setSupportZoom(false);
+        s.setBuiltInZoomControls(false);
+        s.setDisplayZoomControls(false);
+        s.setTextZoom(100);
         s.setDomStorageEnabled(true); // progress brauzer xotirasida (localStorage) saqlanadi
         s.setDatabaseEnabled(true);
         s.setMediaPlaybackRequiresUserGesture(false);
@@ -87,6 +107,21 @@ public class MainActivity extends Activity {
 
         if (state != null && web.restoreState(state) != null) return;
         web.loadUrl(startUrl(getIntent()));
+    }
+
+    /** Status bar va navigatsiya paneli: fon rangi + ikonkalar (yorug' fonda qorong'i) */
+    void applyBars(int color) {
+        Window w = getWindow();
+        w.setStatusBarColor(color);
+        w.setNavigationBarColor(color);
+        if (Build.VERSION.SDK_INT >= 23) {
+            double lum = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
+            int flags = w.getDecorView().getSystemUiVisibility();
+            int light = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) light |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            flags = lum > 0.6 ? (flags | light) : (flags & ~light);
+            w.getDecorView().setSystemUiVisibility(flags);
+        }
     }
 
     String startUrl(Intent intent) {
@@ -277,6 +312,23 @@ public class MainActivity extends Activity {
         public void copy(String text) {
             ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("SAT Pro", text));
+        }
+
+        @JavascriptInterface
+        public void setBars(final String css) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    try {
+                        String hex = css.trim();
+                        if (hex.length() == 4 && hex.startsWith("#")) { // #abc → #aabbcc
+                            hex = "#" + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2) + hex.charAt(3) + hex.charAt(3);
+                        }
+                        applyBars(Color.parseColor(hex));
+                    } catch (Exception ignored) {
+                        // rang hex bo'lmasa — joriy rang qoladi
+                    }
+                }
+            });
         }
 
         @JavascriptInterface

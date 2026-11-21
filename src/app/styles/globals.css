@@ -112,9 +112,22 @@
 
 html {
   scroll-behavior: smooth;
+  /* Bezak nurlari va lentalar ekrandan chiqsa ham sahifa yon tomonga surilmasin (telefon/ilova) */
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Grid ustunlari ichidagi uzun/`truncate` matn ustunni ekrandan kengaytirib yubormasin */
+:where(.grid) > * {
+  min-width: 0;
 }
 
 body {
+  overflow-x: clip;
+  /* Telefonda "rezina" tortilish va tegishdagi kulrang chaqnash bo'lmasin */
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans), system-ui, sans-serif;

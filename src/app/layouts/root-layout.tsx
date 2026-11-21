@@ -64,9 +64,12 @@ export function RootLayout({ children, locale }: Readonly<{ children: ReactNode;
           <JourneyGate toolbar={<><LocaleSwitcher /><ThemeToggle className="hidden sm:flex" /></>}>
           <div className="flex min-h-dvh flex-col lg:flex-row">
             <SiteSidebar />
-            <div className="flex min-w-0 flex-1 flex-col">
+            {/* Mobilda pastki navbar uchun joy; footer faqat katta ekranda (mobilda navbar bor) */}
+            <div className="flex min-w-0 flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
               {children}
-              <SiteFooter />
+              <div className="hidden lg:block">
+                <SiteFooter />
+              </div>
             </div>
           </div>
           </JourneyGate>

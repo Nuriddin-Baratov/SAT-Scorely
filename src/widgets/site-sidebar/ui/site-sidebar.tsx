@@ -180,6 +180,70 @@ function ProgressCard() {
   );
 }
 
+/** Mobil pastki navbar: eng kerakli bo'limlar + to'liq menyu. */
+function MobileTabBar({ menuOpen, onMenu }: { menuOpen: boolean; onMenu: () => void }) {
+  const { t, href } = useI18n();
+  const pathname = stripLocale(usePathname());
+  const today = useToday();
+  const mistakes = useMistakes();
+  const dueCount = today && mistakes ? dueMistakes(mistakes, today).length : 0;
+
+  const tabs: NavItem[] = [
+    { path: routes.dashboard, label: t.nav.dashboard, icon: "home" },
+    { path: routes.tests, label: t.nav.tests, icon: "pencil" },
+    { path: routes.practice, label: t.nav.practiceShort, icon: "database" },
+    { path: routes.leaderboard, label: t.nav.leaderboard, icon: "trophy" },
+  ];
+  const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
+  const anyActive = tabs.some((tab) => isActive(tab.path));
+
+  const itemCls = (active: boolean) =>
+    cn(
+      "relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-[11px] font-semibold transition active:scale-95",
+      active ? "text-accent" : "text-muted",
+    );
+  const iconWrap = (active: boolean) =>
+    cn("grid h-7 w-12 place-items-center rounded-full transition", active && "bg-accent-soft");
+
+  return (
+    <nav
+      aria-label={t.nav.mainMenu}
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/95 px-2 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur-xl lg:hidden"
+    >
+      <ul className="mx-auto flex max-w-lg">
+        {tabs.map((tab) => {
+          const active = isActive(tab.path);
+          return (
+            <li key={tab.path} className="flex min-w-0 flex-1">
+              <Link href={href(tab.path)} aria-current={active ? "page" : undefined} className={itemCls(active)}>
+                <span className={iconWrap(active)}>
+                  <Icon name={tab.icon} className="size-5" strokeWidth={active ? 2.2 : 1.8} />
+                </span>
+                <span className="max-w-full truncate">{tab.label}</span>
+              </Link>
+            </li>
+          );
+        })}
+        <li className="flex min-w-0 flex-1">
+          <button
+            type="button"
+            onClick={onMenu}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-sidebar"
+            className={itemCls(menuOpen || !anyActive)}
+          >
+            <span className={iconWrap(menuOpen || !anyActive)}>
+              <Icon name="list" className="size-5" strokeWidth={2} />
+            </span>
+            <span className="max-w-full truncate">{t.nav.menu}</span>
+            {dueCount > 0 && <span className="absolute top-1.5 right-[calc(50%-1.25rem)] size-2 rounded-full bg-warning" aria-hidden />}
+          </button>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
 export function SiteSidebar() {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -206,25 +270,15 @@ export function SiteSidebar() {
         </div>
       </aside>
 
-      {/* Mobil yuqori panel */}
-      <div className="sticky top-0 z-40 px-3 pt-3 lg:hidden">
-        <div className="flex h-14 items-center justify-between rounded-full border border-border/80 bg-surface/95 pr-2 pl-4 shadow-card">
+      {/* Mobil yuqori panel — menyu pastki navbarda */}
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/90 backdrop-blur-xl lg:hidden">
+        <div className="flex h-14 items-center justify-between px-4">
           <Logo />
-          <div className="flex items-center gap-1">
-            <LocaleSwitcher />
-            <button
-              type="button"
-              className="grid size-10 place-items-center rounded-full bg-surface-2"
-              aria-expanded={open}
-              aria-controls="mobile-sidebar"
-              aria-label={t.nav.menu}
-              onClick={() => setOpen(true)}
-            >
-              <Icon name="list" className="size-5" strokeWidth={2} />
-            </button>
-          </div>
+          <LocaleSwitcher />
         </div>
-      </div>
+      </header>
+
+      <MobileTabBar menuOpen={open} onMenu={() => setOpen(true)} />
 
       {/* Mobil drawer */}
       <div

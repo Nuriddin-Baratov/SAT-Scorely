@@ -44,6 +44,7 @@ export const en: Dictionary = {
     settings: "Settings",
     vocabulary: "Vocabulary",
     practice: "Question bank",
+    practiceShort: "Practice",
     mistakes: "Mistake notebook",
     achievements: "Achievements",
     groups: { learn: "Learn", practice: "Practice", personal: "Personal" },

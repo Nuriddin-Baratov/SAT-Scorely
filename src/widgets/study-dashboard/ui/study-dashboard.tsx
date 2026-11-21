@@ -100,10 +100,10 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
           <span />
         </div>
         <div className="bg-grid-dark pointer-events-none absolute inset-0" aria-hidden />
-        <div className="relative grid gap-10 p-7 sm:p-10 lg:grid-cols-[1.25fr_1fr] lg:items-center">
+        <div className="relative grid gap-8 p-5 sm:gap-10 sm:p-10 lg:grid-cols-[1.25fr_1fr] lg:items-center [&>*]:min-w-0">
           <div>
             <Eyebrow className="text-[#a99dff]">{d.eyebrow}</Eyebrow>
-            <h1 className="mt-4 text-5xl leading-none sm:text-6xl">
+            <h1 className="mt-4 text-4xl leading-none sm:text-6xl">
               {d.hello} <span className="text-gradient-light font-serif font-normal tracking-normal italic">{firstName(profile)}</span>
             </h1>
             <div className="mt-5 flex flex-wrap gap-2 text-xs">
@@ -112,18 +112,18 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
               <span className="glass rounded-full px-3 py-1.5">{d.weekN(thisWeek + 1)}</span>
             </div>
 
-            <div className="mt-9 flex items-end gap-5">
+            <div className="mt-8 flex items-end gap-3 sm:mt-9 sm:gap-5">
               <div>
                 <p className="text-xs text-white/50">{d.now}</p>
-                <p className="font-display text-6xl leading-none sm:text-7xl">{plan.baseline.total}</p>
+                <p className="font-display text-5xl leading-none sm:text-7xl">{plan.baseline.total}</p>
               </div>
-              <div className="mb-5 flex flex-1 items-center gap-2" aria-hidden>
+              <div className="mb-4 flex min-w-6 flex-1 items-center gap-2 sm:mb-5" aria-hidden>
                 <span className="h-px flex-1 bg-gradient-to-r from-white/10 to-[#a99dff]" />
                 <Icon name="arrowRight" className="size-4 text-[#a99dff]" />
               </div>
               <div className="text-right">
                 <p className="text-xs text-white/50">{d.target}</p>
-                <p className="text-gradient-light font-display text-6xl leading-none sm:text-7xl">{plan.target.total}</p>
+                <p className="text-gradient-light font-display text-5xl leading-none sm:text-7xl">{plan.target.total}</p>
               </div>
             </div>
             <div className="mt-7 grid gap-5 sm:grid-cols-2">
@@ -132,7 +132,7 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
             </div>
           </div>
 
-          <div className="glass rounded-[1.75rem] p-6">
+          <div className="glass rounded-[1.75rem] p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold">{d.progress}</p>
               <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", feas.cls)}>{feas.label}</span>
@@ -374,7 +374,7 @@ function NextSessionCard({ session, today, onOpen }: { session: PlanSession; tod
   const diff = daysBetween(parseISODate(today), parseISODate(session.date));
   const when = diff === 0 ? t.dashboard.today : diff === 1 ? d.tomorrow : diff < 0 ? d.missed(-diff) : formatDay(session.date, locale);
   return (
-    <div className="gradient-border relative overflow-hidden rounded-[2rem] bg-surface p-7 shadow-lift sm:p-9">
+    <div className="gradient-border relative overflow-hidden rounded-[2rem] bg-surface p-5 shadow-lift sm:p-9">
       <div className="glow pointer-events-none absolute inset-0 opacity-70" aria-hidden />
       <div className="relative grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
         <div>
@@ -385,7 +385,7 @@ function NextSessionCard({ session, today, onOpen }: { session: PlanSession; tod
               <p className={cn("text-sm font-medium", diff < 0 ? "text-warning" : "text-muted")}>{when}</p>
             </div>
           </div>
-          <h2 className="mt-5 text-4xl leading-tight sm:text-5xl">{session.title}</h2>
+          <h2 className="mt-5 text-3xl leading-tight break-words sm:text-5xl">{session.title}</h2>
           <p className="mt-2 text-muted">{session.subtitle}</p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Badge tone="accent" className="px-3 py-1">{sessionKindLabels(locale)[session.kind]}</Badge>

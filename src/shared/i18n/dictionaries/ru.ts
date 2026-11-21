@@ -44,6 +44,7 @@ export const ru: Dictionary = {
     settings: "Настройки",
     vocabulary: "Словарь",
     practice: "Банк вопросов",
+    practiceShort: "Практика",
     mistakes: "Тетрадь ошибок",
     achievements: "Достижения",
     groups: { learn: "Обучение", practice: "Практика", personal: "Личное" },

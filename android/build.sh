@@ -12,22 +12,20 @@ export JAVA_HOME="$TOOLS/jdk"
 export PATH="$JAVA_HOME/bin:$PATH"
 
 # Har bir yangi versiyada oshiring (telefon yangilanishni faqat kattaroq raqam bilan qabul qiladi)
-VERSION_CODE=1
-VERSION_NAME="1.0"
+VERSION_CODE=2
+VERSION_NAME="1.1"
 
 KEYSTORE=keystore/satpro-release.jks
 PROPS=keystore/keystore.properties
 
 rm -rf build && mkdir -p build/res build/gen build/classes build/dex dist
 
-# 1. Resurslar (+ saytdagi ikonka)
+# 1. Resurslar (ikonkalar: res/mipmap-* va Android 8+ uchun adaptive ikonka)
 cp -r res/. build/res/
-mkdir -p build/res/mipmap-xxxhdpi
-cp ../public/icon-192.png build/res/mipmap-xxxhdpi/ic_launcher.png
 "$BT/aapt2" compile --dir build/res -o build/res.zip
 "$BT/aapt2" link -o build/base.apk -I "$ANDROID_JAR" --manifest AndroidManifest.xml \
   --java build/gen --min-sdk-version 21 --target-sdk-version 34 \
-  --version-code "$VERSION_CODE" --version-name "$VERSION_NAME" build/res.zip
+  --version-code "$VERSION_CODE" --version-name "$VERSION_NAME" --replace-version build/res.zip
 
 # 2. Java kodi → DEX
 javac -encoding UTF-8 -nowarn -Xlint:-options -source 1.8 -target 1.8 -bootclasspath "$ANDROID_JAR" -d build/classes \
