@@ -189,10 +189,12 @@ public class MainActivity extends Activity {
         failedUrl = url;
         showingOffline = true;
         String html = "<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
-            "<style>body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:#0b0f1a;" +
-            "color:#e8ecf5;font-family:sans-serif;text-align:center;padding:24px;box-sizing:border-box}" +
-            "h1{font-size:22px;margin:0 0 8px}p{color:#9aa3b8;margin:0 0 24px;line-height:1.5}" +
-            "button{background:#f1cf8b;color:#0b0f1a;border:0;border-radius:999px;padding:14px 28px;font-size:16px;font-weight:600}</style>" +
+            "<style>:root{color-scheme:light dark}" +
+            "body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:#fff;" +
+            "color:#14141c;font-family:sans-serif;text-align:center;padding:24px;box-sizing:border-box}" +
+            "h1{font-size:22px;margin:0 0 8px}p{color:#6b6b78;margin:0 0 24px;line-height:1.5}" +
+            "button{background:#5b4cf5;color:#fff;border:0;border-radius:999px;padding:14px 28px;font-size:16px;font-weight:600}" +
+            "@media (prefers-color-scheme:dark){body{background:#101018;color:#ececf3}p{color:#9a9aab}button{background:#7a6bff}}</style>" +
             "</head><body><div><h1>Internet yo'q</h1>" +
             "<p>Internetga ulaning (Wi-Fi yoki mobil internet) va qayta urining.<br>Нет подключения к интернету.</p>" +
             "<button onclick='SATProApp.retry()'>Qayta urinish</button></div></body></html>";
