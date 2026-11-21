@@ -39,5 +39,5 @@ export const faq = [
   { q: "SAT'ni necha marta topshirish mumkin?", a: "Cheklov yo'q. Ko'pchilik talabalar 2–3 marta topshiradi. Ko'plab universitetlar “superscore” qiladi — turli sanalardagi eng yaxshi bo'lim ballarini birlashtiradi." },
   { q: "Natija qancha vaqt amal qiladi?", a: "College Board ballarni yillar davomida saqlaydi, lekin ko'pchilik universitetlar so'nggi 5 yil ichidagi natijalarni qabul qiladi. Har bir universitet talabini alohida tekshiring." },
   { q: "Xalqaro test sanalari qachon?", a: "Xalqaro SAT odatda yiliga 7 marta o'tkaziladi: mart, may, iyun, avgust, oktabr, noyabr va dekabr. Aniq sanalar va narxlarni har doim satsuite.collegeboard.org saytida tekshiring." },
-  { q: "Tayyorlanish uchun qancha vaqt kerak?", a: "Ko'pchilik uchun 8–16 hafta muntazam tayyorgarlik optimal. 100+ ball o'sish uchun odatda 40–80 soat sifatli mashq kerak bo'ladi. Scorely rejangizni aynan shu hisob bilan tuzadi." },
+  { q: "Tayyorlanish uchun qancha vaqt kerak?", a: "Ko'pchilik uchun 8–16 hafta muntazam tayyorgarlik optimal. 100+ ball o'sish uchun odatda 40–80 soat sifatli mashq kerak bo'ladi. SAT Pro rejangizni aynan shu hisob bilan tuzadi." },
 ];

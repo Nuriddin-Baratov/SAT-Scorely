@@ -2,15 +2,15 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Scorely — Digital SAT",
-    short_name: "Scorely",
+    name: "SAT Pro — Digital SAT",
+    short_name: "SAT Pro",
     description: "Digital SAT'ga shaxsiy tayyorgarlik: reja, testlar, xatolar daftari va lug'at.",
     start_url: "/",
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#f6f5f1",
-    theme_color: "#5b4cf5",
+    background_color: "#0b0f1a",
+    theme_color: "#0b0f1a",
     categories: ["education"],
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },

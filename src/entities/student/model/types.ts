@@ -23,6 +23,10 @@ export interface StudentProfile {
   studyDays: number[];
   sessionMinutes: number;
   goals: string;
+  /** Shahar (ixtiyoriy) */
+  city?: string;
+  /** Nima uchun SAT topshiryapti (ixtiyoriy) */
+  reason?: string;
   /** Reja shu kundan boshlab tuziladi (`YYYY-MM-DD`) */
   planStartDate: string;
   createdAt: string;

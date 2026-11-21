@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 
-import { practiceTests, summarizeAttempt, testLength, useTestAttempts, type PracticeTest } from "@/entities/practice-test";
+import {
+  FINAL_TEST_ID,
+  getPracticeTest,
+  practiceTests,
+  summarizeAttempt,
+  testLength,
+  useCertificates,
+  useTestAttempts,
+  type PracticeTest,
+} from "@/entities/practice-test";
 import { routes } from "@/shared/config";
 import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
@@ -15,6 +24,68 @@ const kindStyle: Record<PracticeTest["kind"], { icon: IconName; tone: "accent" |
   math: { icon: "calculator", tone: "gold" },
   mixed: { icon: "bolt", tone: "success" },
 };
+
+/** Umumiy yakuniy test: o'tilsa sertifikat beriladi. */
+function FinalExamCard() {
+  const { t, href } = useI18n();
+  const f = t.final;
+  const attempts = useTestAttempts();
+  const certificates = useCertificates();
+  const test = getPracticeTest(FINAL_TEST_ID)!;
+  const own = attempts?.filter((a) => a.testId === test.id) ?? [];
+  const best = own.length ? Math.max(...own.map((a) => Math.round(summarizeAttempt(test, a).accuracy * 100))) : null;
+  const cert = certificates?.[0];
+
+  return (
+    <div className="relative mt-12 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#f9e3a3] via-[#f5b83d] to-[#9a7cf7] p-[1.5px] shadow-[0_30px_70px_-30px_#f5b83d]">
+      <div className="relative overflow-hidden rounded-[calc(2rem-1.5px)] bg-[#0b0f1a] p-7 text-white sm:p-9">
+        <span className="pointer-events-none absolute -top-24 -right-20 size-80 rounded-full bg-[#f5b83d]/20 blur-3xl" aria-hidden />
+        <span className="pointer-events-none absolute -bottom-28 left-1/4 size-80 rounded-full bg-[#4a63ec]/25 blur-3xl" aria-hidden />
+        <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f5b83d]/15 px-3 py-1 text-xs font-bold text-[#f3d27a]">
+                <Icon name="medal" className="size-3.5" /> {f.badge}
+              </span>
+            </div>
+            <h2 className="mt-4 text-3xl font-bold sm:text-4xl">{f.title}</h2>
+            <p className="mt-2 max-w-2xl text-white/65">{f.text}</p>
+            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/70">
+              <span className="flex items-center gap-1.5">
+                <Icon name="list" className="size-4 text-[#f3d27a]" /> {testLength(test)} {t.common.questions}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Icon name="clock" className="size-4 text-[#f3d27a]" /> {test.minutes} {t.common.min}
+              </span>
+              {best !== null && (
+                <span className="flex items-center gap-1.5">
+                  <Icon name="trophy" className="size-4 text-[#f3d27a]" /> {f.best(best)}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch">
+            <Link
+              href={href(routes.test(test.id))}
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#f9e3a3] via-[#f5b83d] to-[#e0b04a] px-7 font-bold text-[#2b1d03] shadow-[0_12px_30px_-10px_#f5b83d] transition hover:brightness-105"
+            >
+              {own.length ? f.retry : f.start} <Icon name="arrowRight" className="size-4" />
+            </Link>
+            {cert && (
+              <Link
+                href={href(routes.certificate(cert.id))}
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white/10 px-6 text-sm font-semibold ring-1 ring-white/20 transition hover:bg-white/15"
+              >
+                <Icon name="check" className="size-4 text-emerald-300" /> {f.viewCertificate}
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function TestsPage() {
   const { t, locale, href } = useI18n();
@@ -31,9 +102,11 @@ export function TestsPage() {
           </ButtonLink>
         </div>
 
+        <FinalExamCard />
+
         <Link
           href={href(routes.simulator)}
-          className="noise group relative mt-12 block overflow-hidden rounded-[2rem] bg-ink p-7 text-white shadow-lift sm:p-9"
+          className="noise group relative mt-6 block overflow-hidden rounded-[2rem] bg-ink p-7 text-white shadow-lift sm:p-9"
         >
           <div className="aurora opacity-70" aria-hidden>
             <span />
@@ -55,7 +128,7 @@ export function TestsPage() {
         </Link>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {practiceTests.filter((test) => !test.simulation).map((test) => {
+          {practiceTests.filter((test) => !test.simulation && !test.final).map((test) => {
             const own = attempts?.filter((a) => a.testId === test.id) ?? [];
             const scores = own.map((a) => Math.round(summarizeAttempt(test, a).accuracy * 100));
             const last = scores[0];

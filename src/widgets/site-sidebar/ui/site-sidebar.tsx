@@ -16,6 +16,7 @@ import { useToday } from "@/shared/lib/react";
 import { ButtonLink } from "@/shared/ui/button";
 import { Icon, type IconName } from "@/shared/ui/icon";
 import { Logo } from "@/shared/ui/logo";
+import { NavProgress } from "@/shared/ui/nav-progress";
 
 interface NavItem {
   path: string;
@@ -50,11 +51,8 @@ function useNavGroups() {
     {
       title: t.nav.groups.personal,
       items: [
-        { path: routes.dashboard, label: t.nav.dashboard, icon: "target" },
-        { path: routes.achievements, label: t.nav.achievements, icon: "medal" },
         { path: routes.leaderboard, label: t.nav.leaderboard, icon: "trophy" },
         ...(isTeacher ? [{ path: routes.teacher, label: t.nav.teacher, icon: "chart" as const }] : []),
-        { path: routes.onboarding, label: t.nav.plan, icon: "sparkles" },
         { path: routes.settings, label: t.nav.settings, icon: "sun" },
       ],
     },
@@ -79,7 +77,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <Logo />
       </div>
 
-      <ProgressCard onNavigate={onNavigate} />
+      <ProgressCard />
 
       <nav className="-mx-1 flex-1 space-y-6 overflow-y-auto px-1" aria-label={t.nav.mainMenu}>
         {groups.map((group) => (
@@ -101,6 +99,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     >
                       <Icon name={item.icon} className={cn("size-[18px] shrink-0", active ? "text-accent" : "text-muted group-hover:text-fg")} />
                       <span className="truncate">{item.label}</span>
+                      <NavProgress />
                       {item.path === routes.mistakes && dueCount > 0 ? (
                         <span className="ml-auto rounded-full bg-warning px-1.5 py-px text-[11px] font-bold text-white tabular-nums">{dueCount}</span>
                       ) : (
@@ -135,14 +134,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             </span>
             <Icon name="arrowRight" className="ml-auto size-4 shrink-0 text-muted" />
           </Link>
-        ) : session.status === "guest" ? (
-          <ButtonLink href={href(routes.login)} onClick={onNavigate} className="w-full">
-            {t.auth.login} <Icon name="arrowRight" className="size-4" />
-          </ButtonLink>
         ) : (
-          <ButtonLink href={href(routes.onboarding)} onClick={onNavigate} className="w-full">
-            {t.nav.start} <Icon name="arrowRight" className="size-4" />
-          </ButtonLink>
+          session.status === "guest" && (
+            <ButtonLink href={href(routes.login)} onClick={onNavigate} className="w-full">
+              {t.auth.login} <Icon name="arrowRight" className="size-4" />
+            </ButtonLink>
+          )
         )}
       </div>
     </div>
@@ -150,8 +147,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 /** Daraja, XP va seriya — sidebar tepasida. */
-function ProgressCard({ onNavigate }: { onNavigate?: () => void }) {
-  const { t, href } = useI18n();
+function ProgressCard() {
+  const { t } = useI18n();
   const game = useGameState();
   const today = useToday();
   if (!game || !today) return <div className="mb-5 h-[76px] animate-pulse rounded-2xl bg-surface-2" />;
@@ -161,11 +158,7 @@ function ProgressCard({ onNavigate }: { onNavigate?: () => void }) {
   const activeToday = game.activeDays.includes(today);
 
   return (
-    <Link
-      href={href(routes.achievements)}
-      onClick={onNavigate}
-      className="mb-5 block rounded-2xl bg-gradient-to-br from-accent-soft to-surface-2/60 p-3.5 ring-1 ring-accent/10 transition hover:ring-accent/30"
-    >
+    <div className="mb-5 rounded-2xl bg-gradient-to-br from-accent-soft to-surface-2/60 p-3.5 ring-1 ring-accent/10">
       <div className="flex items-center justify-between gap-2 text-xs">
         <span className="font-semibold text-accent">
           {t.game.level} {level.index + 1} · {t.game.levels[level.index]}
@@ -183,7 +176,7 @@ function ProgressCard({ onNavigate }: { onNavigate?: () => void }) {
       <p className="mt-1.5 text-[11px] text-muted tabular-nums">
         {game.xp} XP{level.next !== null && ` / ${level.next}`}
       </p>
-    </Link>
+    </div>
   );
 }
 

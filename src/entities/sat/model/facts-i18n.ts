@@ -48,7 +48,7 @@ const ru: FactsText = {
     { q: "Сколько раз можно сдавать SAT?", a: "Ограничений нет. Большинство сдаёт 2–3 раза. Многие университеты делают «superscore» — объединяют лучшие баллы по разделам из разных дат." },
     { q: "Сколько действует результат?", a: "College Board хранит баллы годами, но большинство университетов принимает результаты за последние 5 лет. Требования каждого вуза проверяйте отдельно." },
     { q: "Когда международные даты экзамена?", a: "Международный SAT обычно проводится 7 раз в год: в марте, мае, июне, августе, октябре, ноябре и декабре. Точные даты и цены всегда проверяйте на satsuite.collegeboard.org." },
-    { q: "Сколько времени нужно на подготовку?", a: "Для большинства оптимальны 8–16 недель регулярной подготовки. Для роста на 100+ баллов обычно нужно 40–80 часов качественной практики. Scorely строит ваш план именно с этим расчётом." },
+    { q: "Сколько времени нужно на подготовку?", a: "Для большинства оптимальны 8–16 недель регулярной подготовки. Для роста на 100+ баллов обычно нужно 40–80 часов качественной практики. SAT Pro строит ваш план именно с этим расчётом." },
   ],
 };
 
@@ -90,7 +90,7 @@ const en: FactsText = {
     { q: "How many times can I take the SAT?", a: "There's no limit. Most students take it 2–3 times. Many universities “superscore” — combining your best section scores from different dates." },
     { q: "How long are scores valid?", a: "The College Board keeps scores for years, but most universities accept results from the last 5 years. Check each university's requirements." },
     { q: "When are the international test dates?", a: "The international SAT is usually offered 7 times a year: March, May, June, August, October, November and December. Always confirm exact dates and fees at satsuite.collegeboard.org." },
-    { q: "How long should I prepare?", a: "For most students, 8–16 weeks of steady prep is ideal. Gaining 100+ points usually takes 40–80 hours of quality practice. Scorely builds your plan around exactly that." },
+    { q: "How long should I prepare?", a: "For most students, 8–16 weeks of steady prep is ideal. Gaining 100+ points usually takes 40–80 hours of quality practice. SAT Pro builds your plan around exactly that." },
   ],
 };
 

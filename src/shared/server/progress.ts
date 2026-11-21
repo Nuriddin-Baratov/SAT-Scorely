@@ -69,10 +69,11 @@ function shortName(full: string) {
  */
 export async function leaderboard(scope: "week" | "all", weekStart: string, classId?: string, limit = 50): Promise<LeaderRow[]> {
   const rows = await query<{ id: string; name: string; xp: number; streak: number; base: number | null }>(
-    `select u.id, u.name, d.xp, d.streak,
+    // left join: yangi ro'yxatdan o'tgan (hali progress sinxronlanmagan) o'quvchilar ham 0 XP bilan ko'rinadi
+    `select u.id, u.name, coalesce(d.xp, 0) as xp, coalesce(d.streak, 0) as streak,
        (select x.xp from xp_daily x where x.user_id = u.id and x.day < $1 order by x.day desc limit 1) as base
-     from users u join user_data d on d.user_id = u.id
-     where u.public_profile = true
+     from users u left join user_data d on d.user_id = u.id
+     where u.public_profile = true and u.role = 'student'
        ${classId ? "and exists (select 1 from class_members m where m.class_id = $2 and m.user_id = u.id)" : ""}`,
     classId ? [weekStart, classId] : [weekStart],
   );

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { TEST_PAGE_IDS } from "@/entities/practice-test/model/test-ids";
 import { LOCALE_COOKIE, defaultLocale, hasLocale, type Locale } from "@/shared/i18n/config";
 
 /** Cookie → Accept-Language → standart til */
@@ -19,11 +20,49 @@ function detectLocale(request: NextRequest): Locale {
   return (preferred.find((p) => hasLocale(p.lang))?.lang as Locale | undefined) ?? defaultLocale;
 }
 
+/** `app/[lang]/` ichidagi sahifalar (birinchi segment). Yangi sahifa qo'shilsa — shu yerga ham. */
+const PAGES = new Set([
+  "",
+  "achievements",
+  "calculator",
+  "certificate",
+  "dashboard",
+  "leaderboard",
+  "login",
+  "mistakes",
+  "onboarding",
+  "plan",
+  "practice",
+  "quiz",
+  "results",
+  "sat",
+  "settings",
+  "simulator",
+  "teacher",
+  "tests",
+  "vocabulary",
+]);
+
+/** `/<til>/...` dan keyingi qism mavjud sahifami */
+function isKnownPage(rest: string[]) {
+  const [page = "", id, ...extra] = rest;
+  if (extra.length || !PAGES.has(page)) return false;
+  if (id === undefined) return true;
+  return page === "tests" && TEST_PAGE_IDS.includes(id);
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const first = pathname.split("/")[1];
+  const [, first, ...rest] = pathname.split("/");
 
   if (hasLocale(first)) {
+    // Noma'lum manzil — Cache Components bilan sahifa ichidagi notFound() oqim boshlangach ishlaydi
+    // va status 200 bo'lib qoladi. Shuning uchun tekshiruv shu yerda: tilga mos 404 sahifasi, status 404.
+    if (!isKnownPage(rest.filter(Boolean))) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/${first}/_not-found-page`;
+      return NextResponse.rewrite(url, { status: 404 });
+    }
     // Tanlangan tilni eslab qolamiz — keyingi prefikssiz havolalar shu tilga yo'naltiriladi.
     const response = NextResponse.next();
     if (request.cookies.get(LOCALE_COOKIE)?.value !== first) {

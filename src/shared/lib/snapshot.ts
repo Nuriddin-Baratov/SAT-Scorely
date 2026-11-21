@@ -1,4 +1,4 @@
-/** Brauzerda saqlangan barcha Scorely ma'lumotlari (localStorage) uchun yordamchilar. */
+/** Brauzerda saqlangan barcha SAT Pro ma'lumotlari (localStorage) uchun yordamchilar. */
 export const STORAGE_PREFIX = "scorely.";
 
 /** Qurilmaga xos sozlamalar — eksport/sinxronizatsiyaga kirmaydi */
@@ -43,7 +43,7 @@ export function applySnapshot(snapshot: Snapshot): number {
 }
 
 /**
- * Shu qurilmadagi barcha Scorely ma'lumotlarini o'chiradi (mavzu sozlamasidan tashqari).
+ * Shu qurilmadagi barcha SAT Pro ma'lumotlarini o'chiradi (mavzu sozlamasidan tashqari).
  * Sinxronizatsiya belgisi ham o'chiriladi — aks holda bo'sh holat bulutga yozilib,
  * bulutdagi progress ham yo'qolardi. Endi keyingi ochilishda bulutdan tiklash taklif qilinadi.
  */

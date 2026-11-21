@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import {
   domainDescription,
@@ -10,15 +10,56 @@ import {
 } from "@/entities/sat";
 import { routes } from "@/shared/config";
 import { getDictionary, localizePath, type Locale } from "@/shared/i18n";
-import { ButtonLink } from "@/shared/ui/button";
-import { Icon } from "@/shared/ui/icon";
-import { Badge, Card, Container, Eyebrow } from "@/shared/ui/primitives";
+import { cn } from "@/shared/lib";
+import { Icon, type IconName } from "@/shared/ui/icon";
+import { Particles } from "@/shared/ui/premium";
 
-function H2({ id, eyebrow, children }: { id: string; eyebrow: string; children: ReactNode }) {
+import { Checklist, ReadingBar, SampleQuestion, ScoreExplorer, Spotlight, TocSpy } from "./guide-interactive";
+
+/** Bo'lim sarlavhasi: raqamli belgi + eyebrow + katta sarlavha (scroll bilan paydo bo'ladi). */
+function H2({ id, n, eyebrow, children }: { id: string; n: number; eyebrow: string; children: ReactNode }) {
   return (
-    <div id={id} className="scroll-mt-24 lg:scroll-mt-6">
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-3 text-4xl leading-tight sm:text-5xl">{children}</h2>
+    <div id={id} className="reveal flex scroll-mt-24 items-start gap-4 lg:scroll-mt-6">
+      <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent to-[#2a1f9e] font-display text-lg font-bold text-white shadow-[0_10px_30px_-10px_var(--accent)]">
+        {String(n).padStart(2, "0")}
+      </span>
+      <div>
+        <p className="text-xs font-semibold tracking-[0.2em] text-accent uppercase">{eyebrow.replace(/^\d+\s*·\s*/, "")}</p>
+        <h2 className="mt-1.5 text-3xl leading-tight font-bold sm:text-4xl">{children}</h2>
+      </div>
+    </div>
+  );
+}
+
+const overviewIcons: IconName[] = ["clock", "list", "trophy"];
+const sectionTheme = {
+  rw: { text: "text-accent", soft: "bg-accent-soft", ring: "#8b7dff", from: "from-accent/20", icon: "book" as IconName },
+  math: { text: "text-gold", soft: "bg-gold-soft", ring: "#f5c76b", from: "from-gold/20", icon: "calculator" as IconName },
+};
+
+/** Domenning imtihondagi ulushi — kichik donut */
+function Donut({ value, color }: { value: number; color: string }) {
+  const r = 16;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="relative size-14 shrink-0">
+      <svg viewBox="0 0 40 40" className="size-full -rotate-90" aria-hidden>
+        <circle cx="20" cy="20" r={r} fill="none" stroke="var(--surface-2)" strokeWidth="5" />
+        <circle
+          cx="20"
+          cy="20"
+          r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - value / 100)}
+          className="ring-draw"
+          style={{ "--c": c } as CSSProperties}
+        />
+      </svg>
+      <span className="absolute inset-0 grid place-items-center text-xs font-bold tabular-nums">{value}%</span>
     </div>
   );
 }
@@ -27,6 +68,20 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   const g = t.guide;
   const facts = getSatFacts(locale);
+  const flow = t.home.structure.flow;
+  const [rw, math] = sections;
+  const timeline = [
+    { label: `R&W · 1`, min: rw.modules.minutes, cls: "from-[#8b7dff] to-[#5b4cf5]" },
+    { label: `R&W · 2`, min: rw.modules.minutes, cls: "from-[#a99dff] to-[#8b7dff]" },
+    { label: "☕", min: 10, cls: "from-white/25 to-white/10" },
+    { label: `Math · 1`, min: math.modules.minutes, cls: "from-[#ffe3a3] to-[#f5c76b]" },
+    { label: `Math · 2`, min: math.modules.minutes, cls: "from-[#f5c76b] to-amber-500" },
+  ];
+  const totalMin = timeline.reduce((s, x) => s + x.min, 0);
+  // Yuguruvchi lenta: barcha SAT ko'nikmalari (bo'lim rangi bilan)
+  const skills = sections.flatMap((s) =>
+    getDomainsBySection(s.id).flatMap((d) => d.skills.map((sk) => ({ name: sk.name, section: s.id }))),
+  );
 
   const toc = [
     { id: "overview", label: g.toc.overview },
@@ -40,152 +95,290 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
     { id: "strategies", label: g.toc.strategies },
     { id: "faq", label: g.toc.faq },
   ];
+  const num = (id: string) => toc.findIndex((x) => x.id === id) + 1;
 
   return (
     <main className="flex-1">
+      <ReadingBar />
+      <Spotlight />
+      {/* ================= HERO ================= */}
       <section className="px-3 pt-3">
-        <div className="noise relative overflow-hidden rounded-[2.25rem] bg-ink text-white">
-          <div className="aurora" aria-hidden>
-            <span />
-            <span />
-            <span />
+        <div className="relative overflow-hidden rounded-[2.25rem] bg-[#0b0f1a] text-white">
+          <Particles />
+          <div className="bg-grid-dark pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+          <div className="relative mx-auto grid max-w-6xl gap-12 px-6 pt-14 pb-16 sm:px-10 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:pt-20 lg:pb-20">
+            <div className="pro-in">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3.5 py-1.5 text-xs font-medium text-white/85 ring-1 ring-white/10">
+                <Icon name="book" className="size-3.5 text-[#f5c76b]" /> {g.badge}
+              </span>
+              <h1 className="mt-6 text-5xl leading-[0.98] font-bold sm:text-6xl lg:text-7xl">
+                {g.titleA}{" "}
+                <span className="pro-gradient-text font-serif text-[1.1em] font-normal tracking-normal italic">{g.titleAccent}</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-lg text-white/65">{g.subtitle}</p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href={localizePath(locale, routes.onboarding)} className="pro-btn">
+                  {t.home.heroCta} <Icon name="arrowRight" className="size-4" />
+                </a>
+                <a
+                  href="#structure"
+                  className="inline-flex h-[3.25rem] items-center gap-2 rounded-full px-6 font-semibold text-white/80 ring-1 ring-white/15 transition hover:bg-white/5 hover:text-white"
+                >
+                  {g.toc.structure} <Icon name="chevronDown" className="size-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Imtihon vaqt chizig'i (atrofida suzuvchi chiplar) */}
+            <div className="relative">
+              <span className="animate-float absolute -top-5 -left-4 z-10 hidden rounded-2xl bg-white px-3 py-2 text-xs font-bold text-[#0b0f1a] shadow-lift lg:block">
+                🎯 400 – 1600
+              </span>
+              <span className="animate-float absolute -right-3 -bottom-5 z-10 hidden rounded-2xl bg-gradient-to-r from-[#f5c76b] to-[#ffe3a3] px-3 py-2 text-xs font-bold text-[#0b0f1a] shadow-lift [animation-delay:-3s] lg:block">
+                ⚡ {t.adaptive.badge} · Bluebook
+              </span>
+            <div className="pro-card pro-in p-6 [animation-delay:150ms] sm:p-7">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold">{g.structure.title}</span>
+                <span className="font-display font-bold text-[#f5c76b] tabular-nums">{totalMin} {t.common.min}</span>
+              </div>
+              <div className="meter-run mt-5 flex h-14 gap-1.5">
+                {timeline.map((seg, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      "meter-fill relative grid basis-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-b text-[10px] font-bold text-[#0b0f1a]",
+                      seg.cls,
+                    )}
+                    style={{ flexGrow: seg.min, "--d": `${300 + i * 140}ms` } as CSSProperties}
+                    title={`${seg.label} · ${seg.min} ${t.common.min}`}
+                  >
+                    <span className="hidden truncate px-1 sm:block">{seg.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                {g.heroStats.map(([v, l], i) => (
+                  <div key={l} className="rounded-2xl bg-white/[0.04] px-4 py-3 ring-1 ring-white/10 pro-in" style={{ animationDelay: `${400 + i * 90}ms` }}>
+                    <p className="font-display text-xl font-bold text-[#ffe3a3]">{v}</p>
+                    <p className="text-xs text-white/50">{l}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            </div>
           </div>
-          <div className="bg-grid-dark pointer-events-none absolute inset-0" aria-hidden />
-          <Container className="relative pt-16 pb-20 sm:pb-24 lg:pt-24">
-            <span className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85">
-              <Icon name="book" className="size-3.5 text-[#f1cf8b]" /> {g.badge}
-            </span>
-            <h1 className="mt-7 max-w-4xl text-5xl leading-[0.98] sm:text-7xl">
-              {g.titleA}{" "}
-              <span className="text-gradient-light font-serif text-[1.1em] font-normal tracking-normal italic">{g.titleAccent}</span>
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg text-white/65">{g.subtitle}</p>
-            <div className="mt-10 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
-              {g.heroStats.map(([v, l]) => (
-                <div key={l} className="glass rounded-2xl px-4 py-3">
-                  <p className="font-display text-xl">{v}</p>
-                  <p className="text-xs text-white/50">{l}</p>
-                </div>
+
+          {/* Yuguruvchi lenta: barcha ko'nikmalar */}
+          <div className="relative overflow-hidden border-t border-white/10 py-4 [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
+            <div className="animate-marquee flex w-max gap-3 hover:[animation-play-state:paused]">
+              {[...skills, ...skills].map((sk, i) => (
+                <span
+                  key={i}
+                  aria-hidden={i >= skills.length}
+                  className="flex shrink-0 items-center gap-2 rounded-full bg-white/[0.05] px-4 py-1.5 text-sm text-white/70 ring-1 ring-white/10"
+                >
+                  <span className={cn("size-1.5 rounded-full", sk.section === "rw" ? "bg-[#a99dff]" : "bg-[#f5c76b]")} />
+                  {sk.name}
+                </span>
               ))}
             </div>
-          </Container>
+          </div>
         </div>
       </section>
 
-      <Container className="grid gap-14 py-16 lg:grid-cols-[220px_1fr]">
-        <nav aria-label={g.tocLabel} className="hidden lg:block">
-          <ul className="sticky top-6 space-y-1 border-l border-border text-sm">
-            {toc.map((item) => (
-              <li key={item.id}>
-                <a href={`#${item.id}`} className="-ml-px block border-l-2 border-transparent py-2 pl-4 text-muted transition hover:border-accent hover:text-fg">
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[250px_1fr] lg:py-20">
+        <aside className="hidden lg:block">
+          <TocSpy items={toc} label={g.tocLabel} progressLabel={g.readProgress} />
+        </aside>
 
         <article className="min-w-0 space-y-24">
-          {/* Umumiy */}
-          <section className="space-y-6">
-            <H2 id="overview" eyebrow={g.overview.eyebrow}>{g.overview.title}</H2>
+          {/* Mobil mundarija */}
+          <nav aria-label={g.tocLabel} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:hidden">
+            {toc.map((item, i) => (
+              <a key={item.id} href={`#${item.id}`} className="shrink-0 rounded-full bg-surface-2 px-3.5 py-2 text-sm font-medium text-muted hover:text-fg">
+                <span className="mr-1.5 text-xs text-accent tabular-nums">{i + 1}</span>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          {/* ================= Umumiy ================= */}
+          <section className="space-y-8">
+            <H2 id="overview" n={num("overview")} eyebrow={g.overview.eyebrow}>{g.overview.title}</H2>
             <div className="space-y-4 text-lg leading-relaxed text-muted">
               {g.overview.paragraphs.map((p) => (
                 <p key={p}>{p}</p>
               ))}
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
-              {g.overview.cards.map(([a, b]) => (
-                <Card key={a} className="p-6">
-                  <p className="text-xl font-semibold tracking-tight">{a}</p>
-                  <p className="mt-1 text-sm text-muted">{b}</p>
-                </Card>
+              {g.overview.cards.map(([a, b], i) => (
+                <div
+                  key={a}
+                  className="spot reveal group relative overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-lift"
+                >
+                  <div className="pointer-events-none absolute -top-10 -right-10 size-32 rounded-full bg-accent/10 blur-2xl transition group-hover:bg-accent/25" aria-hidden />
+                  <span className="relative grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-accent-soft to-gold-soft text-accent">
+                    <Icon name={overviewIcons[i] ?? "star"} className="size-5" />
+                  </span>
+                  <p className="relative mt-5 text-xl font-bold tracking-tight">{a}</p>
+                  <p className="relative mt-1 text-sm text-muted">{b}</p>
+                </div>
               ))}
             </div>
           </section>
 
-          {/* Tuzilma */}
-          <section className="space-y-6">
-            <H2 id="structure" eyebrow={g.structure.eyebrow}>{g.structure.title}</H2>
-            <Card className="overflow-x-auto p-0">
-              <table className="w-full min-w-[560px] text-left text-sm">
-                <thead className="border-b border-border text-xs tracking-wider text-muted uppercase">
-                  <tr>
-                    {g.structure.columns.map((c) => (
-                      <th key={c} className="px-6 py-4 font-medium">{c}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {sections.map((s) => (
-                    <tr key={s.id}>
-                      <td className="px-6 py-4 font-medium">{s.name}</td>
-                      <td className="px-6 py-4 text-muted">2 × {s.modules.minutes} {t.common.min}</td>
-                      <td className="px-6 py-4 text-muted">{s.questions} (2 × {s.modules.questions})</td>
-                      <td className="px-6 py-4 text-muted">{s.minutes} {t.common.min}</td>
-                      <td className="px-6 py-4 text-muted">≈{Math.round((s.minutes * 60) / s.questions)} {g.structure.seconds}</td>
-                    </tr>
-                  ))}
-                  <tr className="bg-surface-2/50">
-                    <td className="px-6 py-4 font-medium">{g.structure.total}</td>
-                    <td className="px-6 py-4 text-muted">{g.structure.fourModules}</td>
-                    <td className="px-6 py-4 text-muted">98</td>
-                    <td className="px-6 py-4 text-muted">{g.structure.totalTime}</td>
-                    <td className="px-6 py-4 text-muted">—</td>
-                  </tr>
-                </tbody>
-              </table>
-            </Card>
-            <p className="text-sm text-muted">{g.structure.pretest}</p>
-          </section>
+          {/* ================= Savolni sinab ko'rish ================= */}
+          <SampleQuestion />
 
-          {/* Adaptiv */}
-          <section className="space-y-6">
-            <H2 id="adaptive" eyebrow={g.adaptive.eyebrow}>{g.adaptive.title}</H2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <Card className="p-6">
-                <p className="text-sm font-semibold text-accent">{t.home.structure.flow.m1}</p>
-                <p className="mt-2 text-sm text-muted">{g.adaptive.m1}</p>
-              </Card>
-              <Card className="flex flex-col justify-center p-6 text-center">
-                <p className="text-3xl">⟶</p>
-                <p className="mt-2 text-sm text-muted">{g.adaptive.algo}</p>
-              </Card>
-              <Card className="p-6">
-                <p className="text-sm font-semibold text-gold">{t.adaptive.module2}</p>
-                <p className="mt-2 text-sm text-muted">{g.adaptive.m2}</p>
-              </Card>
+          {/* ================= Tuzilma ================= */}
+          <section className="space-y-8">
+            <H2 id="structure" n={num("structure")} eyebrow={g.structure.eyebrow}>{g.structure.title}</H2>
+            <div className="grid items-stretch gap-4 md:grid-cols-[1fr_auto_1fr]">
+              {sections.map((s, idx) => {
+                const th = sectionTheme[s.id];
+                const card = (
+                  <div key={s.id} className={cn("reveal relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br to-surface p-6", th.from)}>
+                    <div className="flex items-center gap-3">
+                      <span className={cn("grid size-10 place-items-center rounded-xl", th.soft, th.text)}>
+                        <Icon name={th.icon} className="size-5" />
+                      </span>
+                      <p className="text-lg font-bold">{s.name}</p>
+                    </div>
+                    <div className="mt-5 grid grid-cols-2 gap-2">
+                      {[1, 2].map((m) => (
+                        <div key={m} className="rounded-2xl bg-surface/80 p-3.5 ring-1 ring-border">
+                          <p className={cn("text-xs font-bold", th.text)}>{m === 1 ? t.adaptive.module1 : t.adaptive.module2}</p>
+                          <p className="mt-1 font-display text-2xl font-bold tabular-nums">{s.modules.questions}</p>
+                          <p className="text-xs text-muted">
+                            {t.common.questions} · {s.modules.minutes} {t.common.min}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted">
+                      <span>
+                        <strong className="text-fg tabular-nums">{s.questions}</strong> {t.common.questions}
+                      </span>
+                      <span>
+                        <strong className="text-fg tabular-nums">{s.minutes}</strong> {t.common.min}
+                      </span>
+                      <span>
+                        ≈<strong className="text-fg tabular-nums">{Math.round((s.minutes * 60) / s.questions)}</strong> {g.structure.seconds}
+                      </span>
+                    </div>
+                  </div>
+                );
+                return idx === 0 ? (
+                  [
+                    card,
+                    <div key="break" className="flex items-center justify-center">
+                      <span className="rounded-full border border-dashed border-border bg-surface-2 px-4 py-2 text-xs font-semibold text-muted md:[writing-mode:vertical-rl] md:py-4">
+                        ☕ {g.breakLabel}
+                      </span>
+                    </div>,
+                  ]
+                ) : (
+                  card
+                );
+              })}
             </div>
-            <p className="leading-relaxed text-muted">{g.adaptive.takeaway}</p>
+            <div className="reveal flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-ink p-5 text-white sm:px-7">
+              <p className="font-semibold">{g.structure.total}</p>
+              <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-white/70">
+                <span>{g.structure.fourModules}</span>
+                <span>
+                  <strong className="text-white">98</strong> {t.common.questions}
+                </span>
+                <span>{g.structure.totalTime}</span>
+              </div>
+            </div>
+            <p className="flex gap-3 rounded-2xl bg-accent-soft/60 p-4 text-sm text-muted">
+              <Icon name="sparkles" className="mt-0.5 size-4 shrink-0 text-accent" /> {g.structure.pretest}
+            </p>
           </section>
 
-          {/* Bo'limlar */}
-          {sections.map((raw, i) => {
+          {/* ================= Adaptiv ================= */}
+          <section className="space-y-8">
+            <H2 id="adaptive" n={num("adaptive")} eyebrow={g.adaptive.eyebrow}>{g.adaptive.title}</H2>
+            <div className="reveal relative overflow-hidden rounded-[2rem] bg-[#0b0f1a] p-6 text-white sm:p-8">
+              <Particles />
+              <div className="relative grid items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
+                <div className="rounded-2xl bg-white/[0.05] p-5 ring-1 ring-white/10">
+                  <p className="text-sm font-bold text-[#a99dff]">{flow.m1}</p>
+                  <p className="text-xs text-white/50">{flow.m1Sub}</p>
+                  <p className="mt-3 text-sm text-white/70">{g.adaptive.m1}</p>
+                </div>
+
+                {/* Algoritm tuguni */}
+                <div className="flex flex-col items-center gap-2 py-2 text-center">
+                  <span className="relative grid size-16 place-items-center rounded-full bg-gradient-to-br from-[#f5c76b] to-[#5b8cff] text-[#0b0f1a] shadow-[0_0_30px_rgb(245_199_107/0.5)]">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-[#f5c76b]/30" aria-hidden />
+                    <Icon name="brain" className="relative size-7" />
+                  </span>
+                  <p className="text-sm font-bold">{flow.algo}</p>
+                  <p className="max-w-40 text-xs text-white/50">{g.adaptive.algo}</p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="rounded-2xl bg-gradient-to-r from-[#f5c76b]/20 to-transparent p-4 ring-1 ring-[#f5c76b]/40">
+                    <p className="flex items-center gap-2 text-sm font-bold text-[#f5c76b]">
+                      <Icon name="trending" className="size-4" /> {flow.hard}
+                    </p>
+                    <p className="text-xs text-white/55">{flow.hardSub}</p>
+                  </div>
+                  <div className="rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10">
+                    <p className="text-sm font-bold text-white/80">{flow.easy}</p>
+                    <p className="text-xs text-white/45">{flow.easySub}</p>
+                  </div>
+                </div>
+              </div>
+              <p className="relative mt-6 border-t border-white/10 pt-5 text-sm leading-relaxed text-white/65">{g.adaptive.m2}</p>
+            </div>
+            <p className="flex gap-3 rounded-2xl border-l-4 border-gold bg-gold-soft/60 p-4 leading-relaxed">
+              <Icon name="bolt" className="mt-1 size-4 shrink-0 text-gold" /> {g.adaptive.takeaway}
+            </p>
+          </section>
+
+          {/* ================= Bo'limlar ================= */}
+          {sections.map((raw) => {
             const section = localizeSection(raw, locale);
+            const th = sectionTheme[section.id];
             return (
-              <section key={section.id} className="space-y-6">
-                <H2 id={section.id} eyebrow={`0${4 + i} · ${g.sectionEyebrow}`}>
+              <section key={section.id} className="space-y-8">
+                <H2 id={section.id} n={num(section.id)} eyebrow={g.sectionEyebrow}>
                   {section.name}
                 </H2>
-                <p className="text-lg leading-relaxed text-muted">{section.description}</p>
-                <ul className="flex flex-wrap gap-2">
-                  {section.highlights.map((h) => (
-                    <li key={h}>
-                      <Badge tone={section.id === "rw" ? "accent" : "gold"} className="px-3 py-1 text-sm">{h}</Badge>
-                    </li>
-                  ))}
-                </ul>
+                <div className={cn("reveal rounded-3xl bg-gradient-to-br to-transparent p-6 sm:p-8", th.from)}>
+                  <p className="text-lg leading-relaxed">{section.description}</p>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <span className="rounded-2xl bg-surface px-4 py-2 text-sm shadow-card">
+                      <strong className={cn("font-display text-xl", th.text)}>{raw.questions}</strong> {t.common.questions}
+                    </span>
+                    <span className="rounded-2xl bg-surface px-4 py-2 text-sm shadow-card">
+                      <strong className={cn("font-display text-xl", th.text)}>{raw.minutes}</strong> {t.common.min}
+                    </span>
+                  </div>
+                  <ul className="mt-5 flex flex-wrap gap-2">
+                    {section.highlights.map((h) => (
+                      <li key={h} className={cn("rounded-full px-3 py-1 text-sm font-medium", th.soft, th.text)}>
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
                 <div className="space-y-4">
                   {getDomainsBySection(section.id).map((domain) => (
-                    <Card key={domain.id} className="p-6 sm:p-8">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <h3 className="text-xl font-semibold tracking-tight">{domain.name}</h3>
+                    <div key={domain.id} className="spot reveal rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-7">
+                      <div className="flex items-start gap-4">
+                        <Donut value={Math.round(domain.weight * 100)} color={th.ring} />
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-xl font-bold tracking-tight">{domain.name}</h3>
                           {locale !== "en" && <p className="text-sm text-muted">{t.domains[domain.id]}</p>}
-                        </div>
-                        <div className="flex gap-2">
-                          <Badge>≈{Math.round(domain.weight * 100)}%</Badge>
-                          <Badge>{domain.questions} {t.common.questions}</Badge>
+                          <span className={cn("mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold", th.soft, th.text)}>
+                            {domain.questions} {t.common.questions}
+                          </span>
                         </div>
                       </div>
                       <p className="mt-4 text-muted">{domainDescription(domain, locale)}</p>
@@ -193,65 +386,68 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
                         {domain.skills.map((rawSkill) => {
                           const skill = localizeSkill(rawSkill, locale);
                           return (
-                            <details key={skill.id} className="group rounded-2xl border border-border bg-bg p-4 open:bg-surface-2/40">
+                            <details
+                              key={skill.id}
+                              className="group rounded-2xl border border-border bg-bg p-4 transition open:border-accent/40 open:bg-accent-soft/30 open:shadow-card"
+                            >
                               <summary className="flex cursor-pointer list-none items-start justify-between gap-3">
                                 <span>
-                                  <span className="block font-medium">{skill.displayName}</span>
+                                  <span className="block font-semibold">{skill.displayName}</span>
                                   {locale !== "en" && <span className="block text-xs text-muted">{skill.name}</span>}
                                 </span>
-                                <span className="text-muted transition group-open:rotate-45" aria-hidden>+</span>
+                                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-2 text-muted transition group-open:rotate-180 group-open:bg-accent group-open:text-accent-fg">
+                                  <Icon name="chevronDown" className="size-4" />
+                                </span>
                               </summary>
                               <p className="mt-3 text-sm text-muted">{skill.summary}</p>
                               <ul className="mt-3 space-y-1.5 text-sm">
                                 {skill.strategies.map((st) => (
-                                  <li key={st} className="flex gap-2"><span className="text-accent">→</span>{st}</li>
+                                  <li key={st} className="flex gap-2">
+                                    <Icon name="check" className="mt-0.5 size-4 shrink-0 text-success" />
+                                    {st}
+                                  </li>
                                 ))}
                               </ul>
-                              <p className="mt-4 text-xs font-semibold tracking-wide text-danger uppercase">{g.traps}</p>
+                              <p className="mt-4 text-xs font-bold tracking-wide text-danger uppercase">{g.traps}</p>
                               <ul className="mt-1.5 space-y-1 text-sm text-muted">
                                 {skill.traps.map((tr) => (
-                                  <li key={tr} className="flex gap-2"><span className="text-danger">×</span>{tr}</li>
+                                  <li key={tr} className="flex gap-2">
+                                    <Icon name="x" className="mt-0.5 size-4 shrink-0 text-danger" />
+                                    {tr}
+                                  </li>
                                 ))}
                               </ul>
                             </details>
                           );
                         })}
                       </div>
-                    </Card>
+                    </div>
                   ))}
                 </div>
               </section>
             );
           })}
 
-          {/* Ballash */}
-          <section className="space-y-6">
-            <H2 id="scoring" eyebrow={g.scoring.eyebrow}>{g.scoring.title}</H2>
+          {/* ================= Ballash ================= */}
+          <section className="space-y-8">
+            <H2 id="scoring" n={num("scoring")} eyebrow={g.scoring.eyebrow}>{g.scoring.title}</H2>
             <p className="leading-relaxed text-muted">{g.scoring.text}</p>
-            <div className="space-y-3">
-              {facts.scoreBands.map((b, i) => (
-                <div key={b.range} className="grid items-center gap-4 rounded-2xl border border-border bg-surface p-5 sm:grid-cols-[140px_110px_1fr]">
-                  <p className="font-display text-3xl">{b.range}</p>
-                  <div>
-                    <Badge tone={i === 0 ? "gold" : i < 3 ? "accent" : "neutral"}>{b.label}</Badge>
-                    <p className="mt-1 text-xs text-muted">{b.percentile} {g.scoring.percentile}</p>
-                  </div>
-                  <p className="text-sm text-muted">{b.note}</p>
-                </div>
-              ))}
-            </div>
+            <ScoreExplorer bands={facts.scoreBands} title={g.explorer.title} hint={g.explorer.hint} percentileLabel={g.scoring.percentile} />
             <p className="text-xs text-muted">{g.scoring.note}</p>
           </section>
 
-          {/* Ro'yxatdan o'tish */}
-          <section className="space-y-6">
-            <H2 id="registration" eyebrow={g.registration.eyebrow}>{g.registration.title}</H2>
-            <ol className="space-y-4">
+          {/* ================= Ro'yxatdan o'tish ================= */}
+          <section className="space-y-8">
+            <H2 id="registration" n={num("registration")} eyebrow={g.registration.eyebrow}>{g.registration.title}</H2>
+            <ol className="relative space-y-4">
+              <span className="absolute top-6 bottom-6 left-6 w-0.5 bg-gradient-to-b from-accent via-gold to-transparent" aria-hidden />
               {facts.timeline.map((item, i) => (
-                <li key={item.title} className="flex gap-5">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft font-semibold text-accent">{i + 1}</span>
-                  <div className="pt-1.5">
-                    <p className="font-semibold">{item.title}</p>
+                <li key={item.title} className="reveal relative flex gap-5">
+                  <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent to-[#2a1f9e] font-display font-bold text-white shadow-[0_0_0_6px_var(--bg),0_10px_24px_-8px_var(--accent)]">
+                    {i + 1}
+                  </span>
+                  <div className="spot flex-1 rounded-2xl border border-border bg-surface p-5 shadow-card transition hover:shadow-lift">
+                    <p className="font-bold">{item.title}</p>
                     <p className="mt-1 text-muted">{item.text}</p>
                   </div>
                 </li>
@@ -261,50 +457,52 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
               href="https://satsuite.collegeboard.org/sat/dates-deadlines"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex text-sm font-medium text-accent hover:underline"
+              className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent hover:text-accent-fg"
             >
-              {g.registration.link} ↗
+              <Icon name="calendar" className="size-4" /> {g.registration.link} ↗
             </a>
           </section>
 
-          {/* Test kuni */}
-          <section className="space-y-6">
-            <H2 id="test-day" eyebrow={g.testDay.eyebrow}>{g.testDay.title}</H2>
-            <Card className="p-6 sm:p-8">
-              <ul className="grid gap-3 sm:grid-cols-2">
-                {facts.checklist.map((item) => (
-                  <li key={item} className="flex gap-3">
-                    <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-success-soft text-xs text-success">✓</span>
-                    <span className="text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+          {/* ================= Test kuni ================= */}
+          <section className="space-y-8">
+            <H2 id="test-day" n={num("test-day")} eyebrow={g.testDay.eyebrow}>{g.testDay.title}</H2>
+            <Checklist items={facts.checklist} />
           </section>
 
-          {/* Strategiyalar */}
-          <section className="space-y-6">
-            <H2 id="strategies" eyebrow={g.strategies.eyebrow}>{g.strategies.title}</H2>
+          {/* ================= Strategiyalar ================= */}
+          <section className="space-y-8">
+            <H2 id="strategies" n={num("strategies")} eyebrow={g.strategies.eyebrow}>{g.strategies.title}</H2>
             <div className="grid gap-4 sm:grid-cols-2">
               {facts.strategies.map((s, i) => (
-                <Card key={s.title} className="p-6">
-                  <p className="font-display text-3xl text-accent">{String(i + 1).padStart(2, "0")}</p>
-                  <p className="mt-3 font-semibold">{s.title}</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted">{s.text}</p>
-                </Card>
+                <div
+                  key={s.title}
+                  className="spot reveal group relative overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-card transition duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lift"
+                >
+                  <span
+                    className="pointer-events-none absolute -right-2 -bottom-6 font-display text-[7rem] leading-none font-extrabold text-accent/[0.06] transition group-hover:text-accent/[0.12]"
+                    aria-hidden
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p className="text-gradient relative font-display text-3xl font-extrabold">{String(i + 1).padStart(2, "0")}</p>
+                  <p className="relative mt-3 font-bold">{s.title}</p>
+                  <p className="relative mt-1.5 text-sm leading-relaxed text-muted">{s.text}</p>
+                </div>
               ))}
             </div>
           </section>
 
-          {/* FAQ */}
-          <section className="space-y-6">
-            <H2 id="faq" eyebrow={g.faq.eyebrow}>{g.faq.title}</H2>
-            <div className="divide-y divide-border rounded-3xl border border-border bg-surface">
+          {/* ================= FAQ ================= */}
+          <section className="space-y-8">
+            <H2 id="faq" n={num("faq")} eyebrow={g.faq.eyebrow}>{g.faq.title}</H2>
+            <div className="space-y-3">
               {facts.faq.map((item) => (
-                <details key={item.q} className="group px-6 py-5">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+                <details key={item.q} className="spot reveal group rounded-2xl border border-border bg-surface px-5 py-4 shadow-card transition open:border-accent/40 sm:px-6">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
                     {item.q}
-                    <span className="text-xl text-muted transition group-open:rotate-45" aria-hidden>+</span>
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 text-muted transition group-open:rotate-45 group-open:bg-accent group-open:text-accent-fg">
+                      <span className="text-lg leading-none">+</span>
+                    </span>
                   </summary>
                   <p className="mt-3 leading-relaxed text-muted">{item.a}</p>
                 </details>
@@ -312,18 +510,21 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
             </div>
           </section>
 
-          <Card className="relative overflow-hidden p-10 text-center">
-            <div className="glow pointer-events-none absolute inset-0" aria-hidden />
+          {/* ================= CTA ================= */}
+          <div className="reveal relative overflow-hidden rounded-[2rem] bg-[#0b0f1a] p-10 text-center text-white sm:p-14">
+            <Particles />
             <div className="relative">
-              <h2 className="font-display text-4xl">{g.cta.title}</h2>
-              <p className="mt-3 text-muted">{g.cta.text}</p>
-              <ButtonLink href={localizePath(locale, routes.onboarding)} size="lg" className="mt-7">
+              <h2 className="font-display text-4xl font-bold sm:text-5xl">
+                <span className="pro-gradient-text">{g.cta.title}</span>
+              </h2>
+              <p className="mx-auto mt-3 max-w-lg text-white/60">{g.cta.text}</p>
+              <a href={localizePath(locale, routes.onboarding)} className="pro-btn mt-8">
                 {t.home.heroCta} <Icon name="arrowRight" className="size-4.5" />
-              </ButtonLink>
+              </a>
             </div>
-          </Card>
+          </div>
         </article>
-      </Container>
+      </div>
     </main>
   );
 }

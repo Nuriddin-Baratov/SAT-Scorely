@@ -4,10 +4,12 @@ import { useState } from "react";
 
 import { gameRepository } from "@/entities/gamification";
 import { mistakesRepository } from "@/entities/mistake";
+import { studentRepository } from "@/entities/student";
 import {
   MathTools,
   QuestionCard,
   attemptsRepository,
+  certificatesRepository,
   chooseAdaptivePath,
   getTestQuestions,
   moduleTwoQuestions,
@@ -98,6 +100,18 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
       ...(path ? { path } : {}),
     });
     const summary = summarizeAttempt(test, attempt);
+    // Yakuniy test yakunlandi — natijadan qat'i nazar sertifikat beriladi (id = urinish id'si)
+    if (test.final) {
+      certificatesRepository.issue({
+        id: attempt.id,
+        name: studentRepository.get()?.fullName || t.certificate.student,
+        accuracy: summary.accuracy,
+        correct: summary.correct,
+        total: summary.total,
+        scores: summary.sectionScores,
+        issuedAt: attempt.finishedAt,
+      });
+    }
     mistakesRepository.addWrong(summary.wrongIds);
     const game = gameRepository.track({ type: "test", correct: summary.correct, total: summary.total, hardModule: path === "hard" });
     if (summary.accuracy >= 0.8) launchConfetti();

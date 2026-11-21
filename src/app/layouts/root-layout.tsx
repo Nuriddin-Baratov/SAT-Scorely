@@ -4,11 +4,14 @@ import { Geist, Geist_Mono, Instrument_Serif, Plus_Jakarta_Sans } from "next/fon
 
 import { siteConfig } from "@/shared/config";
 import { getDictionary, languageAlternates, localizePath, resolveLocale, type Locale } from "@/shared/i18n";
-import { themeInitScript } from "@/features/toggle-theme";
+import { LocaleSwitcher } from "@/features/switch-locale";
+import { ThemeToggle, themeInitScript } from "@/features/toggle-theme";
 import { AchievementToaster } from "@/widgets/achievement-toaster";
 import { InlineScript } from "@/shared/ui/inline-script";
 import { SiteFooter } from "@/widgets/site-footer";
 import { SiteSidebar } from "@/widgets/site-sidebar";
+import { JourneyGate, journeyTexts } from "@/features/sat-journey";
+import { SplashScreen, splashInitScript } from "@/shared/ui/premium";
 import { Providers } from "../providers";
 import "../styles/globals.css";
 
@@ -40,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f7f6f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#09090f" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f1a" },
   ],
 };
 
@@ -53,9 +56,12 @@ export function RootLayout({ children, locale }: Readonly<{ children: ReactNode;
     >
       <head>
         <InlineScript html={themeInitScript} />
+        <InlineScript html={splashInitScript} />
       </head>
       <body className="min-h-full">
         <Providers locale={locale}>
+          <SplashScreen text={journeyTexts[locale].splash} />
+          <JourneyGate toolbar={<><LocaleSwitcher /><ThemeToggle className="hidden sm:flex" /></>}>
           <div className="flex min-h-dvh flex-col lg:flex-row">
             <SiteSidebar />
             <div className="flex min-w-0 flex-1 flex-col">
@@ -63,6 +69,7 @@ export function RootLayout({ children, locale }: Readonly<{ children: ReactNode;
               <SiteFooter />
             </div>
           </div>
+          </JourneyGate>
           <AchievementToaster />
         </Providers>
       </body>

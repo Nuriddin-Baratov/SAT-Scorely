@@ -4,21 +4,51 @@ import { useState } from "react";
 
 import { gameRepository } from "@/entities/gamification";
 import { useVocabProgress, vocabRepository, vocabWords, type VocabWord, type WordStatus } from "@/entities/vocab";
-import { useI18n } from "@/shared/i18n";
+import { useI18n, type Locale } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Icon } from "@/shared/ui/icon";
 import { Card, ProgressBar } from "@/shared/ui/primitives";
 
 type Filter = "new" | "learning" | "known" | "all";
+interface QuizItem {
+  word: VocabWord;
+  /** 4 ta variant (biri — to'g'ri javob), aralashtirilgan */
+  options: VocabWord[];
+}
+
+const shuffle = <T,>(list: T[]) => [...list].sort(() => Math.random() - 0.5);
+
+/** To'g'ri javob + 3 ta chalg'ituvchi (iloji boricha shu so'z turkumidan, tarjimasi takrorlanmaydigan). */
+function buildQuiz(words: VocabWord[], locale: Locale, size = 15): QuizItem[] {
+  return shuffle(words)
+    .slice(0, size)
+    .map((word) => {
+      const seen = new Set([word.translation[locale]]);
+      const pool = [
+        ...shuffle(vocabWords.filter((w) => w.pos === word.pos)),
+        ...shuffle(vocabWords.filter((w) => w.pos !== word.pos)),
+      ];
+      const distractors: VocabWord[] = [];
+      for (const w of pool) {
+        if (distractors.length === 3) break;
+        if (seen.has(w.translation[locale])) continue;
+        seen.add(w.translation[locale]);
+        distractors.push(w);
+      }
+      return { word, options: shuffle([word, ...distractors]) };
+    });
+}
 
 export function Flashcards() {
   const { t, locale } = useI18n();
   const progress = useVocabProgress();
   const [filter, setFilter] = useState<Filter>("new");
-  const [deck, setDeck] = useState<VocabWord[] | null>(null);
+  const [deck, setDeck] = useState<QuizItem[] | null>(null);
   const [index, setIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  /** Tanlangan variant (so'z) — javob berilgandan keyin */
+  const [picked, setPicked] = useState<string | null>(null);
+  const [score, setScore] = useState(0);
 
   if (progress === undefined) return <div className="h-96 animate-pulse rounded-3xl bg-surface-2" />;
 
@@ -31,31 +61,56 @@ export function Flashcards() {
   };
   const list = vocabWords.filter((w) => filter === "all" || statusOf(w) === filter);
 
-  function answer(status: WordStatus) {
-    if (!deck) return;
-    const word = deck[index];
+  function choose(option: VocabWord) {
+    if (!deck || picked) return;
+    const { word } = deck[index];
+    const correct = option.word === word.word;
+    setPicked(option.word);
+    if (correct) setScore((s) => s + 1);
+    // To'g'ri — o'rganilgan; xato — qayta takrorlash ro'yxatiga
+    const status: WordStatus = correct ? "known" : "learning";
     if (vocabRepository.mark(word.word, status)) gameRepository.track({ type: "word" });
-    setFlipped(false);
+  }
+
+  function next() {
+    setPicked(null);
     setIndex((i) => i + 1);
   }
 
-  // ---------- Kartochka rejimi ----------
+  // ---------- Test rejimi ----------
   if (deck) {
-    const word = deck[index];
-    if (!word) {
+    const item = deck[index];
+    if (!item) {
       return (
         <Card className="mx-auto max-w-xl p-10 text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-success-soft text-success">
             <Icon name="check" className="size-7" />
           </span>
           <h2 className="mt-6 text-2xl font-bold">{t.vocab.deckDone}</h2>
-          <p className="mt-2 text-muted">{t.vocab.knownCount(counts.known, counts.all)}</p>
-          <Button className="mt-8" onClick={() => setDeck(null)}>
-            {t.practice.backToList}
-          </Button>
+          <p className="mt-2 text-lg font-semibold">{t.vocab.score(score, deck.length)}</p>
+          <p className="mt-1 text-muted">{t.vocab.knownCount(counts.known, counts.all)}</p>
+          <div className="mt-8 flex flex-col-reverse justify-center gap-3 sm:flex-row">
+            <Button variant="outline" onClick={() => setDeck(null)}>
+              {t.practice.backToList}
+            </Button>
+            {/* Xuddi shu so'zlar — yangi tartib va yangi variantlar bilan */}
+            <Button
+              onClick={() => {
+                setDeck(buildQuiz(deck.map((d) => d.word), locale));
+                setIndex(0);
+                setPicked(null);
+                setScore(0);
+              }}
+              autoFocus
+            >
+              <Icon name="refresh" className="size-4" /> {t.vocab.tryAgain}
+            </Button>
+          </div>
         </Card>
       );
     }
+
+    const { word } = item;
 
     return (
       <div className="mx-auto max-w-xl space-y-5">
@@ -69,47 +124,66 @@ export function Flashcards() {
           </span>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setFlipped((f) => !f)}
-          aria-label={t.vocab.flip}
-          className="group block w-full [perspective:1200px]"
-        >
-          <div
-            className={cn(
-              "relative h-80 w-full transition-transform duration-500 [transform-style:preserve-3d] motion-reduce:transition-none",
-              flipped && "[transform:rotateY(180deg)]",
-            )}
-          >
-            <div className="noise absolute inset-0 grid place-items-center overflow-hidden rounded-[1.75rem] bg-ink p-8 text-white shadow-lift [backface-visibility:hidden]">
-              <div className="aurora opacity-50" aria-hidden>
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className="relative text-center">
-                <p className="text-xs font-semibold tracking-[0.2em] text-white/50 uppercase">{t.vocab.pos[word.pos]}</p>
-                <p lang="en" className="mt-3 font-display text-5xl font-bold">{word.word}</p>
-                <p className="mt-6 text-sm text-white/50">{t.vocab.tapToFlip}</p>
-              </div>
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-center rounded-[1.75rem] border border-border bg-surface p-8 text-left shadow-lift [backface-visibility:hidden] [transform:rotateY(180deg)]">
-              <p lang="en" className="font-display text-2xl font-bold">{word.word}</p>
-              <p lang="en" className="mt-2 text-muted">{word.definition}</p>
-              <p className="mt-4 text-lg font-semibold text-accent">{word.translation[locale]}</p>
-              <p lang="en" className="mt-4 rounded-xl bg-surface-2/70 p-3 text-sm italic">“{word.example}”</p>
-            </div>
+        {/* Savol: inglizcha so'z */}
+        <div key={word.word} className="noise relative grid h-56 place-items-center overflow-hidden rounded-[1.75rem] bg-ink p-8 text-white shadow-lift animate-fade-up">
+          <div className="aurora opacity-50" aria-hidden>
+            <span />
+            <span />
+            <span />
           </div>
-        </button>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" size="lg" onClick={() => answer("learning")}>
-            <Icon name="refresh" className="size-4" /> {t.vocab.again}
-          </Button>
-          <Button size="lg" onClick={() => answer("known")}>
-            <Icon name="check" className="size-4" /> {t.vocab.know}
-          </Button>
+          <div className="relative text-center">
+            <p className="text-xs font-semibold tracking-[0.2em] text-white/50 uppercase">{t.vocab.pos[word.pos]}</p>
+            <p lang="en" className="mt-3 font-display text-4xl font-bold sm:text-5xl">{word.word}</p>
+            <p className="mt-5 text-sm text-white/60">{t.vocab.prompt}</p>
+          </div>
         </div>
+
+        {/* 4 ta variant */}
+        <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label={t.vocab.prompt}>
+          {item.options.map((option, i) => {
+            const isAnswer = option.word === word.word;
+            const isPicked = option.word === picked;
+            return (
+              <button
+                key={option.word}
+                type="button"
+                disabled={!!picked}
+                onClick={() => choose(option)}
+                className={cn(
+                  "flex items-center gap-3 rounded-2xl border p-4 text-left font-medium transition",
+                  !picked && "border-border bg-surface hover:border-accent hover:bg-accent-soft",
+                  picked && isAnswer && "border-success bg-success-soft text-success",
+                  picked && isPicked && !isAnswer && "border-danger bg-danger-soft text-danger",
+                  picked && !isAnswer && !isPicked && "border-border bg-surface opacity-50",
+                )}
+              >
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-bold text-muted">
+                  {picked && (isAnswer || isPicked) ? (
+                    <Icon name={isAnswer ? "check" : "x"} className="size-4" />
+                  ) : (
+                    "ABCD"[i]
+                  )}
+                </span>
+                {option.translation[locale]}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Javobdan keyin: natija, ta'rif va misol */}
+        {picked && (
+          <Card className="animate-fade-up space-y-3 p-5">
+            <p className={cn("font-semibold", picked === word.word ? "text-success" : "text-danger")}>
+              {picked === word.word ? t.vocab.correct : t.vocab.wrong} —{" "}
+              <span lang="en" className="text-fg">{word.word}</span>: {word.translation[locale]}
+            </p>
+            <p lang="en" className="text-sm text-muted">{word.definition}</p>
+            <p lang="en" className="rounded-xl bg-surface-2/70 p-3 text-sm italic">“{word.example}”</p>
+            <Button size="lg" className="w-full" onClick={next} autoFocus>
+              {t.common.next} <Icon name="arrowRight" className="size-4" />
+            </Button>
+          </Card>
+        )}
       </div>
     );
   }
@@ -122,16 +196,18 @@ export function Flashcards() {
           <p className="text-sm font-semibold">{t.vocab.knownCount(counts.known, counts.all)}</p>
           <ProgressBar value={(counts.known / counts.all) * 100} tone="success" className="mt-3" label={t.vocab.title} />
         </div>
+        {/* Filtrda so'z qolmagan bo'lsa (masalan, hammasi o'rganilgan) — barcha so'zlar bilan qayta urinish */}
         <Button
           size="lg"
-          disabled={!list.length}
           onClick={() => {
             setIndex(0);
-            setFlipped(false);
-            setDeck([...list].sort(() => Math.random() - 0.5).slice(0, 15));
+            setPicked(null);
+            setScore(0);
+            setDeck(buildQuiz(list.length ? list : vocabWords, locale));
           }}
         >
-          <Icon name="cards" className="size-4.5" /> {t.vocab.startDeck}
+          <Icon name={list.length ? "cards" : "refresh"} className="size-4.5" />{" "}
+          {list.length ? t.vocab.startDeck : t.vocab.tryAgain}
         </Button>
       </Card>
 

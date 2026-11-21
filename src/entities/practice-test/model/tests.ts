@@ -2,6 +2,7 @@ import { scaleSection, type SectionId } from "@/entities/sat/@x/practice-test";
 
 import { isCorrect } from "./answer";
 import { getQuestion, questions } from "./questions";
+import { TEST_PAGE_IDS } from "./test-ids";
 import type { AdaptivePath, AnswerValue, PracticeTest, Question, TestAttempt } from "./types";
 
 export const practiceTests: PracticeTest[] = [
@@ -164,6 +165,63 @@ practiceTests.push({
   minutes: 46,
   questionIds: [],
 });
+
+// ---------------- Yakuniy test ----------------
+
+export const FINAL_TEST_ID = "final-exam";
+
+/**
+ * Har bir domendan oson → o'rta → qiyin tartibida 3 tadan savol (R&W avval, keyin Math — SAT'dagidek).
+ * Savollar banki o'zgarsa ham avtomatik moslashadi.
+ */
+function finalQuestionIds() {
+  const rank = { easy: 0, medium: 1, hard: 2 } as const;
+  const order: Question["domainId"][] = [
+    "information-ideas",
+    "craft-structure",
+    "expression-ideas",
+    "conventions",
+    "algebra",
+    "advanced-math",
+    "data-analysis",
+    "geometry-trig",
+  ];
+  return order.flatMap((domain) => {
+    const pool = questions.filter((q) => q.domainId === domain).sort((a, b) => rank[a.difficulty] - rank[b.difficulty]);
+    // Har xil qiyinlikdan: birinchi, o'rtadagi va oxirgi savol
+    const picks = pool.length <= 3 ? pool : [pool[0], pool[Math.floor(pool.length / 2)], pool[pool.length - 1]];
+    return picks.map((q) => q.id);
+  });
+}
+
+const finalIds = finalQuestionIds();
+const finalMinutes = Math.round(
+  finalIds.reduce((s, id) => s + (getQuestion(id)?.sectionId === "math" ? 95 : 71), 0) / 60,
+);
+
+practiceTests.push({
+  id: FINAL_TEST_ID,
+  kind: "mixed",
+  final: true,
+  title: {
+    uz: "Yakuniy test",
+    ru: "Итоговый тест",
+    en: "Final exam",
+  },
+  description: {
+    uz: "Barcha 8 ta SAT domenidan savollar: oson, o'rta va qiyin. Yakunlagan har bir o'quvchi SAT Pro sertifikatini oladi.",
+    ru: "Вопросы из всех 8 доменов SAT: лёгкие, средние и сложные. Каждый, кто пройдёт тест, получит сертификат SAT Pro.",
+    en: "Questions from all 8 SAT domains: easy, medium and hard. Everyone who finishes gets a SAT Pro certificate.",
+  },
+  minutes: finalMinutes,
+  questionIds: finalIds,
+});
+
+// Proxy'dagi 404 tekshiruvi uchun ro'yxat (test-ids.ts) bu yerdagi testlar bilan mos bo'lishi shart
+if (process.env.NODE_ENV !== "production") {
+  const missing = practiceTests.filter((t) => !t.simulation && !TEST_PAGE_IDS.includes(t.id)).map((t) => t.id);
+  if (missing.length) console.error(`[practice-test] TEST_PAGE_IDS ro'yxatiga qo'shing: ${missing.join(", ")}`);
+}
 
 /** Adaptiv testda oson yo'l bo'yicha bo'lim ballining yuqori chegarasi */
 const EASY_PATH_CAP = 620;

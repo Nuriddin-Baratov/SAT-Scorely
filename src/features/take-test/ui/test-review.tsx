@@ -50,6 +50,28 @@ export function TestReview({
         </p>
       )}
 
+      {/* Yakuniy test: natijadan qat'i nazar sertifikat */}
+      {test.final && (
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#f9e3a3] via-[#f5b83d] to-[#e0b04a] p-[1.5px] shadow-[0_20px_50px_-20px_#f5b83d]">
+            <div className="relative flex flex-col gap-5 overflow-hidden rounded-[calc(2rem-1.5px)] bg-[#0b0f1a] p-6 text-white sm:flex-row sm:items-center sm:p-8">
+              <span className="pointer-events-none absolute -top-20 -right-16 size-64 rounded-full bg-[#f5b83d]/20 blur-3xl" aria-hidden />
+              <span className="relative grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#f9e3a3] to-[#e0b04a] text-[#2b1d03] shadow-[0_10px_30px_-8px_#f5b83d]">
+                <Icon name="medal" className="size-8" />
+              </span>
+              <div className="relative flex-1">
+                <h2 className="text-xl font-bold sm:text-2xl">{t.final.passedTitle}</h2>
+                <p className="mt-1 text-sm text-white/65">{t.final.passedText}</p>
+              </div>
+              <ButtonLink
+                href={href(routes.certificate(attempt.id))}
+                className="relative shrink-0 bg-gradient-to-r from-[#f9e3a3] via-[#f5b83d] to-[#e0b04a] text-[#2b1d03] hover:brightness-105"
+              >
+                {t.final.viewCertificate} <Icon name="arrowRight" className="size-4" />
+              </ButtonLink>
+            </div>
+          </div>
+      )}
+
       <Card className="overflow-hidden">
         <div className="noise relative bg-ink p-6 text-white sm:p-8">
           <div className="aurora opacity-60" aria-hidden>

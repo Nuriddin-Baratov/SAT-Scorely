@@ -33,6 +33,8 @@ export function rateLimit(request: Request, key: string, limit = 10, windowMs = 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
   const id = `${key}:${ip}`;
   const now = Date.now();
+  // Muddati o'tgan yozuvlarni vaqti-vaqti bilan tozalaymiz — aks holda har bir yangi IP xotirada abadiy qoladi
+  if (hits.size > 1000) for (const [key, value] of hits) if (value.reset < now) hits.delete(key);
   const entry = hits.get(id);
   if (!entry || entry.reset < now) {
     hits.set(id, { count: 1, reset: now + windowMs });

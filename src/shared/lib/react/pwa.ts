@@ -35,8 +35,15 @@ export function useServiceWorker() {
     window.addEventListener("beforeinstallprompt", onBeforeInstall);
     window.addEventListener("appinstalled", onInstalled);
     if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
-      // dev'da eski kesh xalaqit beradi — faqat production
       navigator.serviceWorker.register("/sw.js").catch(() => {});
+    } else if ("serviceWorker" in navigator) {
+      // dev: avvalgi production ishga tushirishdan qolgan worker eski JS'ni keshdan beradi
+      // (hydration xatolari). Uni va keshlarini o'chirib, sahifani bir marta yangilaymiz.
+      const controlled = !!navigator.serviceWorker.controller;
+      void Promise.all([
+        navigator.serviceWorker.getRegistrations().then((regs) => Promise.all(regs.map((r) => r.unregister()))),
+        caches?.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))),
+      ]).then(() => controlled && window.location.reload());
     }
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);

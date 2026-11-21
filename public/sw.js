@@ -1,5 +1,5 @@
-/* Scorely service worker — oflayn ishlash uchun oddiy kesh strategiyasi. */
-const VERSION = "scorely-v1";
+/* SAT Pro service worker — oflayn ishlash uchun oddiy kesh strategiyasi. */
+const VERSION = "satpro-v2";
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const PRECACHE = ["/icon-192.png", "/icon-512.png", "/icon.svg"];
@@ -51,6 +51,8 @@ async function cacheFirst(request) {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
+  // Lokal ishlab chiqishda kesh eski kodni berib, hydration xatolariga sabab bo'ladi.
+  if (self.location.hostname === "localhost" || self.location.hostname === "127.0.0.1") return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
 

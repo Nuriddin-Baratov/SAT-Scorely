@@ -35,6 +35,8 @@ export type Question = ChoiceQuestion | SprQuestion;
 export interface PracticeTest {
   id: string;
   kind: SectionId | "mixed";
+  /** Umumiy yakuniy test — o'tilsa sertifikat beriladi */
+  final?: boolean;
   title: Localized;
   description: Localized;
   minutes: number;

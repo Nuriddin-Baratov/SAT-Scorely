@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "Scorely",
+  name: "SAT Pro",
 } as const;
 
 /** Tilsiz yo'llar. Havola uchun `localizePath(locale, routes.x)` yoki `useI18n().href(routes.x)`. */
@@ -10,6 +10,7 @@ export const routes = {
   dashboard: "/dashboard",
   tests: "/tests",
   test: (id: string) => `/tests/${id}`,
+  certificate: (id: string) => `/certificate?id=${encodeURIComponent(id)}`,
   results: "/results",
   calculator: "/calculator",
   practice: "/practice",

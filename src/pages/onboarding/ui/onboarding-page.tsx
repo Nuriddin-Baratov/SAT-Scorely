@@ -1,13 +1,17 @@
-import { OnboardingWizard } from "@/features/onboarding";
-import { Container } from "@/shared/ui/primitives";
+import { StudentOnboarding } from "@/features/sat-journey";
+import { LocaleSwitcher } from "@/features/switch-locale";
+import { ThemeToggle } from "@/features/toggle-theme";
 
+/** O'quvchi haqidagi savollar (testsiz) — dashboard'dan rejani qayta tuzish uchun ham shu sahifa. */
 export function OnboardingPage() {
   return (
-    <main className="relative flex-1">
-      <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
-      <Container className="relative py-10 sm:py-16">
-        <OnboardingWizard />
-      </Container>
-    </main>
+    <StudentOnboarding
+      toolbar={
+        <>
+          <LocaleSwitcher />
+          <ThemeToggle className="hidden sm:flex" />
+        </>
+      }
+    />
   );
 }
