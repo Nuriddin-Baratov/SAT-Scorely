@@ -18,7 +18,7 @@ export function AchievementsPage() {
   return (
     <main className="relative flex-1">
       <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
-      <Container className="relative py-12 sm:py-16">
+      <Container className="relative py-5 sm:py-16">
         <SectionHeading eyebrow={t.achievements.eyebrow} title={t.achievements.title} description={t.achievements.description} />
 
         {!game || !today ? (
@@ -59,7 +59,7 @@ function Content({
   const activeLast12 = days.filter((d) => active.has(d.iso)).length;
 
   return (
-    <div className="mt-10 space-y-6">
+    <div className="mt-4 space-y-4 sm:mt-10 sm:space-y-6">
       {/* Daraja */}
       <div className="noise relative overflow-hidden rounded-[1.75rem] bg-ink p-7 text-white shadow-lift sm:p-9">
         <div className="aurora opacity-70" aria-hidden>
@@ -74,7 +74,7 @@ function Content({
             </p>
             <p className="mt-1 font-display text-4xl font-bold">{t.game.levels[level.index]}</p>
             <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-gradient-to-r from-[#8b7dff] to-[#f1cf8b]" style={{ width: `${level.progress * 100}%` }} />
+              <div className="h-full rounded-full bg-gradient-to-r from-[#60a5fa] to-[#bfdbfe]" style={{ width: `${level.progress * 100}%` }} />
             </div>
             <p className="mt-2 text-sm text-white/60 tabular-nums">
               {game.xp} XP
@@ -164,7 +164,7 @@ function Content({
 function Stat({ icon, value, label, sub }: { icon: "flame" | "medal"; value: number | string; label: string; sub?: string }) {
   return (
     <div className="rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/10">
-      <Icon name={icon} className={cn("size-5", icon === "flame" ? "text-[#f5a54a]" : "text-[#f1cf8b]")} />
+      <Icon name={icon} className={cn("size-5", icon === "flame" ? "text-[#f5a54a]" : "text-[#bfdbfe]")} />
       <p className="mt-3 font-display text-4xl font-bold tabular-nums">{value}</p>
       <p className="text-sm text-white/60">{label}</p>
       {sub && <p className="mt-1 text-xs text-white/40">{sub}</p>}

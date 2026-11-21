@@ -5,6 +5,7 @@ export { formatDuration } from "./duration";
 export { STORAGE_PREFIX, applySnapshot, clearSnapshot, collectSnapshot, isSnapshot, type Snapshot } from "./snapshot";
 export {
   DAY_MS,
+  MONTHS_SHORT,
   WEEKDAYS_LONG,
   WEEKDAYS_SHORT,
   addDays,

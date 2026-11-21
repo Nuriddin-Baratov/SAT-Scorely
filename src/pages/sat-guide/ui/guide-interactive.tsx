@@ -22,7 +22,7 @@ export function ReadingBar() {
   }, []);
   return (
     <span className="pointer-events-none fixed inset-x-0 top-0 z-[45] h-[3px]" aria-hidden>
-      <span ref={ref} className="block h-full origin-left scale-x-0 bg-gradient-to-r from-[#5b8cff] via-accent to-[#f5c76b] shadow-[0_0_10px_var(--accent)]" />
+      <span ref={ref} className="block h-full origin-left scale-x-0 bg-gradient-to-r from-[#60a5fa] via-accent to-[#93c5fd] shadow-[0_0_10px_var(--accent)]" />
     </span>
   );
 }
@@ -84,12 +84,12 @@ export function SampleQuestion() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-[2rem] bg-[#0b0f1a] p-4 text-white sm:p-8">
+    <div className="relative overflow-hidden rounded-[2rem] bg-ink p-4 text-white sm:p-8">
       <div className="pointer-events-none absolute -top-32 left-1/3 size-96 rounded-full bg-accent/25 blur-3xl" aria-hidden />
       <div className="relative">
         <div className="flex flex-wrap items-end justify-between gap-4 px-2 sm:px-0">
           <div>
-            <p className="text-xs font-semibold tracking-[0.2em] text-[#f5c76b] uppercase">{s.eyebrow}</p>
+            <p className="text-xs font-semibold tracking-[0.2em] text-[#93c5fd] uppercase">{s.eyebrow}</p>
             <h3 className="mt-2 font-display text-2xl font-bold sm:text-3xl">{s.title}</h3>
             <p className="mt-1 max-w-lg text-sm text-white/60">{s.text}</p>
           </div>
@@ -103,7 +103,7 @@ export function SampleQuestion() {
                 onClick={() => next(sec)}
                 className={cn(
                   "rounded-full px-4 py-1.5 text-sm font-semibold transition",
-                  section === sec ? "bg-white text-[#0b0f1a]" : "text-white/60 hover:text-white",
+                  section === sec ? "bg-white text-[#1e3a8a]" : "text-white/60 hover:text-white",
                 )}
               >
                 {sec === "rw" ? "Reading & Writing" : "Math"}
@@ -119,7 +119,7 @@ export function SampleQuestion() {
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 px-2 sm:px-0">
           <p className={cn("min-h-6 text-sm font-semibold", checked ? (correct ? "text-emerald-300" : "text-rose-300") : "text-white/50")}>
             {checked ? (correct ? t.practice.correct : t.practice.incorrect) : ""}
-            {streak > 1 && <span className="ml-3 rounded-full bg-[#f5c76b]/15 px-2.5 py-1 text-[#f5c76b]">{s.streak(streak)}</span>}
+            {streak > 1 && <span className="ml-3 rounded-full bg-[#93c5fd]/15 px-2.5 py-1 text-[#93c5fd]">{s.streak(streak)}</span>}
           </p>
           {checked ? (
             <button type="button" onClick={() => next()} className="pro-btn">
@@ -211,7 +211,7 @@ interface Band {
   label: string;
   note: string;
 }
-const bandColors = ["#f5c76b", "#8b7dff", "#5b8cff", "#34d399", "#94a3b8"];
+const bandColors = ["#93c5fd", "#60a5fa", "#60a5fa", "#34d399", "#94a3b8"];
 
 /** Interaktiv ball shkalasi: slayder qiymati qaysi darajaga tushishini ko'rsatadi. */
 export function ScoreExplorer({ bands, title, hint, percentileLabel }: { bands: readonly Band[]; title: string; hint: string; percentileLabel: string }) {
@@ -224,10 +224,10 @@ export function ScoreExplorer({ bands, title, hint, percentileLabel }: { bands: 
   const pos = (v: number) => ((v - 400) / 1200) * 100;
 
   return (
-    <div className="relative overflow-hidden rounded-[2rem] bg-[#0b0f1a] p-6 text-white sm:p-8">
+    <div className="relative overflow-hidden rounded-[2rem] bg-ink p-6 text-white sm:p-8">
       <div className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full blur-3xl transition-colors duration-500" style={{ background: `${band.color}33` }} aria-hidden />
       <div className="relative">
-        <p className="text-xs font-semibold tracking-[0.2em] text-[#f5c76b] uppercase">{title}</p>
+        <p className="text-xs font-semibold tracking-[0.2em] text-[#93c5fd] uppercase">{title}</p>
         <p className="mt-1 text-sm text-white/55">{hint}</p>
 
         <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
@@ -235,7 +235,7 @@ export function ScoreExplorer({ bands, title, hint, percentileLabel }: { bands: 
             <span className="pro-gradient-text">{score}</span>
           </p>
           <div className="text-right">
-            <span className="inline-block rounded-full px-3 py-1 text-sm font-bold text-[#0b0f1a] transition-colors" style={{ background: band.color }}>
+            <span className="inline-block rounded-full px-3 py-1 text-sm font-bold text-[#1e3a8a] transition-colors" style={{ background: band.color }}>
               {band.label}
             </span>
             <p className="mt-1.5 text-sm text-white/60">
@@ -256,7 +256,7 @@ export function ScoreExplorer({ bands, title, hint, percentileLabel }: { bands: 
             ))}
           </div>
           <span
-            className="pointer-events-none absolute top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-[#0b0f1a] shadow-[0_0_0_2px_white,0_0_18px_white]"
+            className="pointer-events-none absolute top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-[#1e3a8a] shadow-[0_0_0_2px_white,0_0_18px_white]"
             style={{ left: `${pos(score)}%`, background: band.color }}
             aria-hidden
           />

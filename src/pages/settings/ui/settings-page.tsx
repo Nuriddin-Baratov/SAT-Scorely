@@ -42,7 +42,7 @@ export function SettingsPage() {
   return (
     <main className="relative flex-1">
       <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
-      <Container className="relative max-w-4xl space-y-5 py-12 sm:py-16">
+      <Container className="relative max-w-4xl space-y-4 py-5 sm:space-y-5 sm:py-16">
         <SectionHeading eyebrow={s.eyebrow} title={s.title} description={s.description} />
 
         <div className="space-y-5 pt-5">
@@ -148,7 +148,7 @@ function AccountDetails() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-4">
-        <span className="grid size-12 place-items-center rounded-full bg-gradient-to-br from-[#a99dff] to-[#5b4cf5] text-lg font-bold text-white">
+        <span className="grid size-12 place-items-center rounded-full bg-gradient-to-br from-[#bfdbfe] to-[#2563eb] text-lg font-bold text-white">
           {user.name.charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0">

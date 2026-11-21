@@ -7,6 +7,6 @@
         <item name="android:statusBarColor">@color/bg</item>
         <item name="android:navigationBarColor">@color/bg</item>
     </style>
-    <color name="bg">#101018</color>
-    <color name="accent">#7a6bff</color>
+    <color name="bg">#111827</color>
+    <color name="accent">#3b82f6</color>
 </resources>

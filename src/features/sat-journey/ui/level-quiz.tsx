@@ -57,13 +57,13 @@ export function LevelQuiz({ modal }: { modal?: boolean }) {
       </div>
       <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-[#f5c76b] to-[#5b8cff] transition-[width] duration-500"
+          className="h-full rounded-full bg-gradient-to-r from-[#93c5fd] to-[#60a5fa] transition-[width] duration-500"
           style={{ width: `${((step + 1) / questions.length) * 100}%` }}
         />
       </div>
 
       <div key={step} className="pro-in mt-10">
-        <p className="text-xs font-semibold tracking-[0.2em] text-[#f5c76b] uppercase">{q.eyebrow}</p>
+        <p className="text-xs font-semibold tracking-[0.2em] text-[#93c5fd] uppercase">{q.eyebrow}</p>
         <h1 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{q.q[key]}</h1>
         <div className="mt-8 grid gap-3">
           {options.map((value) => {
@@ -71,7 +71,7 @@ export function LevelQuiz({ modal }: { modal?: boolean }) {
             return (
               <button key={value} type="button" aria-pressed={active} onClick={() => choose(value)} className="pro-option">
                 {label(value)}
-                <span className={active ? "text-[#f5c76b]" : "text-white/25"}>
+                <span className={active ? "text-[#93c5fd]" : "text-white/25"}>
                   <Icon name={active ? "check" : "arrowRight"} className="size-4" />
                 </span>
               </button>

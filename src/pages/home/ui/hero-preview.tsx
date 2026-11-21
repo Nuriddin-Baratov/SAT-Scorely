@@ -29,7 +29,7 @@ export function HeroPreview({ t }: { t: Dictionary["home"]["preview"] }) {
       <div className="glass relative rounded-[1.75rem] p-6 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.8)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-full bg-gradient-to-br from-[#a99dff] to-[#5b4cf5] text-sm font-bold">A</span>
+            <span className="grid size-10 place-items-center rounded-full bg-gradient-to-br from-[#bfdbfe] to-[#2563eb] text-sm font-bold">A</span>
             <div>
               <p className="text-sm font-semibold">{t.student}</p>
               <p className="text-xs text-white/50">{t.week}</p>
@@ -52,12 +52,12 @@ export function HeroPreview({ t }: { t: Dictionary["home"]["preview"] }) {
         <svg viewBox="0 0 360 100" className="mt-3 w-full overflow-visible">
           <defs>
             <linearGradient id="hero-area" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stopColor="#8b7dff" stopOpacity="0.45" />
-              <stop offset="1" stopColor="#8b7dff" stopOpacity="0" />
+              <stop offset="0" stopColor="#60a5fa" stopOpacity="0.45" />
+              <stop offset="1" stopColor="#60a5fa" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="hero-line" x1="0" x2="1">
-              <stop offset="0" stopColor="#8b7dff" />
-              <stop offset="1" stopColor="#f1cf8b" />
+              <stop offset="0" stopColor="#60a5fa" />
+              <stop offset="1" stopColor="#bfdbfe" />
             </linearGradient>
           </defs>
           {[0, 30, 60, 90].map((y) => (
@@ -65,8 +65,8 @@ export function HeroPreview({ t }: { t: Dictionary["home"]["preview"] }) {
           ))}
           <path d={area} fill="url(#hero-area)" />
           <path d={line} fill="none" stroke="url(#hero-line)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4 0" />
-          <circle cx={now[0]} cy={now[1]} r="5" fill="#0b0a1d" stroke="#a99dff" strokeWidth="2.5" />
-          <circle cx={last[0]} cy={last[1]} r="5" fill="#f1cf8b" />
+          <circle cx={now[0]} cy={now[1]} r="5" fill="#1e3a8a" stroke="#bfdbfe" strokeWidth="2.5" />
+          <circle cx={last[0]} cy={last[1]} r="5" fill="#bfdbfe" />
         </svg>
 
         <ul className="mt-5 space-y-2">
@@ -75,13 +75,13 @@ export function HeroPreview({ t }: { t: Dictionary["home"]["preview"] }) {
               key={r.title}
               className={cn(
                 "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 ring-1",
-                r.today ? "bg-white/[0.09] ring-[#8b7dff]/50" : "bg-white/[0.03] ring-white/[0.06]",
+                r.today ? "bg-white/[0.09] ring-[#60a5fa]/50" : "bg-white/[0.03] ring-white/[0.06]",
               )}
             >
               <span
                 className={cn(
                   "grid size-5 shrink-0 place-items-center rounded-full",
-                  r.done ? "bg-emerald-400 text-[#0b0a1d]" : "ring-2 ring-white/25",
+                  r.done ? "bg-emerald-400 text-[#1e3a8a]" : "ring-2 ring-white/25",
                 )}
               >
                 {r.done && <Icon name="check" className="size-3.5" strokeWidth={3} />}
@@ -89,7 +89,7 @@ export function HeroPreview({ t }: { t: Dictionary["home"]["preview"] }) {
               <span className="w-5 text-[11px] font-medium text-white/45">{r.day}</span>
               <span className={cn("flex-1 truncate text-sm", r.done && "text-white/45 line-through")}>{r.title}</span>
               {r.today ? (
-                <span className="rounded-full bg-[#8b7dff] px-2 py-0.5 text-[10px] font-semibold">{t.today}</span>
+                <span className="rounded-full bg-[#60a5fa] px-2 py-0.5 text-[10px] font-semibold">{t.today}</span>
               ) : (
                 <span className="text-[11px] text-white/40">{r.meta}</span>
               )}
@@ -110,7 +110,7 @@ export function HeroPreview({ t }: { t: Dictionary["home"]["preview"] }) {
       </div>
 
       <div className="animate-float absolute -right-4 -bottom-8 hidden items-center gap-3 rounded-2xl bg-white px-4 py-3 text-ink shadow-[0_20px_40px_-15px_rgb(0_0_0/0.6)] [animation-delay:-3s] sm:flex lg:-right-10">
-        <span className="grid size-9 place-items-center rounded-xl bg-[#eeecff] text-[#5b4cf5]">
+        <span className="grid size-9 place-items-center rounded-xl bg-[#eff6ff] text-[#2563eb]">
           <Icon name="trending" className="size-5" />
         </span>
         <div>

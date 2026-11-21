@@ -44,6 +44,9 @@ export function Flashcards() {
   const { t, locale } = useI18n();
   const progress = useVocabProgress();
   const [filter, setFilter] = useState<Filter>("new");
+  // Ro'yxat 20 tadan; filtr almashsa — yana boshidan
+  const [more, setMore] = useState({ key: "new" as Filter, n: 20 });
+  const shown = more.key === filter ? more.n : 20;
   const [deck, setDeck] = useState<QuizItem[] | null>(null);
   const [index, setIndex] = useState(0);
   /** Tanlangan variant (so'z) — javob berilgandan keyin */
@@ -190,8 +193,8 @@ export function Flashcards() {
 
   // ---------- Ro'yxat ----------
   return (
-    <div className="space-y-6">
-      <Card className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-3 sm:space-y-6">
+      <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:p-6">
         <div className="flex-1">
           <p className="text-sm font-semibold">{t.vocab.knownCount(counts.known, counts.all)}</p>
           <ProgressBar value={(counts.known / counts.all) * 100} tone="success" className="mt-3" label={t.vocab.title} />
@@ -199,6 +202,7 @@ export function Flashcards() {
         {/* Filtrda so'z qolmagan bo'lsa (masalan, hammasi o'rganilgan) — barcha so'zlar bilan qayta urinish */}
         <Button
           size="lg"
+          className="w-full sm:w-auto"
           onClick={() => {
             setIndex(0);
             setPicked(null);
@@ -211,7 +215,7 @@ export function Flashcards() {
         </Button>
       </Card>
 
-      <div className="flex flex-wrap gap-2" role="tablist">
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0" role="tablist">
         {(["new", "learning", "known", "all"] as const).map((f) => (
           <button
             key={f}
@@ -220,7 +224,7 @@ export function Flashcards() {
             aria-selected={filter === f}
             onClick={() => setFilter(f)}
             className={cn(
-              "rounded-full px-4 py-2 text-sm font-medium transition",
+              "shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition",
               filter === f ? "bg-fg text-bg" : "bg-surface-2 text-muted hover:text-fg",
             )}
           >
@@ -229,27 +233,41 @@ export function Flashcards() {
         ))}
       </div>
 
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {list.map((w) => {
+      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface shadow-card sm:grid sm:grid-cols-2 sm:divide-y-0 sm:gap-px sm:bg-border lg:grid-cols-3">
+        {list.slice(0, shown).map((w) => {
           const status = statusOf(w);
           return (
-            <li key={w.word} className="rounded-2xl border border-border bg-surface p-4 shadow-card">
-              <div className="flex items-start justify-between gap-2">
-                <p lang="en" className="font-display text-lg font-bold">{w.word}</p>
-                <span
-                  className={cn(
-                    "mt-1.5 size-2.5 shrink-0 rounded-full",
-                    status === "known" ? "bg-success" : status === "learning" ? "bg-warning" : "bg-border",
-                  )}
-                  title={t.vocab.filters[status]}
-                />
+            <li key={w.word} className="flex items-center gap-3 bg-surface px-4 py-2.5 sm:block sm:p-4">
+              <span
+                className={cn(
+                  "size-2 shrink-0 rounded-full sm:hidden",
+                  status === "known" ? "bg-success" : status === "learning" ? "bg-warning" : "bg-border",
+                )}
+                title={t.vocab.filters[status]}
+              />
+              <div className="flex min-w-0 flex-1 items-baseline gap-2 sm:block">
+                <div className="flex items-start justify-between gap-2">
+                  <p lang="en" className="font-display font-bold sm:text-lg">{w.word}</p>
+                  <span
+                    className={cn(
+                      "mt-1.5 hidden size-2.5 shrink-0 rounded-full sm:block",
+                      status === "known" ? "bg-success" : status === "learning" ? "bg-warning" : "bg-border",
+                    )}
+                    title={t.vocab.filters[status]}
+                  />
+                </div>
+                <p className="min-w-0 truncate text-sm text-accent sm:mt-1">{w.translation[locale]}</p>
+                <p lang="en" className="mt-1 hidden line-clamp-2 text-xs text-muted sm:block">{w.definition}</p>
               </div>
-              <p className="mt-1 text-sm text-accent">{w.translation[locale]}</p>
-              <p lang="en" className="mt-1 line-clamp-2 text-xs text-muted">{w.definition}</p>
             </li>
           );
         })}
       </ul>
+      {list.length > shown && (
+        <Button variant="outline" className="w-full" onClick={() => setMore({ key: filter, n: shown + 20 })}>
+          {t.results.showAll} ({list.length - shown})
+        </Button>
+      )}
     </div>
   );
 }

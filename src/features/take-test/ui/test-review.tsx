@@ -53,7 +53,7 @@ export function TestReview({
       {/* Yakuniy test: natijadan qat'i nazar sertifikat */}
       {test.final && (
           <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#f9e3a3] via-[#f5b83d] to-[#e0b04a] p-[1.5px] shadow-[0_20px_50px_-20px_#f5b83d]">
-            <div className="relative flex flex-col gap-5 overflow-hidden rounded-[calc(2rem-1.5px)] bg-[#0b0f1a] p-6 text-white sm:flex-row sm:items-center sm:p-8">
+            <div className="relative flex flex-col gap-5 overflow-hidden rounded-[calc(2rem-1.5px)] bg-ink p-6 text-white sm:flex-row sm:items-center sm:p-8">
               <span className="pointer-events-none absolute -top-20 -right-16 size-64 rounded-full bg-[#f5b83d]/20 blur-3xl" aria-hidden />
               <span className="relative grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#f9e3a3] to-[#e0b04a] text-[#2b1d03] shadow-[0_10px_30px_-8px_#f5b83d]">
                 <Icon name="medal" className="size-8" />
@@ -92,7 +92,7 @@ export function TestReview({
                 {t.runner.time}: <strong className="text-white">{formatDuration(attempt.durationSec)}</strong>
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f1cf8b]/15 px-3 py-1 text-sm font-semibold text-[#f1cf8b]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#bfdbfe]/15 px-3 py-1 text-sm font-semibold text-[#bfdbfe]">
                   <Icon name="star" className="size-4" /> +{reward.xp} XP
                 </span>
                 {reward.levelUp && (

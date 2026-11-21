@@ -14,5 +14,5 @@
     </style>
     <!-- Saytdagi surface va accent ranglari -->
     <color name="bg">#ffffff</color>
-    <color name="accent">#5b4cf5</color>
+    <color name="accent">#2563eb</color>
 </resources>

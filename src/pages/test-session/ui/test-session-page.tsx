@@ -10,7 +10,7 @@ export function TestSessionPage({ testId }: { testId: string }) {
 
   return (
     <main className="flex-1">
-      <Container className="py-8 sm:py-12">
+      <Container className="pt-0 pb-6 sm:py-12">
         <TestRunner test={test} />
       </Container>
     </main>

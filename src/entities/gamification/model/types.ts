@@ -39,6 +39,8 @@ export interface GameState {
   };
   /** Kunlik savol javoblari: sana → javob */
   daily: Record<string, DailyRecord>;
+  /** Kunlik faollik: sana → ishlangan savol/mashq soni (faollik xaritasi uchun; eski profillarda bo'lmasligi mumkin) */
+  activity?: Record<string, number>;
 }
 
 export type GameEvent =

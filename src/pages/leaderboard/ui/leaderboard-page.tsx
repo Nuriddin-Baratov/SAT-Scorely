@@ -64,15 +64,15 @@ export function LeaderboardPage() {
     };
   }, [scope, classId, session.status]);
 
-  const medal = ["bg-[#f1cf8b] text-ink", "bg-zinc-300 text-ink", "bg-[#d79b6a] text-ink"];
+  const medal = ["bg-[#bfdbfe] text-ink", "bg-zinc-300 text-ink", "bg-[#d79b6a] text-ink"];
 
   return (
     <main className="relative flex-1">
       <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
-      <Container className="relative max-w-4xl py-12 sm:py-16">
+      <Container className="relative max-w-4xl py-5 sm:py-16">
         <SectionHeading eyebrow={l.eyebrow} title={l.title} description={l.description} />
 
-        <div className="mt-10 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3 sm:mt-10">
           <div className="inline-flex rounded-full bg-surface-2 p-1" role="tablist">
             {(["week", "all"] as const).map((sc) => (
               <button

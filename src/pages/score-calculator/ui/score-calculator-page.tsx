@@ -39,10 +39,10 @@ export function ScoreCalculatorPage() {
   return (
     <main className="relative flex-1">
       <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
-      <Container className="relative py-12 sm:py-16">
+      <Container className="relative py-5 sm:py-16">
         <SectionHeading eyebrow={t.calculator.eyebrow} title={t.calculator.title} description={t.calculator.description} />
 
-        <div className="mt-10 inline-flex rounded-full bg-surface-2 p-1" role="tablist">
+        <div className="mt-4 inline-flex rounded-full bg-surface-2 p-1 sm:mt-10" role="tablist">
           {(["score", "target"] as const).map((m) => (
             <button
               key={m}
@@ -151,7 +151,7 @@ function ScoreCard({ total, sectionScores }: { total: number; sectionScores: Rec
           {total}
         </p>
         <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10">
-          <div className="h-full rounded-full bg-gradient-to-r from-[#8b7dff] to-[#f1cf8b] transition-[width] duration-500" style={{ width: `${pct}%` }} />
+          <div className="h-full rounded-full bg-gradient-to-r from-[#60a5fa] to-[#bfdbfe] transition-[width] duration-500" style={{ width: `${pct}%` }} />
         </div>
         <div className="mt-1.5 flex justify-between text-[11px] text-white/40">
           <span>400</span>

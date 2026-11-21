@@ -61,7 +61,7 @@ export function JourneyGate({ children, toolbar }: { children: ReactNode; toolba
       <div inert={blocked} className="contents">
         {children}
       </div>
-      {(!stage || redirect) && <div className="fixed inset-0 z-[56] bg-[#070b18]" aria-busy />}
+      {(!stage || redirect) && <div className="fixed inset-0 z-[56] bg-[#1e3a8a]" aria-busy />}
       {showRegister && <RegisterForm toolbar={toolbar} />}
       {showOnboarding && <StudentOnboarding toolbar={toolbar} />}
     </>

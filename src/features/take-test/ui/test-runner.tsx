@@ -24,6 +24,7 @@ import {
 import { routes } from "@/shared/config";
 import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
+import { useFocusMode } from "@/shared/lib/react";
 import { Button, ButtonLink } from "@/shared/ui/button";
 import { launchConfetti } from "@/shared/ui/confetti";
 import { Icon } from "@/shared/ui/icon";
@@ -62,6 +63,8 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
   const [path, setPath] = useState<AdaptivePath | null>(null);
   const [startedAt] = useState(() => Date.now());
   const [result, setResult] = useState<{ attempt: TestAttempt; reward: TestReward; timedOut: boolean } | null>(null);
+  // Test ketayotganda mobil navbar va sarlavha yashiriladi
+  useFocusMode(!result);
 
   const inModuleTwo = path !== null;
   const firstIndex = inModuleTwo ? moduleOneLength : 0;
@@ -182,23 +185,65 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
     );
   }
 
+  const position = index - firstIndex + 1;
+  const answeredCount = visible.length - unanswered;
+  const isLast = index >= lastIndex;
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_17rem]">
-      <div className="min-w-0 space-y-4">
-        <Card className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{test.title[locale]}</p>
-            <p className="text-xs text-muted">
-              {isAdaptive && `${inModuleTwo ? t.adaptive.module2 : t.adaptive.module1} · `}
-              {t.runner.question} {index - firstIndex + 1} {t.runner.of} {visible.length}
-            </p>
+      <div className="min-w-0 space-y-3 sm:space-y-4">
+        {/* Yuqori panel: mobilda ekran tepasiga yopishadi (fokus rejimida sayt sarlavhasi yashirin) */}
+        <div className="sticky top-0 z-30 -mx-4 border-b border-border bg-surface/95 px-4 pt-3 pb-2 backdrop-blur-xl sm:static sm:mx-0 sm:rounded-2xl sm:border sm:px-5 sm:py-4 sm:shadow-card">
+          <div className="flex items-center gap-3">
+            <ButtonLink
+              href={href(routes.tests)}
+              variant="ghost"
+              size="sm"
+              className="-ml-2 size-9 shrink-0 px-0! lg:hidden"
+              aria-label={t.runner.exit}
+            >
+              <Icon name="x" className="size-5" />
+            </ButtonLink>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">{test.title[locale]}</p>
+              <p className="text-xs text-muted tabular-nums">
+                {isAdaptive && `${inModuleTwo ? t.adaptive.module2 : t.adaptive.module1} · `}
+                {t.runner.question} {position} {t.runner.of} {visible.length}
+              </p>
+            </div>
+            <Countdown startedAt={startedAt} limitMs={limitMs} onExpire={() => finish(true)} />
           </div>
-          <Countdown startedAt={startedAt} limitMs={limitMs} onExpire={() => finish(true)} />
-        </Card>
+          {/* Progress + savol raqamlari (mobil navigator) */}
+          <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-surface-2" aria-hidden>
+            <div className="h-full rounded-full bg-accent transition-[width] duration-300" style={{ width: `${(answeredCount / visible.length) * 100}%` }} />
+          </div>
+          <div className="-mx-4 mt-2 flex gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:hidden" aria-label={t.runner.navigator}>
+            {visible.map(({ q: item, i }) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => goTo(i)}
+                aria-current={i === index ? "step" : undefined}
+                aria-label={`${t.runner.question} ${i - firstIndex + 1}`}
+                className={cn(
+                  "relative grid size-8 shrink-0 place-items-center rounded-lg text-xs font-bold tabular-nums transition",
+                  i === index
+                    ? "bg-fg text-bg"
+                    : isAnswered(answers[i])
+                      ? "bg-accent-soft text-accent"
+                      : "bg-surface-2 text-muted",
+                )}
+              >
+                {i - firstIndex + 1}
+                {marked.has(i) && <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full border-2 border-surface bg-warning" />}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <QuestionCard
           question={q}
-          number={index - firstIndex + 1}
+          number={position}
           selected={answers[index]}
           onSelect={(choice) => setAnswers((prev) => prev.map((a, i) => (i === index ? choice : a)))}
           headerExtra={
@@ -207,7 +252,7 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
               onClick={toggleMark}
               aria-pressed={marked.has(index)}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition",
+                "hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition lg:inline-flex",
                 marked.has(index) ? "bg-warning-soft text-warning" : "text-muted hover:bg-surface-2",
               )}
             >
@@ -219,23 +264,41 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
 
         {q.sectionId === "math" && <MathTools />}
 
-        <div className="flex items-center justify-between gap-3">
-          <Button variant="outline" onClick={() => goTo(index - 1)} disabled={index === firstIndex}>
-            <Icon name="arrowLeft" className="size-4" /> {t.runner.prev}
+        {/* Harakat paneli: mobilda ekran pastiga yopishgan, bosh barmoq yetadigan joyda */}
+        <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-2 border-t border-border bg-surface/95 px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] backdrop-blur-xl lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+          <Button
+            variant="outline"
+            onClick={() => goTo(index - 1)}
+            disabled={index === firstIndex}
+            className="size-12 shrink-0 px-0! lg:h-11 lg:w-auto lg:px-5!"
+            aria-label={t.runner.prev}
+          >
+            <Icon name="arrowLeft" className="size-5 lg:size-4" />
+            <span className="hidden lg:inline">{t.runner.prev}</span>
           </Button>
-          {index < lastIndex ? (
-            <Button onClick={() => goTo(index + 1)}>
+          <Button
+            variant="outline"
+            onClick={toggleMark}
+            aria-pressed={marked.has(index)}
+            aria-label={marked.has(index) ? t.runner.marked : t.runner.mark}
+            className={cn("size-12 shrink-0 px-0! lg:hidden", marked.has(index) && "border-warning bg-warning-soft text-warning")}
+          >
+            <Icon name="flag" className="size-5" />
+          </Button>
+          <div className="flex-1 lg:hidden" />
+          {!isLast ? (
+            <Button onClick={() => goTo(index + 1)} className="h-12 flex-[2] text-base lg:ml-auto lg:h-11 lg:flex-none lg:text-sm">
               {t.runner.next} <Icon name="arrowRight" className="size-4" />
             </Button>
           ) : (
-            <Button onClick={confirmFinish}>
+            <Button onClick={confirmFinish} className="h-12 flex-[2] text-base lg:ml-auto lg:h-11 lg:flex-none lg:text-sm">
               <Icon name="check" className="size-4" /> {finishLabel}
             </Button>
           )}
         </div>
       </div>
 
-      <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
+      <aside className="hidden space-y-4 lg:sticky lg:top-6 lg:block lg:self-start">
         <Card className="p-5">
           <p className="text-sm font-semibold">{t.runner.navigator}</p>
           <div className="mt-4 grid grid-cols-6 gap-2 lg:grid-cols-4">

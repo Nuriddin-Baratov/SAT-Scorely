@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
+import { GuideFold } from "./guide-fold";
+
 import {
   domainDescription,
   getDomainsBySection,
@@ -20,12 +22,12 @@ import { Checklist, ReadingBar, SampleQuestion, ScoreExplorer, Spotlight, TocSpy
 function H2({ id, n, eyebrow, children }: { id: string; n: number; eyebrow: string; children: ReactNode }) {
   return (
     <div id={id} className="reveal flex scroll-mt-24 items-start gap-4 lg:scroll-mt-6">
-      <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent to-[#2a1f9e] font-display text-lg font-bold text-white shadow-[0_10px_30px_-10px_var(--accent)]">
+      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-accent to-[#1e40af] font-display text-sm font-bold text-white shadow-[0_10px_30px_-10px_var(--accent)] sm:size-12 sm:rounded-2xl sm:text-lg">
         {String(n).padStart(2, "0")}
       </span>
       <div>
-        <p className="text-xs font-semibold tracking-[0.2em] text-accent uppercase">{eyebrow.replace(/^\d+\s*·\s*/, "")}</p>
-        <h2 className="mt-1.5 text-3xl leading-tight font-bold sm:text-4xl">{children}</h2>
+        <p className="text-[10px] font-semibold tracking-[0.2em] text-accent uppercase sm:text-xs">{eyebrow.replace(/^\d+\s*·\s*/, "")}</p>
+        <h2 className="mt-0.5 text-lg leading-tight font-bold sm:mt-1.5 sm:text-4xl">{children}</h2>
       </div>
     </div>
   );
@@ -33,8 +35,8 @@ function H2({ id, n, eyebrow, children }: { id: string; n: number; eyebrow: stri
 
 const overviewIcons: IconName[] = ["clock", "list", "trophy"];
 const sectionTheme = {
-  rw: { text: "text-accent", soft: "bg-accent-soft", ring: "#8b7dff", from: "from-accent/20", icon: "book" as IconName },
-  math: { text: "text-gold", soft: "bg-gold-soft", ring: "#f5c76b", from: "from-gold/20", icon: "calculator" as IconName },
+  rw: { text: "text-accent", soft: "bg-accent-soft", ring: "#60a5fa", from: "from-accent/20", icon: "book" as IconName },
+  math: { text: "text-gold", soft: "bg-gold-soft", ring: "#93c5fd", from: "from-gold/20", icon: "calculator" as IconName },
 };
 
 /** Domenning imtihondagi ulushi — kichik donut */
@@ -71,11 +73,11 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
   const flow = t.home.structure.flow;
   const [rw, math] = sections;
   const timeline = [
-    { label: `R&W · 1`, min: rw.modules.minutes, cls: "from-[#8b7dff] to-[#5b4cf5]" },
-    { label: `R&W · 2`, min: rw.modules.minutes, cls: "from-[#a99dff] to-[#8b7dff]" },
+    { label: `R&W · 1`, min: rw.modules.minutes, cls: "from-[#60a5fa] to-[#2563eb]" },
+    { label: `R&W · 2`, min: rw.modules.minutes, cls: "from-[#bfdbfe] to-[#60a5fa]" },
     { label: "☕", min: 10, cls: "from-white/25 to-white/10" },
-    { label: `Math · 1`, min: math.modules.minutes, cls: "from-[#ffe3a3] to-[#f5c76b]" },
-    { label: `Math · 2`, min: math.modules.minutes, cls: "from-[#f5c76b] to-amber-500" },
+    { label: `Math · 1`, min: math.modules.minutes, cls: "from-[#dbeafe] to-[#93c5fd]" },
+    { label: `Math · 2`, min: math.modules.minutes, cls: "from-[#93c5fd] to-amber-500" },
   ];
   const totalMin = timeline.reduce((s, x) => s + x.min, 0);
   // Yuguruvchi lenta: barcha SAT ko'nikmalari (bo'lim rangi bilan)
@@ -103,13 +105,13 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
       <Spotlight />
       {/* ================= HERO ================= */}
       <section className="px-3 pt-3">
-        <div className="relative overflow-hidden rounded-[2.25rem] bg-[#0b0f1a] text-white">
+        <div className="relative overflow-hidden rounded-[2.25rem] bg-ink text-white">
           <Particles />
           <div className="bg-grid-dark pointer-events-none absolute inset-0 opacity-60" aria-hidden />
           <div className="relative mx-auto grid max-w-6xl gap-12 px-6 pt-14 pb-16 sm:px-10 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:pt-20 lg:pb-20">
             <div className="pro-in">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3.5 py-1.5 text-xs font-medium text-white/85 ring-1 ring-white/10">
-                <Icon name="book" className="size-3.5 text-[#f5c76b]" /> {g.badge}
+                <Icon name="book" className="size-3.5 text-[#93c5fd]" /> {g.badge}
               </span>
               <h1 className="mt-6 text-5xl leading-[0.98] font-bold sm:text-6xl lg:text-7xl">
                 {g.titleA}{" "}
@@ -131,23 +133,23 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
 
             {/* Imtihon vaqt chizig'i (atrofida suzuvchi chiplar) */}
             <div className="relative">
-              <span className="animate-float absolute -top-5 -left-4 z-10 hidden rounded-2xl bg-white px-3 py-2 text-xs font-bold text-[#0b0f1a] shadow-lift lg:block">
+              <span className="animate-float absolute -top-5 -left-4 z-10 hidden rounded-2xl bg-white px-3 py-2 text-xs font-bold text-[#1e3a8a] shadow-lift lg:block">
                 🎯 400 – 1600
               </span>
-              <span className="animate-float absolute -right-3 -bottom-5 z-10 hidden rounded-2xl bg-gradient-to-r from-[#f5c76b] to-[#ffe3a3] px-3 py-2 text-xs font-bold text-[#0b0f1a] shadow-lift [animation-delay:-3s] lg:block">
+              <span className="animate-float absolute -right-3 -bottom-5 z-10 hidden rounded-2xl bg-gradient-to-r from-[#93c5fd] to-[#dbeafe] px-3 py-2 text-xs font-bold text-[#1e3a8a] shadow-lift [animation-delay:-3s] lg:block">
                 ⚡ {t.adaptive.badge} · Bluebook
               </span>
             <div className="pro-card pro-in p-6 [animation-delay:150ms] sm:p-7">
               <div className="flex items-center justify-between text-sm">
                 <span className="font-semibold">{g.structure.title}</span>
-                <span className="font-display font-bold text-[#f5c76b] tabular-nums">{totalMin} {t.common.min}</span>
+                <span className="font-display font-bold text-[#93c5fd] tabular-nums">{totalMin} {t.common.min}</span>
               </div>
               <div className="meter-run mt-5 flex h-14 gap-1.5">
                 {timeline.map((seg, i) => (
                   <div
                     key={i}
                     className={cn(
-                      "meter-fill relative grid basis-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-b text-[10px] font-bold text-[#0b0f1a]",
+                      "meter-fill relative grid basis-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-b text-[10px] font-bold text-[#1e3a8a]",
                       seg.cls,
                     )}
                     style={{ flexGrow: seg.min, "--d": `${300 + i * 140}ms` } as CSSProperties}
@@ -160,7 +162,7 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
               <div className="mt-6 grid grid-cols-2 gap-3">
                 {g.heroStats.map(([v, l], i) => (
                   <div key={l} className="rounded-2xl bg-white/[0.04] px-4 py-3 ring-1 ring-white/10 pro-in" style={{ animationDelay: `${400 + i * 90}ms` }}>
-                    <p className="font-display text-xl font-bold text-[#ffe3a3]">{v}</p>
+                    <p className="font-display text-xl font-bold text-[#dbeafe]">{v}</p>
                     <p className="text-xs text-white/50">{l}</p>
                   </div>
                 ))}
@@ -178,7 +180,7 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
                   aria-hidden={i >= skills.length}
                   className="flex shrink-0 items-center gap-2 rounded-full bg-white/[0.05] px-4 py-1.5 text-sm text-white/70 ring-1 ring-white/10"
                 >
-                  <span className={cn("size-1.5 rounded-full", sk.section === "rw" ? "bg-[#a99dff]" : "bg-[#f5c76b]")} />
+                  <span className={cn("size-1.5 rounded-full", sk.section === "rw" ? "bg-[#bfdbfe]" : "bg-[#93c5fd]")} />
                   {sk.name}
                 </span>
               ))}
@@ -187,14 +189,14 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[250px_1fr] lg:py-20">
+      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-4 sm:px-6 lg:grid-cols-[250px_1fr] lg:py-20">
         <aside className="hidden lg:block">
           <TocSpy items={toc} label={g.tocLabel} progressLabel={g.readProgress} />
         </aside>
 
-        <article className="min-w-0 space-y-24">
+        <article className="min-w-0 space-y-2.5 lg:space-y-24">
           {/* Mobil mundarija */}
-          <nav aria-label={g.tocLabel} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:hidden">
+          <nav aria-label={g.tocLabel} className="-mx-4 hidden gap-2 overflow-x-auto px-4 pb-1">
             {toc.map((item, i) => (
               <a key={item.id} href={`#${item.id}`} className="shrink-0 rounded-full bg-surface-2 px-3.5 py-2 text-sm font-medium text-muted hover:text-fg">
                 <span className="mr-1.5 text-xs text-accent tabular-nums">{i + 1}</span>
@@ -204,8 +206,7 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
           </nav>
 
           {/* ================= Umumiy ================= */}
-          <section className="space-y-8">
-            <H2 id="overview" n={num("overview")} eyebrow={g.overview.eyebrow}>{g.overview.title}</H2>
+          <GuideFold id="overview" heading={<H2 id="overview" n={num("overview")} eyebrow={g.overview.eyebrow}>{g.overview.title}</H2>}>
             <div className="space-y-4 text-lg leading-relaxed text-muted">
               {g.overview.paragraphs.map((p) => (
                 <p key={p}>{p}</p>
@@ -226,14 +227,13 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
                 </div>
               ))}
             </div>
-          </section>
+          </GuideFold>
 
           {/* ================= Savolni sinab ko'rish ================= */}
           <SampleQuestion />
 
           {/* ================= Tuzilma ================= */}
-          <section className="space-y-8">
-            <H2 id="structure" n={num("structure")} eyebrow={g.structure.eyebrow}>{g.structure.title}</H2>
+          <GuideFold id="structure" heading={<H2 id="structure" n={num("structure")} eyebrow={g.structure.eyebrow}>{g.structure.title}</H2>}>
             <div className="grid items-stretch gap-4 md:grid-cols-[1fr_auto_1fr]">
               {sections.map((s, idx) => {
                 const th = sectionTheme[s.id];
@@ -296,24 +296,23 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
             <p className="flex gap-3 rounded-2xl bg-accent-soft/60 p-4 text-sm text-muted">
               <Icon name="sparkles" className="mt-0.5 size-4 shrink-0 text-accent" /> {g.structure.pretest}
             </p>
-          </section>
+          </GuideFold>
 
           {/* ================= Adaptiv ================= */}
-          <section className="space-y-8">
-            <H2 id="adaptive" n={num("adaptive")} eyebrow={g.adaptive.eyebrow}>{g.adaptive.title}</H2>
-            <div className="reveal relative overflow-hidden rounded-[2rem] bg-[#0b0f1a] p-6 text-white sm:p-8">
+          <GuideFold id="adaptive" heading={<H2 id="adaptive" n={num("adaptive")} eyebrow={g.adaptive.eyebrow}>{g.adaptive.title}</H2>}>
+            <div className="reveal relative overflow-hidden rounded-[2rem] bg-ink p-6 text-white sm:p-8">
               <Particles />
               <div className="relative grid items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
                 <div className="rounded-2xl bg-white/[0.05] p-5 ring-1 ring-white/10">
-                  <p className="text-sm font-bold text-[#a99dff]">{flow.m1}</p>
+                  <p className="text-sm font-bold text-[#bfdbfe]">{flow.m1}</p>
                   <p className="text-xs text-white/50">{flow.m1Sub}</p>
                   <p className="mt-3 text-sm text-white/70">{g.adaptive.m1}</p>
                 </div>
 
                 {/* Algoritm tuguni */}
                 <div className="flex flex-col items-center gap-2 py-2 text-center">
-                  <span className="relative grid size-16 place-items-center rounded-full bg-gradient-to-br from-[#f5c76b] to-[#5b8cff] text-[#0b0f1a] shadow-[0_0_30px_rgb(245_199_107/0.5)]">
-                    <span className="absolute inset-0 animate-ping rounded-full bg-[#f5c76b]/30" aria-hidden />
+                  <span className="relative grid size-16 place-items-center rounded-full bg-gradient-to-br from-[#93c5fd] to-[#60a5fa] text-[#1e3a8a] shadow-[0_0_30px_rgb(245_199_107/0.5)]">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-[#93c5fd]/30" aria-hidden />
                     <Icon name="brain" className="relative size-7" />
                   </span>
                   <p className="text-sm font-bold">{flow.algo}</p>
@@ -321,8 +320,8 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="rounded-2xl bg-gradient-to-r from-[#f5c76b]/20 to-transparent p-4 ring-1 ring-[#f5c76b]/40">
-                    <p className="flex items-center gap-2 text-sm font-bold text-[#f5c76b]">
+                  <div className="rounded-2xl bg-gradient-to-r from-[#93c5fd]/20 to-transparent p-4 ring-1 ring-[#93c5fd]/40">
+                    <p className="flex items-center gap-2 text-sm font-bold text-[#93c5fd]">
                       <Icon name="trending" className="size-4" /> {flow.hard}
                     </p>
                     <p className="text-xs text-white/55">{flow.hardSub}</p>
@@ -338,17 +337,16 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
             <p className="flex gap-3 rounded-2xl border-l-4 border-gold bg-gold-soft/60 p-4 leading-relaxed">
               <Icon name="bolt" className="mt-1 size-4 shrink-0 text-gold" /> {g.adaptive.takeaway}
             </p>
-          </section>
+          </GuideFold>
 
           {/* ================= Bo'limlar ================= */}
           {sections.map((raw) => {
             const section = localizeSection(raw, locale);
             const th = sectionTheme[section.id];
             return (
-              <section key={section.id} className="space-y-8">
-                <H2 id={section.id} n={num(section.id)} eyebrow={g.sectionEyebrow}>
+              <GuideFold key={section.id} id={section.id} heading={<H2 id={section.id} n={num(section.id)} eyebrow={g.sectionEyebrow}>
                   {section.name}
-                </H2>
+                </H2>}>
                 <div className={cn("reveal rounded-3xl bg-gradient-to-br to-transparent p-6 sm:p-8", th.from)}>
                   <p className="text-lg leading-relaxed">{section.description}</p>
                   <div className="mt-5 flex flex-wrap gap-3">
@@ -424,26 +422,24 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
                     </div>
                   ))}
                 </div>
-              </section>
+              </GuideFold>
             );
           })}
 
           {/* ================= Ballash ================= */}
-          <section className="space-y-8">
-            <H2 id="scoring" n={num("scoring")} eyebrow={g.scoring.eyebrow}>{g.scoring.title}</H2>
+          <GuideFold id="scoring" heading={<H2 id="scoring" n={num("scoring")} eyebrow={g.scoring.eyebrow}>{g.scoring.title}</H2>}>
             <p className="leading-relaxed text-muted">{g.scoring.text}</p>
             <ScoreExplorer bands={facts.scoreBands} title={g.explorer.title} hint={g.explorer.hint} percentileLabel={g.scoring.percentile} />
             <p className="text-xs text-muted">{g.scoring.note}</p>
-          </section>
+          </GuideFold>
 
           {/* ================= Ro'yxatdan o'tish ================= */}
-          <section className="space-y-8">
-            <H2 id="registration" n={num("registration")} eyebrow={g.registration.eyebrow}>{g.registration.title}</H2>
+          <GuideFold id="registration" heading={<H2 id="registration" n={num("registration")} eyebrow={g.registration.eyebrow}>{g.registration.title}</H2>}>
             <ol className="relative space-y-4">
               <span className="absolute top-6 bottom-6 left-6 w-0.5 bg-gradient-to-b from-accent via-gold to-transparent" aria-hidden />
               {facts.timeline.map((item, i) => (
                 <li key={item.title} className="reveal relative flex gap-5">
-                  <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent to-[#2a1f9e] font-display font-bold text-white shadow-[0_0_0_6px_var(--bg),0_10px_24px_-8px_var(--accent)]">
+                  <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent to-[#1e40af] font-display font-bold text-white shadow-[0_0_0_6px_var(--bg),0_10px_24px_-8px_var(--accent)]">
                     {i + 1}
                   </span>
                   <div className="spot flex-1 rounded-2xl border border-border bg-surface p-5 shadow-card transition hover:shadow-lift">
@@ -461,17 +457,15 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
             >
               <Icon name="calendar" className="size-4" /> {g.registration.link} ↗
             </a>
-          </section>
+          </GuideFold>
 
           {/* ================= Test kuni ================= */}
-          <section className="space-y-8">
-            <H2 id="test-day" n={num("test-day")} eyebrow={g.testDay.eyebrow}>{g.testDay.title}</H2>
+          <GuideFold id="test-day" heading={<H2 id="test-day" n={num("test-day")} eyebrow={g.testDay.eyebrow}>{g.testDay.title}</H2>}>
             <Checklist items={facts.checklist} />
-          </section>
+          </GuideFold>
 
           {/* ================= Strategiyalar ================= */}
-          <section className="space-y-8">
-            <H2 id="strategies" n={num("strategies")} eyebrow={g.strategies.eyebrow}>{g.strategies.title}</H2>
+          <GuideFold id="strategies" heading={<H2 id="strategies" n={num("strategies")} eyebrow={g.strategies.eyebrow}>{g.strategies.title}</H2>}>
             <div className="grid gap-4 sm:grid-cols-2">
               {facts.strategies.map((s, i) => (
                 <div
@@ -490,11 +484,10 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
                 </div>
               ))}
             </div>
-          </section>
+          </GuideFold>
 
           {/* ================= FAQ ================= */}
-          <section className="space-y-8">
-            <H2 id="faq" n={num("faq")} eyebrow={g.faq.eyebrow}>{g.faq.title}</H2>
+          <GuideFold id="faq" heading={<H2 id="faq" n={num("faq")} eyebrow={g.faq.eyebrow}>{g.faq.title}</H2>}>
             <div className="space-y-3">
               {facts.faq.map((item) => (
                 <details key={item.q} className="spot reveal group rounded-2xl border border-border bg-surface px-5 py-4 shadow-card transition open:border-accent/40 sm:px-6">
@@ -508,10 +501,10 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
                 </details>
               ))}
             </div>
-          </section>
+          </GuideFold>
 
           {/* ================= CTA ================= */}
-          <div className="reveal relative overflow-hidden rounded-[2rem] bg-[#0b0f1a] p-10 text-center text-white sm:p-14">
+          <div className="reveal relative overflow-hidden rounded-[2rem] bg-ink p-10 text-center text-white sm:p-14">
             <Particles />
             <div className="relative">
               <h2 className="font-display text-4xl font-bold sm:text-5xl">

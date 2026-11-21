@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Saytdagi logotip foni: binafsha gradient -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <gradient android:angle="315" android:startColor="#7b6dff" android:centerColor="#5b4cf5" android:endColor="#2a1f9e" android:type="linear" />
+    <gradient android:angle="315" android:startColor="#3b82f6" android:centerColor="#2563eb" android:endColor="#1e40af" android:type="linear" />
 </shape>

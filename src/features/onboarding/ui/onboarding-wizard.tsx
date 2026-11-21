@@ -113,13 +113,13 @@ function Wizard({ existing, today }: { existing: StudentProfile | null; today: s
             <span />
           </div>
           <div className="relative">
-            <p className="text-xs font-semibold tracking-[0.18em] text-[#a99dff] uppercase">{o.eyebrow}</p>
+            <p className="text-xs font-semibold tracking-[0.18em] text-[#bfdbfe] uppercase">{o.eyebrow}</p>
             <p className="mt-2 font-display text-2xl leading-tight">
               {o.stepsCount(steps.length)} <span className="font-serif font-normal tracking-normal italic">{o.fiveMin}</span>
             </p>
             <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#8b7dff] to-[#f1cf8b] transition-[width] duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-[#60a5fa] to-[#bfdbfe] transition-[width] duration-500"
                 style={{ width: `${((step + 1) / steps.length) * 100}%` }}
               />
             </div>
@@ -154,7 +154,7 @@ function Wizard({ existing, today }: { existing: StudentProfile | null; today: s
               ))}
             </ol>
             <div className="mt-6 flex gap-3 rounded-2xl bg-white/[0.06] p-4 text-xs leading-relaxed text-white/60 ring-1 ring-white/10">
-              <Icon name="shield" className="size-5 shrink-0 text-[#a99dff]" />
+              <Icon name="shield" className="size-5 shrink-0 text-[#bfdbfe]" />
               {o.privacy}
             </div>
           </div>

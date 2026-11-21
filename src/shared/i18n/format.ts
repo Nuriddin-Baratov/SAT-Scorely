@@ -1,4 +1,4 @@
-import { WEEKDAYS_LONG, WEEKDAYS_SHORT, formatDate, parseISODate } from "@/shared/lib";
+import { MONTHS_SHORT, WEEKDAYS_LONG, WEEKDAYS_SHORT, formatDate, parseISODate } from "@/shared/lib";
 
 import { localeTags, type Locale } from "./config";
 
@@ -36,4 +36,10 @@ export function formatMinutes(minutes: number, locale: Locale) {
   if (minutes < 60) return `${minutes} ${units[0]}`;
   const hours = Math.round((minutes / 60) * 10) / 10;
   return `${locale === "en" ? hours : String(hours).replace(".", ",")} ${units[1]}`;
+}
+
+/** Oyning qisqa nomi (0 = yanvar): “noy” / “нояб.” / “Nov” */
+export function monthShort(month: number, locale: Locale) {
+  if (locale === "uz") return MONTHS_SHORT[month];
+  return new Intl.DateTimeFormat(localeTags[locale], { month: "short" }).format(new Date(2026, month, 1));
 }

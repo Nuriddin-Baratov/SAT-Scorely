@@ -91,48 +91,48 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {/* ============ HERO ============ */}
-      <section className="noise relative overflow-hidden rounded-[2rem] bg-ink text-white">
+      <section className="noise relative overflow-hidden rounded-2xl bg-ink text-white sm:rounded-[2rem]">
         <div className="aurora opacity-80" aria-hidden>
           <span />
           <span />
           <span />
         </div>
         <div className="bg-grid-dark pointer-events-none absolute inset-0" aria-hidden />
-        <div className="relative grid gap-8 p-5 sm:gap-10 sm:p-10 lg:grid-cols-[1.25fr_1fr] lg:items-center [&>*]:min-w-0">
+        <div className="relative grid gap-8 p-4 sm:gap-10 sm:p-10 lg:grid-cols-[1.25fr_1fr] lg:items-center [&>*]:min-w-0">
           <div>
-            <Eyebrow className="text-[#a99dff]">{d.eyebrow}</Eyebrow>
-            <h1 className="mt-4 text-4xl leading-none sm:text-6xl">
+            <Eyebrow className="text-[#bfdbfe]">{d.eyebrow}</Eyebrow>
+            <h1 className="mt-2 text-2xl leading-none sm:mt-4 sm:text-6xl">
               {d.hello} <span className="text-gradient-light font-serif font-normal tracking-normal italic">{firstName(profile)}</span>
             </h1>
-            <div className="mt-5 flex flex-wrap gap-2 text-xs">
+            <div className="mt-5 hidden flex-wrap gap-2 text-xs sm:flex">
               <span className="glass rounded-full px-3 py-1.5">{d.weekPlan(plan.weeks.length)}</span>
               <span className="glass rounded-full px-3 py-1.5">{d.phase(phaseMeta[plan.weeks[thisWeek].phase].name)}</span>
               <span className="glass rounded-full px-3 py-1.5">{d.weekN(thisWeek + 1)}</span>
             </div>
 
-            <div className="mt-8 flex items-end gap-3 sm:mt-9 sm:gap-5">
+            <div className="mt-4 flex items-end gap-3 sm:mt-9 sm:gap-5">
               <div>
                 <p className="text-xs text-white/50">{d.now}</p>
-                <p className="font-display text-5xl leading-none sm:text-7xl">{plan.baseline.total}</p>
+                <p className="font-display text-4xl leading-none sm:text-7xl">{plan.baseline.total}</p>
               </div>
               <div className="mb-4 flex min-w-6 flex-1 items-center gap-2 sm:mb-5" aria-hidden>
-                <span className="h-px flex-1 bg-gradient-to-r from-white/10 to-[#a99dff]" />
-                <Icon name="arrowRight" className="size-4 text-[#a99dff]" />
+                <span className="h-px flex-1 bg-gradient-to-r from-white/10 to-[#bfdbfe]" />
+                <Icon name="arrowRight" className="size-4 text-[#bfdbfe]" />
               </div>
               <div className="text-right">
                 <p className="text-xs text-white/50">{d.target}</p>
-                <p className="text-gradient-light font-display text-5xl leading-none sm:text-7xl">{plan.target.total}</p>
+                <p className="text-gradient-light font-display text-4xl leading-none sm:text-7xl">{plan.target.total}</p>
               </div>
             </div>
-            <div className="mt-7 grid gap-5 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-7 sm:gap-5">
               <SectionScore label="Reading & Writing" from={plan.baseline.rw} to={plan.target.rw} />
               <SectionScore label="Math" from={plan.baseline.math} to={plan.target.math} />
             </div>
           </div>
 
-          <div className="glass rounded-[1.75rem] p-5 sm:p-6">
+          <div className="glass hidden rounded-[1.75rem] p-5 sm:p-6 lg:block">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold">{d.progress}</p>
               <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", feas.cls)}>{feas.label}</span>
@@ -175,16 +175,19 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
       </section>
 
       {/* ============ STATISTIKA ============ */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
         {stats.map((s) => (
-          <Card key={s.label} className="flex items-center gap-4 p-5">
-            <IconTile tone={s.tone}>
+          <Card key={s.label} className="flex items-center gap-4 p-3.5 sm:p-5">
+            <IconTile tone={s.tone} className="hidden sm:grid">
               <Icon name={s.icon} />
             </IconTile>
             <div className="min-w-0">
-              <p className="text-xs text-muted">{s.label}</p>
+              <p className="flex items-center gap-1.5 truncate text-xs text-muted">
+                <Icon name={s.icon} className="size-3.5 sm:hidden" />
+                {s.label}
+              </p>
               <p className="font-display text-xl sm:text-2xl">{s.value}</p>
-              <p className="truncate text-[11px] text-muted">{s.hint}</p>
+              <p className="hidden truncate text-[11px] text-muted sm:block">{s.hint}</p>
             </div>
           </Card>
         ))}
@@ -194,7 +197,7 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
       {next ? (
         <NextSessionCard session={next} today={today} onOpen={() => setOpenSession(next)} />
       ) : (
-        <Card className="p-10 text-center">
+        <Card className="p-6 text-center sm:p-10">
           <IconTile tone="gold" className="mx-auto size-14">
             <Icon name="trophy" className="size-6" />
           </IconTile>
@@ -203,40 +206,40 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
         </Card>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="hidden gap-6 lg:grid lg:grid-cols-2">
         <DomainFocusCard plan={plan} adaptedFrom={performance.questions} />
         <PhasesCard plan={plan} currentWeek={thisWeek} />
       </div>
 
       {/* ============ HAFTALIK JADVAL ============ */}
-      <Card className="p-6 sm:p-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex items-center gap-4">
-            <IconTile>
+      <Card className="p-4 sm:p-8">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-4">
+            <IconTile className="hidden sm:grid">
               <Icon name="calendar" />
             </IconTile>
-            <div>
-              <h2 className="text-xl">{d.schedule}</h2>
-              <p className="mt-0.5 text-sm text-muted">
+            <div className="min-w-0">
+              <h2 className="text-lg sm:text-xl">{d.schedule}</h2>
+              <p className="mt-0.5 truncate text-xs text-muted sm:text-sm">
                 {formatDay(week.start, locale)} – {formatDay(week.end, locale)} · {phaseMeta[week.phase].name}
                 {week.focus.length > 0 && ` · ${d.focus}: ${week.focus.join(", ")}`}
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled={week.index === 0} onClick={() => setSelectedWeek(week.index - 1)} aria-label={d.prevWeek}>
+          <div className="flex shrink-0 gap-1.5 sm:gap-2">
+            <Button variant="outline" size="sm" className="size-9 px-0! sm:w-auto sm:px-3.5!" disabled={week.index === 0} onClick={() => setSelectedWeek(week.index - 1)} aria-label={d.prevWeek}>
               <Icon name="arrowRight" className="size-4 rotate-180" />
             </Button>
-            <Button variant="outline" size="sm" disabled={week.index === thisWeek} onClick={() => setSelectedWeek(null)}>
+            <Button variant="outline" size="sm" className="hidden sm:inline-flex" disabled={week.index === thisWeek} onClick={() => setSelectedWeek(null)}>
               {d.thisWeek}
             </Button>
-            <Button variant="outline" size="sm" disabled={week.index === plan.weeks.length - 1} onClick={() => setSelectedWeek(week.index + 1)} aria-label={d.nextWeek}>
+            <Button variant="outline" size="sm" className="size-9 px-0! sm:w-auto sm:px-3.5!" disabled={week.index === plan.weeks.length - 1} onClick={() => setSelectedWeek(week.index + 1)} aria-label={d.nextWeek}>
               <Icon name="arrowRight" className="size-4" />
             </Button>
           </div>
         </div>
 
-        <div className="-mx-1 mt-6 flex gap-1.5 overflow-x-auto px-1 pb-2" role="tablist" aria-label={d.weeksLabel}>
+        <div className="-mx-1 mt-4 flex gap-1.5 overflow-x-auto px-1 pb-2 [scrollbar-width:none] sm:mt-6" role="tablist" aria-label={d.weeksLabel}>
           {plan.weeks.map((w) => {
             const total = w.sessions.length;
             const doneCount = w.sessions.filter((s) => done.has(s.id)).length;
@@ -269,7 +272,7 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
           })}
         </div>
 
-        <ul className="mt-5 space-y-2">
+        <ul className="mt-3 space-y-1.5 sm:mt-5 sm:space-y-2">
           {week.sessions.length === 0 && <li className="py-8 text-center text-sm text-muted">{d.noSessions}</li>}
           {week.sessions.map((session) => {
             const isDone = done.has(session.id);
@@ -278,7 +281,7 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
               <li
                 key={session.id}
                 className={cn(
-                  "flex items-center gap-4 rounded-2xl border p-3 transition sm:p-4",
+                  "flex items-center gap-3 rounded-xl border p-2.5 transition sm:gap-4 sm:rounded-2xl sm:p-4",
                   isToday ? "border-accent/40 bg-accent-soft/50" : "border-border bg-bg",
                 )}
               >
@@ -295,7 +298,7 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
                   <SessionKindIcon kind={session.kind} className="hidden sm:grid" />
                   <div className="min-w-0 flex-1">
                     <p className={cn("truncate font-semibold", isDone && "text-muted line-through")}>{session.title}</p>
-                    <p className="truncate text-sm text-muted">{session.subtitle}</p>
+                    <p className="hidden truncate text-sm text-muted sm:block">{session.subtitle}</p>
                   </div>
                   <div className="hidden shrink-0 items-center gap-2 md:flex">
                     {isToday && <Badge tone="accent">{t.dashboard.today}</Badge>}
@@ -329,8 +332,8 @@ function Ring({ value }: { value: number }) {
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90" aria-hidden>
       <defs>
         <linearGradient id="ring-grad" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#a99dff" />
-          <stop offset="1" stopColor="#f1cf8b" />
+          <stop offset="0" stopColor="#bfdbfe" />
+          <stop offset="1" stopColor="#bfdbfe" />
         </linearGradient>
       </defs>
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgb(255 255 255 / 0.1)" strokeWidth={stroke} />
@@ -352,17 +355,21 @@ function Ring({ value }: { value: number }) {
 
 function SectionScore({ label, from, to }: { label: string; from: number; to: number }) {
   const scale = (n: number) => ((n - 200) / 600) * 100;
+  const short = label.startsWith("Reading") ? "R&W" : label;
   return (
     <div>
-      <div className="flex justify-between text-sm">
-        <span className="font-medium text-white/80">{label}</span>
-        <span className="text-white/50">
+      <div className="flex justify-between gap-2 text-sm">
+        <span className="font-medium text-white/85">
+          <span className="sm:hidden">{short}</span>
+          <span className="hidden sm:inline">{label}</span>
+        </span>
+        <span className="text-white/70 tabular-nums">
           {from} → <span className="font-semibold text-white">{to}</span>
         </span>
       </div>
-      <div className="relative mt-2 h-2 rounded-full bg-white/10">
-        <div className="absolute inset-y-0 left-0 rounded-full bg-[#a99dff]/30" style={{ width: `${scale(to)}%` }} />
-        <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#5b4cf5] to-[#a99dff]" style={{ width: `${scale(from)}%` }} />
+      <div className="relative mt-2 h-2 rounded-full bg-white/15">
+        <div className="absolute inset-y-0 left-0 rounded-full bg-white/35" style={{ width: `${scale(to)}%` }} />
+        <div className="absolute inset-y-0 left-0 rounded-full bg-white" style={{ width: `${scale(from)}%` }} />
       </div>
     </div>
   );
@@ -374,9 +381,9 @@ function NextSessionCard({ session, today, onOpen }: { session: PlanSession; tod
   const diff = daysBetween(parseISODate(today), parseISODate(session.date));
   const when = diff === 0 ? t.dashboard.today : diff === 1 ? d.tomorrow : diff < 0 ? d.missed(-diff) : formatDay(session.date, locale);
   return (
-    <div className="gradient-border relative overflow-hidden rounded-[2rem] bg-surface p-5 shadow-lift sm:p-9">
+    <div className="gradient-border relative overflow-hidden rounded-2xl bg-surface p-4 shadow-lift sm:rounded-[2rem] sm:p-9">
       <div className="glow pointer-events-none absolute inset-0 opacity-70" aria-hidden />
-      <div className="relative grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <div className="relative grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-8">
         <div>
           <div className="flex items-center gap-3">
             <SessionKindIcon kind={session.kind} />
@@ -385,20 +392,20 @@ function NextSessionCard({ session, today, onOpen }: { session: PlanSession; tod
               <p className={cn("text-sm font-medium", diff < 0 ? "text-warning" : "text-muted")}>{when}</p>
             </div>
           </div>
-          <h2 className="mt-5 text-3xl leading-tight break-words sm:text-5xl">{session.title}</h2>
-          <p className="mt-2 text-muted">{session.subtitle}</p>
-          <div className="mt-5 flex flex-wrap gap-2">
+          <h2 className="mt-3 text-xl leading-tight break-words sm:mt-5 sm:text-5xl">{session.title}</h2>
+          <p className="mt-1 line-clamp-1 text-sm text-muted sm:mt-2 sm:line-clamp-none sm:text-base">{session.subtitle}</p>
+          <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2">
             <Badge tone="accent" className="px-3 py-1">{sessionKindLabels(locale)[session.kind]}</Badge>
             <Badge className="px-3 py-1"><Icon name="clock" className="size-3" /> {session.minutes} {t.common.minutes}</Badge>
             <Badge className="px-3 py-1">{session.questions} {t.common.questions}</Badge>
             <Badge tone="gold" className="px-3 py-1">{difficultyLabels(locale)[session.difficulty]}</Badge>
           </div>
-          <Button size="lg" onClick={onOpen} className="mt-8">
+          <Button size="lg" onClick={onOpen} className="mt-4 w-full sm:mt-8 sm:w-auto">
             <Icon name="play" className="size-4" />
             {d.start}
           </Button>
         </div>
-        <ol className="relative space-y-2 before:absolute before:top-5 before:bottom-5 before:left-[1.35rem] before:w-px before:bg-border">
+        <ol className="relative hidden space-y-2 before:absolute lg:block before:top-5 before:bottom-5 before:left-[1.35rem] before:w-px before:bg-border">
           {session.blocks.map((b, i) => (
             <li key={b.label} className="relative flex items-center gap-4 rounded-2xl border border-border bg-surface px-3 py-3">
               <span className="relative z-10 grid size-7 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-white">{i + 1}</span>

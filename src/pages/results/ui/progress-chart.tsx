@@ -17,7 +17,7 @@ const H = 240;
 const PAD = { top: 28, right: 20, bottom: 30, left: 40 };
 const TICKS = [0, 25, 50, 75, 100];
 const DRAW_MS = 1400;
-const dotColor = { good: "#34d399", mid: "#f5c76b", low: "#fb7185" } as const;
+const dotColor = { good: "#34d399", mid: "#93c5fd", low: "#fb7185" } as const;
 
 /** Silliq egri chiziq (Catmull-Rom → Bezier); boshqaruv nuqtalari grafik chegarasidan chiqmaydi. */
 function smoothPath(pts: { x: number; y: number }[], minY: number, maxY: number) {
@@ -80,15 +80,15 @@ export function ProgressChart({ points, valueLabel, avgLabel }: { points: ChartP
       >
         <defs>
           <linearGradient id="chart-area" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#5b8cff" stopOpacity="0.35" />
-            <stop offset="0.6" stopColor="#8b7dff" stopOpacity="0.1" />
-            <stop offset="1" stopColor="#8b7dff" stopOpacity="0" />
+            <stop offset="0" stopColor="#60a5fa" stopOpacity="0.35" />
+            <stop offset="0.6" stopColor="#60a5fa" stopOpacity="0.1" />
+            <stop offset="1" stopColor="#60a5fa" stopOpacity="0" />
           </linearGradient>
           {/* userSpaceOnUse — chiziq to'liq gorizontal bo'lsa ham ko'rinadi */}
           <linearGradient id="chart-line" gradientUnits="userSpaceOnUse" x1={PAD.left} y1="0" x2={W - PAD.right} y2="0">
-            <stop offset="0" stopColor="#5b8cff" />
-            <stop offset="0.55" stopColor="#a99dff" />
-            <stop offset="1" stopColor="#f5c76b" />
+            <stop offset="0" stopColor="#60a5fa" />
+            <stop offset="0.55" stopColor="#bfdbfe" />
+            <stop offset="1" stopColor="#93c5fd" />
           </linearGradient>
           <filter id="chart-glow" x="-10%" y="-30%" width="120%" height="160%">
             <feGaussianBlur stdDeviation="6" />
@@ -116,8 +116,8 @@ export function ProgressChart({ points, valueLabel, avgLabel }: { points: ChartP
         {/* O'rtacha qiymat */}
         {avgLabel && points.length > 1 && (
           <g className="chart-fade">
-            <line x1={PAD.left} x2={W - PAD.right} y1={y(avg)} y2={y(avg)} stroke="#f5c76b" strokeOpacity="0.55" strokeDasharray="6 5" />
-            <text x={W - PAD.right} y={y(avg) - 6} textAnchor="end" className="fill-[#f5c76b] text-[10px] font-semibold">
+            <line x1={PAD.left} x2={W - PAD.right} y1={y(avg)} y2={y(avg)} stroke="#93c5fd" strokeOpacity="0.55" strokeDasharray="6 5" />
+            <text x={W - PAD.right} y={y(avg) - 6} textAnchor="end" className="fill-[#93c5fd] text-[10px] font-semibold">
               {avgLabel} · {avg}%
             </text>
           </g>

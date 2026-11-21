@@ -28,10 +28,10 @@ import { journeyTexts } from "../model/texts";
 
 const stepIcons: IconName[] = ["user", "trending", "target", "calendar", "brain"];
 const stepBands = [
-  "from-[#4a63ec] to-[#1f3bb3]",
-  "from-[#1f3bb3] to-[#070b18]",
-  "from-[#9a7cf7] to-[#4a63ec]",
-  "from-[#2fc2b0] to-[#1f3bb3]",
+  "from-[#3b82f6] to-[#1d4ed8]",
+  "from-[#1d4ed8] to-[#1e3a8a]",
+  "from-[#9a7cf7] to-[#3b82f6]",
+  "from-[#2fc2b0] to-[#1d4ed8]",
   "from-[#f5b83d] to-[#9a7cf7]",
 ];
 
@@ -130,7 +130,7 @@ function Flow({ toolbar, today, prev }: { toolbar?: ReactNode; today: string; pr
   return (
     <div className="fixed inset-0 z-[55] overflow-y-auto bg-bg text-fg">
       <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden" aria-hidden>
-        <span className="absolute -top-40 -left-32 size-[30rem] rounded-full bg-[#4a63ec]/15 blur-3xl" />
+        <span className="absolute -top-40 -left-32 size-[30rem] rounded-full bg-[#3b82f6]/15 blur-3xl" />
         <span className="absolute -right-32 -bottom-40 size-[28rem] rounded-full bg-[#2fc2b0]/10 blur-3xl" />
       </div>
 
@@ -143,7 +143,7 @@ function Flow({ toolbar, today, prev }: { toolbar?: ReactNode; today: string; pr
         {result && plan ? (
           /* ---------- Natija ---------- */
           <div className="animate-fade-up mt-8 overflow-hidden rounded-[2rem] border border-border bg-surface shadow-lift">
-            <div className="relative grid h-40 place-items-center overflow-hidden bg-gradient-to-br from-[#4a63ec] to-[#070b18]">
+            <div className="relative grid h-40 place-items-center overflow-hidden bg-gradient-to-br from-[#3b82f6] to-[#1e3a8a]">
               <span className="absolute size-56 rounded-full border border-white/10" />
               <span className="absolute size-80 rounded-full border border-white/5" />
               <span className="relative grid size-16 place-items-center rounded-2xl bg-white/15 text-white ring-1 ring-white/20 backdrop-blur">
@@ -188,7 +188,7 @@ function Flow({ toolbar, today, prev }: { toolbar?: ReactNode; today: string; pr
               <button
                 type="button"
                 onClick={finish}
-                className="mt-7 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#4a63ec] to-[#1f3bb3] font-semibold text-white shadow-[0_14px_30px_-12px_#4a63ec] transition hover:brightness-110"
+                className="mt-7 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#3b82f6] to-[#1d4ed8] font-semibold text-white shadow-[0_14px_30px_-12px_#3b82f6] transition hover:brightness-110"
               >
                 {o.home} <Icon name="arrowRight" className="size-4" />
               </button>
@@ -205,7 +205,7 @@ function Flow({ toolbar, today, prev }: { toolbar?: ReactNode; today: string; pr
               {onboardingSteps.map((id, i) => (
                 <span key={id} className="h-1.5 overflow-hidden rounded-full bg-surface-2">
                   <span
-                    className="block h-full rounded-full bg-gradient-to-r from-[#4a63ec] to-[#9a7cf7] transition-[width] duration-500"
+                    className="block h-full rounded-full bg-gradient-to-r from-[#3b82f6] to-[#9a7cf7] transition-[width] duration-500"
                     style={{ width: i <= step ? "100%" : "0%" }}
                   />
                 </span>
@@ -477,7 +477,7 @@ function Flow({ toolbar, today, prev }: { toolbar?: ReactNode; today: string; pr
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex h-11 items-center gap-2 rounded-2xl bg-gradient-to-r from-[#4a63ec] to-[#1f3bb3] px-6 font-semibold text-white shadow-[0_14px_30px_-12px_#4a63ec] transition hover:brightness-110"
+                  className="inline-flex h-11 items-center gap-2 rounded-2xl bg-gradient-to-r from-[#3b82f6] to-[#1d4ed8] px-6 font-semibold text-white shadow-[0_14px_30px_-12px_#3b82f6] transition hover:brightness-110"
                 >
                   {step === last ? o.finish : o.next} <Icon name={step === last ? "sparkles" : "arrowRight"} className="size-4" />
                 </button>

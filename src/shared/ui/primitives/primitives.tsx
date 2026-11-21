@@ -8,7 +8,7 @@ export function Container({ className, ...props }: HTMLAttributes<HTMLDivElement
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("rounded-3xl border border-border bg-surface shadow-card", className)}
+      className={cn("rounded-2xl border border-border bg-surface shadow-card sm:rounded-3xl", className)}
       {...props}
     />
   );
@@ -46,7 +46,7 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
   return (
     <p
       className={cn(
-        "inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-accent before:h-px before:w-6 before:bg-current",
+        "inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-accent before:h-px before:w-5 before:bg-current sm:text-xs",
         className,
       )}
     >
@@ -93,8 +93,9 @@ export function SectionHeading({
   return (
     <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center")}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h2 className="mt-4 font-display text-4xl leading-[1.05] font-bold sm:text-[3.4rem]">{title}</h2>
-      {description && <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">{description}</p>}
+      <h2 className="mt-2 font-display text-[1.75rem] leading-tight font-bold sm:mt-4 sm:text-5xl sm:leading-[1.05]">{title}</h2>
+      {/* Mobilda tavsif 2 qator — asosiy kontent birinchi ekranda ko'rinsin */}
+      {description && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted sm:mt-4 sm:line-clamp-none sm:text-lg">{description}</p>}
     </div>
   );
 }

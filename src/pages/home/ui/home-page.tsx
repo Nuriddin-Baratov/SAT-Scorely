@@ -18,7 +18,7 @@ const stepIcons: { icon: IconName; tone: "accent" | "gold" | "success" }[] = [
   { icon: "brain", tone: "gold" },
   { icon: "target", tone: "success" },
 ];
-const phaseColors = ["bg-[#8b7dff]", "bg-[#5b4cf5]", "bg-[#c58b2c]", "bg-[#15803d]"];
+const phaseColors = ["bg-[#60a5fa]", "bg-[#2563eb]", "bg-[#c58b2c]", "bg-[#15803d]"];
 
 export function HomePage({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
@@ -53,8 +53,8 @@ export function HomePage({ locale }: { locale: Locale }) {
             <div className="animate-fade-up">
               <span className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium text-white/85">
                 <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#8b7dff] opacity-70" />
-                  <span className="relative inline-flex size-2 rounded-full bg-[#a99dff]" />
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#60a5fa] opacity-70" />
+                  <span className="relative inline-flex size-2 rounded-full bg-[#bfdbfe]" />
                 </span>
                 {h.badge}
               </span>
@@ -105,7 +105,7 @@ export function HomePage({ locale }: { locale: Locale }) {
                   key={`${s.id}-${i}`}
                   className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/70"
                 >
-                  <span className={cn("size-1.5 rounded-full", s.section === "rw" ? "bg-[#a99dff]" : "bg-[#e3b866]")} />
+                  <span className={cn("size-1.5 rounded-full", s.section === "rw" ? "bg-[#bfdbfe]" : "bg-[#e3b866]")} />
                   {s.name}
                 </span>
               ))}
@@ -265,7 +265,7 @@ export function HomePage({ locale }: { locale: Locale }) {
                 <svg viewBox="0 0 120 66" className="w-full" aria-hidden>
                   <defs>
                     <linearGradient id="gauge" x1="0" x2="1">
-                      <stop offset="0" stopColor="#8b7dff" />
+                      <stop offset="0" stopColor="#60a5fa" />
                       <stop offset="1" stopColor="#c58b2c" />
                     </linearGradient>
                   </defs>
@@ -320,7 +320,7 @@ export function HomePage({ locale }: { locale: Locale }) {
           />
           <Container className="relative">
             <div className="mx-auto max-w-2xl text-center">
-              <Eyebrow className="text-[#a99dff]">{h.structure.eyebrow}</Eyebrow>
+              <Eyebrow className="text-[#bfdbfe]">{h.structure.eyebrow}</Eyebrow>
               <h2 className="mt-4 text-4xl leading-[1.05] font-bold sm:text-[3.4rem]">
                 {h.structure.titleA}
                 <span className="text-gradient-light font-serif font-normal tracking-normal italic">{h.structure.titleAccent}</span>
@@ -344,7 +344,7 @@ export function HomePage({ locale }: { locale: Locale }) {
                 <div key={section.id} className="glass reveal rounded-[1.75rem] p-8">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <span className={cn("text-xs font-semibold tracking-[0.18em] uppercase", section.id === "rw" ? "text-[#a99dff]" : "text-[#e3b866]")}>
+                      <span className={cn("text-xs font-semibold tracking-[0.18em] uppercase", section.id === "rw" ? "text-[#bfdbfe]" : "text-[#e3b866]")}>
                         {t.sections[section.id]}
                       </span>
                       <h3 className="mt-2 text-3xl font-bold">{section.name}</h3>
@@ -367,7 +367,7 @@ export function HomePage({ locale }: { locale: Locale }) {
                           </div>
                           <div className="mt-2 h-1.5 rounded-full bg-white/10">
                             <div
-                              className={cn("h-full rounded-full", section.id === "rw" ? "bg-gradient-to-r from-[#5b4cf5] to-[#a99dff]" : "bg-gradient-to-r from-[#a87a26] to-[#f1cf8b]")}
+                              className={cn("h-full rounded-full", section.id === "rw" ? "bg-gradient-to-r from-[#2563eb] to-[#bfdbfe]" : "bg-gradient-to-r from-[#a87a26] to-[#bfdbfe]")}
                               style={{ width: `${(d.weight / 0.35) * 100}%` }}
                             />
                           </div>
@@ -433,7 +433,7 @@ export function HomePage({ locale }: { locale: Locale }) {
 
       {/* ================= CTA ================= */}
       <section className="px-3">
-        <div className="noise relative overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#2a1f9e] via-[#5b4cf5] to-[#8a3ffc] px-6 py-24 text-center text-white">
+        <div className="noise relative overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-[#1e40af] via-[#2563eb] to-[#8a3ffc] px-6 py-24 text-center text-white">
           <div className="bg-grid-dark pointer-events-none absolute inset-0" aria-hidden />
           <div className="pointer-events-none absolute -right-20 -bottom-40 size-[28rem] rounded-full bg-[radial-gradient(closest-side,rgb(241_207_139/0.35),transparent)]" aria-hidden />
           <div className="relative mx-auto max-w-2xl">
@@ -502,7 +502,7 @@ function FlowNode({ title, sub, highlight, small, muted }: { title: string; sub:
       className={cn(
         "rounded-2xl px-5 text-center ring-1",
         small ? "py-2.5" : "py-4",
-        highlight ? "bg-[#5b4cf5] ring-[#8b7dff] shadow-[0_10px_30px_-10px_#5b4cf5]" : "bg-white/[0.05] ring-white/10",
+        highlight ? "bg-[#2563eb] ring-[#60a5fa] shadow-[0_10px_30px_-10px_#2563eb]" : "bg-white/[0.05] ring-white/10",
         muted && "opacity-60",
       )}
     >

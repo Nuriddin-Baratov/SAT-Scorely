@@ -17,12 +17,12 @@ const DOTS = Array.from({ length: 22 }, (_, i) => ({
 export function Particles({ className }: { className?: string }) {
   return (
     <div className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)} aria-hidden>
-      <span className="pro-glow left-[-10%] top-[-20%] bg-[#4f7cff]/30" />
-      <span className="pro-glow right-[-15%] bottom-[-25%] bg-[#f5c76b]/20 [animation-delay:-6s]" />
+      <span className="pro-glow left-[-10%] top-[-20%] bg-[#60a5fa]/30" />
+      <span className="pro-glow right-[-15%] bottom-[-25%] bg-[#93c5fd]/20 [animation-delay:-6s]" />
       {DOTS.map((d, i) => (
         <span
           key={i}
-          className={cn("pro-dot", i % 3 === 0 ? "bg-[#f5c76b]" : "bg-[#8fb2ff]")}
+          className={cn("pro-dot", i % 3 === 0 ? "bg-[#93c5fd]" : "bg-[#93c5fd]")}
           style={{ left: d.left, top: d.top, width: d.size, height: d.size, animationDelay: d.delay, animationDuration: d.duration } as CSSProperties}
         />
       ))}
@@ -33,7 +33,7 @@ export function Particles({ className }: { className?: string }) {
 /** Kirish oqimi sahifalari uchun to'liq ekranli qorong'i qobiq (sidebar ustidan). */
 export function PremiumShell({ children }: { children: ReactNode }) {
   return (
-    <main className="pro-shell fixed inset-0 z-[55] overflow-y-auto bg-[#0b0f1a] text-white">
+    <main className="pro-shell fixed inset-0 z-[55] overflow-y-auto bg-ink text-white">
       <Particles className="fixed" />
       <div className="relative mx-auto flex min-h-full w-full max-w-3xl flex-col justify-center px-4 py-10 sm:px-6">{children}</div>
     </main>

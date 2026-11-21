@@ -32,11 +32,11 @@ function Summary({ plan }: { plan: PersonalPlan }) {
     [p.weeks, String(plan.weeks.length)],
   ];
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3">
       {items.map(([label, value], i) => (
-        <div key={label} className={cn("pro-card p-4", i === 0 && "col-span-2 sm:col-span-1")}>
-          <p className="text-xs text-white/50">{label}</p>
-          <p className={cn("mt-1 font-display text-xl font-bold", i === 0 || i === 3 ? "pro-gradient-text" : "text-white")}>{value}</p>
+        <div key={label} className={cn("pro-card p-2.5 sm:p-4", i === 0 && "col-span-3 sm:col-span-1")}>
+          <p className="truncate text-[11px] text-white/60 sm:text-xs">{label}</p>
+          <p className={cn("mt-0.5 font-display text-base font-bold sm:mt-1 sm:text-xl", i === 0 || i === 3 ? "pro-gradient-text" : "text-white")}>{value}</p>
         </div>
       ))}
     </div>
@@ -53,7 +53,7 @@ function Daily({ plan }: { plan: PersonalPlan }) {
       <ul className="mt-3 grid gap-2 text-sm text-white/75 sm:grid-cols-2">
         {tasks.map((task) => (
           <li key={task} className="flex items-start gap-2">
-            <Icon name="check" className="mt-0.5 size-4 shrink-0 text-[#f5c76b]" /> {task}
+            <Icon name="check" className="mt-0.5 size-4 shrink-0 text-[#93c5fd]" /> {task}
           </li>
         ))}
       </ul>
@@ -65,11 +65,11 @@ function Daily({ plan }: { plan: PersonalPlan }) {
 function WeekCard({ week, current }: { week: WeekPlan; current?: boolean }) {
   const p = useTexts();
   return (
-    <div className={cn("pro-card pro-in p-5", current && "ring-1 ring-[#f5c76b]/60")} style={{ animationDelay: `${Math.min(week.index, 8) * 40}ms` }}>
+    <div className={cn("pro-card pro-in p-5", current && "ring-1 ring-[#93c5fd]/60")} style={{ animationDelay: `${Math.min(week.index, 8) * 40}ms` }}>
       <div className="flex items-center justify-between gap-2">
         <p className="font-display font-bold">{p.week(week.index)}</p>
         {week.test && (
-          <span className="rounded-full bg-[#f5c76b]/15 px-2.5 py-1 text-[11px] font-semibold text-[#f5c76b]">{p.test}</span>
+          <span className="rounded-full bg-[#93c5fd]/15 px-2.5 py-1 text-[11px] font-semibold text-[#93c5fd]">{p.test}</span>
         )}
       </div>
       {week.final ? (
@@ -78,7 +78,7 @@ function WeekCard({ week, current }: { week: WeekPlan; current?: boolean }) {
         <div className="mt-3 space-y-2 text-sm">
           {(["math", "rw"] as const).map((s) => (
             <div key={s}>
-              <p className={cn("text-[11px] font-semibold tracking-wider uppercase", s === "math" ? "text-[#8fb2ff]" : "text-[#f5c76b]")}>
+              <p className={cn("text-[11px] font-semibold tracking-wider uppercase", s === "math" ? "text-[#93c5fd]" : "text-[#93c5fd]")}>
                 {s === "math" ? "Math" : "Reading & Writing"}
               </p>
               <p className="text-white/75">{week[s].join(" · ")}</p>
@@ -114,7 +114,7 @@ export function PlanView({ modal }: { modal?: boolean }) {
   return (
     <div className="pro-in space-y-6">
       <div>
-        <p className="text-xs font-semibold tracking-[0.2em] text-[#f5c76b] uppercase">{p.eyebrow}</p>
+        <p className="text-xs font-semibold tracking-[0.2em] text-[#93c5fd] uppercase">{p.eyebrow}</p>
         <h1 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{p.title}</h1>
       </div>
       <Summary plan={plan} />
@@ -124,7 +124,7 @@ export function PlanView({ modal }: { modal?: boolean }) {
           <WeekCard key={w.index} week={w} />
         ))}
       </div>
-      <div className="sticky bottom-0 -mx-1 flex rounded-2xl bg-[#0b0f1a]/85 p-1 py-3 backdrop-blur flex-col-reverse items-center gap-3 sm:flex-row sm:justify-between">
+      <div className="sticky bottom-0 -mx-1 flex rounded-2xl bg-ink/85 p-1 py-3 backdrop-blur flex-col-reverse items-center gap-3 sm:flex-row sm:justify-between">
         {modal ? (
           // Modalda: javoblar o'chadi → bosqich yana so'rovnomaga qaytadi
           <button type="button" onClick={() => answersStore.clear()} className="text-sm text-white/55 hover:text-white">
@@ -160,11 +160,11 @@ export function PlanPanel() {
   const current = Math.min(plan.weeks.length - 1, Math.max(0, elapsed));
 
   return (
-    <section className="relative mb-8 overflow-hidden rounded-[2rem] bg-[#0b0f1a] p-5 text-white sm:p-8">
+    <section className="relative mb-3 overflow-hidden rounded-2xl bg-ink p-4 text-white sm:mb-6 sm:rounded-[2rem] sm:p-8">
       <Particles />
-      <div className="relative space-y-5">
+      <div className="relative space-y-3 sm:space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-display text-2xl font-bold">
+          <h2 className="font-display text-lg font-bold sm:text-2xl">
             <span className="pro-gradient-text">{p.yourPlan}</span>
           </h2>
           <Link href={href(flowRoutes.plan)} className="text-sm text-white/55 hover:text-white">
@@ -172,7 +172,8 @@ export function PlanPanel() {
           </Link>
         </div>
         <Summary plan={plan} />
-        <div className="grid gap-3 lg:grid-cols-[1fr_1.2fr]">
+        {/* Mobilda tafsilotlar "ko'proq" bosilganda ochiladi — birinchi ekran qisqa bo'lsin */}
+        <div className={cn("gap-3 lg:grid lg:grid-cols-[1fr_1.2fr]", open ? "grid" : "hidden")}>
           <div>
             <p className="mb-2 text-xs font-semibold tracking-wider text-white/50 uppercase">{p.thisWeek}</p>
             <WeekCard week={plan.weeks[current]} current />
@@ -186,7 +187,7 @@ export function PlanPanel() {
             ))}
           </div>
         )}
-        <button type="button" onClick={() => setOpen((o) => !o)} className="text-sm font-semibold text-[#f5c76b] hover:underline">
+        <button type="button" onClick={() => setOpen((o) => !o)} className="text-sm font-semibold text-white/85 hover:underline">
           {open ? p.showLess : p.showAll}
         </button>
       </div>

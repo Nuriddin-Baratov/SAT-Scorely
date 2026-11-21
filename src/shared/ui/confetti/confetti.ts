@@ -1,4 +1,4 @@
-const COLORS = ["#5b4cf5", "#8b7dff", "#f1cf8b", "#c58b2c", "#4ade80", "#f472b6"];
+const COLORS = ["#2563eb", "#60a5fa", "#bfdbfe", "#c58b2c", "#4ade80", "#f472b6"];
 
 /** Yengil konfetti effekti (kutubxonasiz). `prefers-reduced-motion` da ishlamaydi. */
 export function launchConfetti({ particles = 140, duration = 2600 } = {}) {

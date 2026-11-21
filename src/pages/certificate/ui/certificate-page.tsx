@@ -32,7 +32,7 @@ function Seal() {
         <textPath href="#seal-arc" startOffset="2%">SAT PRO · VERIFIED · SAT PRO · VERIFIED ·</textPath>
       </text>
       <circle cx="60" cy="60" r="27" fill="#0b1c5c" />
-      <path d="M60 45 l4.4 9 9.9 1.4-7.2 7 1.7 9.8L60 67.6l-8.8 4.6 1.7-9.8-7.2-7 9.9-1.4z" fill="#f5c76b" />
+      <path d="M60 45 l4.4 9 9.9 1.4-7.2 7 1.7 9.8L60 67.6l-8.8 4.6 1.7-9.8-7.2-7 9.9-1.4z" fill="#93c5fd" />
     </svg>
   );
 }
@@ -70,9 +70,9 @@ function CertificateView({ cert }: { cert: Certificate }) {
 
       <div className="relative flex h-full flex-col items-center px-8 py-12 text-center sm:px-16 sm:py-10">
         <div className="flex items-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-[11px] bg-gradient-to-br from-[#4a63ec] to-[#1f3bb3] text-lg font-extrabold text-white shadow-[0_8px_20px_-8px_#4a63ec]">S</span>
+          <span className="grid size-9 place-items-center rounded-[11px] bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] text-lg font-extrabold text-white shadow-[0_8px_20px_-8px_#3b82f6]">S</span>
           <span className="font-display text-xl font-extrabold tracking-tight">
-            SAT <span className="text-[#4a63ec]">Pro</span>
+            SAT <span className="text-[#3b82f6]">Pro</span>
           </span>
         </div>
 
@@ -96,7 +96,7 @@ function CertificateView({ cert }: { cert: Certificate }) {
 
         <div className="mt-8 flex w-full max-w-3xl items-end justify-between gap-4 sm:mt-auto">
           <div className="w-36 text-left sm:w-48">
-            <p className="font-serif text-2xl italic text-[#1f3bb3]">SAT Pro</p>
+            <p className="font-serif text-2xl italic text-[#1d4ed8]">SAT Pro</p>
             <span className="block h-px bg-[#0b1c3d]/40" />
             <p className="mt-1 text-[10px] font-semibold tracking-wider text-[#0b1c3d]/60 uppercase">{c.signature}</p>
           </div>
@@ -126,7 +126,7 @@ export function CertificatePage({ id }: { id: string }) {
   return (
     <main className="relative flex-1">
       <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
-      <Container className="relative py-8 sm:py-12">
+      <Container className="relative py-5 sm:py-12">
         <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-3">
           <Link href={href(routes.tests)} className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-fg">
             <Icon name="arrowLeft" className="size-4" /> {c.back}

@@ -125,7 +125,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             className="flex items-center gap-3 rounded-2xl bg-surface-2/70 p-2.5 transition hover:bg-surface-2"
           >
-            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#a99dff] to-[#5b4cf5] text-sm font-bold text-white">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#bfdbfe] to-[#2563eb] text-sm font-bold text-white">
               {session.user.name.charAt(0).toUpperCase()}
             </span>
             <span className="min-w-0">
@@ -208,7 +208,7 @@ function MobileTabBar({ menuOpen, onMenu }: { menuOpen: boolean; onMenu: () => v
   return (
     <nav
       aria-label={t.nav.mainMenu}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/95 px-2 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur-xl lg:hidden"
+      className="app-tabbar fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/95 px-2 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur-xl lg:hidden"
     >
       <ul className="mx-auto flex max-w-lg">
         {tabs.map((tab) => {
@@ -271,7 +271,7 @@ export function SiteSidebar() {
       </aside>
 
       {/* Mobil yuqori panel — menyu pastki navbarda */}
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/90 backdrop-blur-xl lg:hidden">
+      <header className="app-header sticky top-0 z-40 border-b border-border/70 bg-surface/90 backdrop-blur-xl lg:hidden">
         <div className="flex h-14 items-center justify-between px-4">
           <Logo />
           <LocaleSwitcher />

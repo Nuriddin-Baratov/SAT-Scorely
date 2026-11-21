@@ -24,7 +24,7 @@ export function Loader({
         <span className={cn("loader-halo absolute inset-0 bg-accent/40", box)} aria-hidden />
         <span
           className={cn(
-            "relative grid place-items-center overflow-hidden bg-gradient-to-br from-[#6d5efc] via-[#5b4cf5] to-[#2a1f9e] text-white shadow-[0_12px_30px_-10px_#5b4cf5]",
+            "relative grid place-items-center overflow-hidden bg-gradient-to-br from-[#3b82f6] via-[#2563eb] to-[#1e40af] text-white shadow-[0_12px_30px_-10px_#2563eb]",
             box,
           )}
           aria-hidden

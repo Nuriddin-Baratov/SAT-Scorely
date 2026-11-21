@@ -58,7 +58,7 @@ export const toneOf = (pct: number): MeterTone => (pct >= 80 ? "good" : pct >= 5
 
 const fill: Record<MeterTone, string> = {
   good: "from-emerald-500 via-emerald-400 to-teal-300 shadow-[0_0_14px_rgb(52_211_153/0.55)]",
-  mid: "from-amber-500 via-[#f5c76b] to-[#ffe3a3] shadow-[0_0_14px_rgb(245_199_107/0.5)]",
+  mid: "from-amber-500 via-[#93c5fd] to-[#dbeafe] shadow-[0_0_14px_rgb(245_199_107/0.5)]",
   low: "from-rose-600 via-rose-500 to-orange-400 shadow-[0_0_14px_rgb(244_63_94/0.5)]",
 };
 
@@ -92,8 +92,8 @@ export function Meter({
       />
       {marker !== undefined && (
         <span className="meter-marker absolute -top-1.5 -bottom-1.5 w-0.5" style={{ left: `${marker}%` }} title={markerLabel} aria-hidden>
-          <span className="absolute inset-0 rounded-full bg-[#f5c76b]" />
-          <span className="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rounded-full bg-[#f5c76b] shadow-[0_0_10px_#f5c76b]" />
+          <span className="absolute inset-0 rounded-full bg-[#93c5fd]" />
+          <span className="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rounded-full bg-[#93c5fd] shadow-[0_0_10px_#93c5fd]" />
         </span>
       )}
     </div>

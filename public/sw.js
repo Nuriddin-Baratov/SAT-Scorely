@@ -1,5 +1,5 @@
 /* SAT Pro service worker — oflayn ishlash uchun oddiy kesh strategiyasi. */
-const VERSION = "satpro-v3"; // yangi logotip — eski kesh tozalanadi
+const VERSION = "satpro-v4"; // ko'k dizayn — eski kesh tozalanadi
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const PRECACHE = ["/icon-192.png", "/icon-512.png", "/icon.svg"];

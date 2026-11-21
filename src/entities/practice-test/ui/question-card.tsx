@@ -38,11 +38,11 @@ export function QuestionCard({
   const correct = isCorrect(q, selected);
 
   return (
-    <Card className={cn("p-6 sm:p-8", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
+    <Card className={cn("p-4 sm:p-8", className)}>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           {number !== undefined && (
-            <span className="grid size-8 place-items-center rounded-lg bg-fg text-sm font-bold text-bg">{number}</span>
+            <span className="grid size-7 place-items-center rounded-lg bg-fg text-xs font-bold text-bg sm:size-8 sm:text-sm">{number}</span>
           )}
           <Badge tone={q.sectionId === "rw" ? "accent" : "gold"}>{t.domains[q.domainId]}</Badge>
           <Badge>{t.levels[q.difficulty]}</Badge>
@@ -51,14 +51,14 @@ export function QuestionCard({
         {headerExtra}
       </div>
 
-      <div lang="en" className="mt-6">
+      <div lang="en" className="mt-4 sm:mt-6">
         {q.passage && (
-          <blockquote className="mb-6 rounded-2xl border-l-4 border-accent bg-surface-2/60 p-5 leading-relaxed whitespace-pre-line">
+          <blockquote className="mb-4 rounded-xl border-l-4 border-accent bg-surface-2/60 p-3.5 text-[15px] leading-relaxed whitespace-pre-line sm:mb-6 sm:rounded-2xl sm:p-5 sm:text-base">
             <span className="sr-only">{t.runner.passage}: </span>
             {q.passage}
           </blockquote>
         )}
-        <p className="leading-relaxed whitespace-pre-line">{q.prompt}</p>
+        <p className="text-[15px] leading-relaxed font-medium whitespace-pre-line sm:text-base">{q.prompt}</p>
 
         {q.format === "spr" ? (
           <SprInput question={q} value={selected} onChange={onSelect} reveal={reveal} correct={correct} />
@@ -68,7 +68,7 @@ export function QuestionCard({
       </div>
 
       {reveal && (
-        <div className="mt-5 rounded-2xl border border-border p-4 text-sm leading-relaxed" role="status">
+        <div className="mt-4 rounded-2xl border border-border bg-surface-2/40 p-4 text-sm leading-relaxed sm:mt-5" role="status">
           <p className={cn("mb-1 flex items-center gap-1.5 text-xs font-semibold", correct ? "text-success" : "text-danger")}>
             <Icon name={correct ? "check" : "x"} className="size-3.5" strokeWidth={2.6} />
             {correct ? t.practice.correct : !isAnswered(selected) ? t.runner.noAnswer : t.practice.incorrect}
@@ -93,7 +93,7 @@ function Choices({
   reveal: boolean;
 }) {
   return (
-    <div className="mt-6 grid gap-2.5" role="radiogroup" aria-label={q.prompt.split("\n")[0]}>
+    <div className="mt-4 grid gap-2 sm:mt-6 sm:gap-2.5" role="radiogroup" aria-label={q.prompt.split("\n")[0]}>
       {q.choices.map((choice, i) => {
         const isSelected = selected === i;
         const isRight = reveal && i === q.answer;
@@ -107,7 +107,7 @@ function Choices({
             disabled={reveal || !onSelect}
             onClick={() => onSelect?.(i)}
             className={cn(
-              "flex items-start gap-3 rounded-2xl border-2 px-4 py-3.5 text-left transition disabled:cursor-default",
+              "choice-press flex min-h-14 w-full items-center gap-3 rounded-2xl border-2 px-3.5 py-3 text-left text-[15px] transition-[border-color,background-color,transform] duration-150 disabled:cursor-default sm:px-4 sm:text-base",
               isRight
                 ? "border-success bg-success-soft"
                 : isWrong
@@ -120,7 +120,7 @@ function Choices({
           >
             <span
               className={cn(
-                "grid size-7 shrink-0 place-items-center rounded-full border-2 text-xs font-bold",
+                "grid size-8 shrink-0 place-items-center rounded-full border-2 text-sm font-bold transition-colors",
                 isRight
                   ? "border-success bg-success text-white"
                   : isWrong
@@ -132,7 +132,7 @@ function Choices({
             >
               {isRight ? <Icon name="check" className="size-3.5" strokeWidth={3} /> : isWrong ? <Icon name="x" className="size-3.5" strokeWidth={3} /> : LETTERS[i]}
             </span>
-            <span className="pt-0.5">{choice}</span>
+            <span className="min-w-0 flex-1 leading-snug">{choice}</span>
           </button>
         );
       })}

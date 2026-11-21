@@ -1,4 +1,4 @@
-const MONTHS = ["yan", "fev", "mar", "apr", "may", "iyn", "iyl", "avg", "sen", "okt", "noy", "dek"];
+export const MONTHS_SHORT = ["yan", "fev", "mar", "apr", "may", "iyn", "iyl", "avg", "sen", "okt", "noy", "dek"];
 export const WEEKDAYS_SHORT = ["Du", "Se", "Ch", "Pa", "Ju", "Sh", "Ya"];
 export const WEEKDAYS_LONG = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"];
 
@@ -34,7 +34,7 @@ export function daysBetween(from: Date, to: Date): number {
 
 export function formatDate(iso: string, withYear = false): string {
   const date = parseISODate(iso);
-  const base = `${date.getDate()}-${MONTHS[date.getMonth()]}`;
+  const base = `${date.getDate()}-${MONTHS_SHORT[date.getMonth()]}`;
   return withYear ? `${base}, ${date.getFullYear()}` : base;
 }
 

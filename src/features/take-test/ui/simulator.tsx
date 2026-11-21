@@ -179,7 +179,7 @@ function Intro({ onStart }: { onStart: () => void }) {
           <span />
         </div>
         <div className="relative max-w-2xl">
-          <p className="text-xs font-semibold tracking-[0.18em] text-[#a99dff] uppercase">{s.eyebrow}</p>
+          <p className="text-xs font-semibold tracking-[0.18em] text-[#bfdbfe] uppercase">{s.eyebrow}</p>
           <h1 className="mt-4 text-4xl leading-tight font-bold sm:text-5xl">{s.title}</h1>
           <p className="mt-4 text-lg leading-relaxed text-white/65">{s.text}</p>
           <Button

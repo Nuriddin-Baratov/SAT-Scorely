@@ -205,7 +205,7 @@ export function RegisterForm({ toolbar }: { toolbar?: ReactNode }) {
               <button
                 type="submit"
                 disabled={pending}
-                className="relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-[#4a63ec] to-[#1f3bb3] font-semibold text-white shadow-[0_14px_30px_-12px_#4a63ec] transition hover:brightness-110 disabled:opacity-70"
+                className="relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-[#3b82f6] to-[#1d4ed8] font-semibold text-white shadow-[0_14px_30px_-12px_#3b82f6] transition hover:brightness-110 disabled:opacity-70"
               >
                 {pending ? (
                   <span className="size-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden />
@@ -231,14 +231,14 @@ export function RegisterForm({ toolbar }: { toolbar?: ReactNode }) {
         </div>
 
         {/* ---------- Qorong'i panel ---------- */}
-        <div className="relative hidden overflow-hidden bg-[#070b18] lg:block">
-          <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_60%_30%,#1f3bb3_0%,transparent_70%),radial-gradient(50%_40%_at_20%_90%,rgb(14_147_132/0.35),transparent_70%)]" />
+        <div className="relative hidden overflow-hidden bg-[#1e3a8a] lg:block">
+          <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_60%_30%,#1d4ed8_0%,transparent_70%),radial-gradient(50%_40%_at_20%_90%,rgb(14_147_132/0.35),transparent_70%)]" />
           <div className="gem" aria-hidden>
             <span />
             <span />
             <span />
           </div>
-          <div className="relative flex h-full flex-col justify-end bg-gradient-to-t from-[#070b18] via-[#070b18]/70 to-transparent p-14 text-white">
+          <div className="relative flex h-full flex-col justify-end bg-gradient-to-t from-[#1e3a8a] via-[#1e3a8a]/70 to-transparent p-14 text-white">
             <p className="text-xs font-semibold tracking-[0.18em] text-[#f3d27a] uppercase">{r.stepsTitle}</p>
             <div className="mt-5 space-y-3">
               {r.steps.map(([title, text], i) => (
