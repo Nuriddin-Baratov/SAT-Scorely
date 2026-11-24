@@ -104,7 +104,7 @@ export const initialGameState: GameState = {
 };
 
 /** Hodisani qo'llaydi va yangi holat + ochilgan nishonlarni qaytaradi (sof funksiya). */
-export function applyEvent(prev: GameState, event: GameEvent, now: Date) {
+export function applyEvent(prev: GameState, event: GameEvent, now: Date, gained = xpFor(event)) {
   const today = toISODate(now);
   const counters = { ...initialGameState.counters, ...prev.counters };
 
@@ -130,7 +130,6 @@ export function applyEvent(prev: GameState, event: GameEvent, now: Date) {
   if (now.getHours() < 5) counters.nightOwl++;
 
   const activeDays = prev.activeDays.includes(today) ? prev.activeDays : [...prev.activeDays, today].sort();
-  const gained = xpFor(event);
   // Faollik xaritasi: testda — savollar soni, qolgan hodisalarda — 1
   const units = event.type === "test" ? Math.max(1, event.total) : 1;
   const activity = { ...prev.activity, [today]: (prev.activity?.[today] ?? 0) + units };

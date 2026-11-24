@@ -116,7 +116,10 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
       });
     }
     mistakesRepository.addWrong(summary.wrongIds);
-    const game = gameRepository.track({ type: "test", correct: summary.correct, total: summary.total, hardModule: path === "hard" });
+    const game = gameRepository.track(
+      { type: "test", correct: summary.correct, total: summary.total, hardModule: path === "hard" },
+      { type: "test", id: attempt.id, testId: test.id, questionIds: questions.map((item) => item.id), answers },
+    );
     if (summary.accuracy >= 0.8) launchConfetti();
     setResult({ attempt, timedOut, reward: { xp: game.gained, levelUp: game.levelUp, newMistakes: summary.wrongIds.length } });
     window.scrollTo({ top: 0, behavior: "smooth" });

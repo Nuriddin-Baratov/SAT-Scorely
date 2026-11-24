@@ -30,7 +30,6 @@ export {
   teacherClasses,
   type ClassMember,
   type LeaderRow,
-  type SyncStats,
 } from "./progress";
 export {
   claimLinkCode,
@@ -45,3 +44,4 @@ export {
   tg,
   unlink,
 } from "./telegram";
+export { DAILY_XP_CAP, alreadyMastered, recordXp, refreshTestStats, tashkentDay, type XpEvent } from "./xp";

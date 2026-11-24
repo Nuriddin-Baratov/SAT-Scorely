@@ -72,7 +72,7 @@ export function Flashcards() {
     if (correct) setScore((s) => s + 1);
     // To'g'ri — o'rganilgan; xato — qayta takrorlash ro'yxatiga
     const status: WordStatus = correct ? "known" : "learning";
-    if (vocabRepository.mark(word.word, status)) gameRepository.track({ type: "word" });
+    if (vocabRepository.mark(word.word, status)) gameRepository.track({ type: "word" }, { type: "word", word: word.word, choice: option.word });
   }
 
   function next() {

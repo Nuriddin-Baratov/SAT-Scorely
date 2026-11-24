@@ -23,7 +23,7 @@ export function QuestionDrill({
   doneExtra,
 }: {
   questions: Question[];
-  onAnswer: (question: Question, correct: boolean) => ReactNode | void;
+  onAnswer: (question: Question, correct: boolean, answer: AnswerValue) => ReactNode | void;
   onExit: () => void;
   doneExtra?: ReactNode;
 }) {
@@ -60,7 +60,7 @@ export function QuestionDrill({
     if (!isAnswered(choice)) return;
     const correct = isCorrect(q, choice);
     if (correct) setScore((s) => s + 1);
-    setNote(onAnswer(q, correct) ?? null);
+    setNote(onAnswer(q, correct, choice) ?? null);
     setChecked(true);
   }
 

@@ -88,12 +88,10 @@ function SimulatorRun({ onRetry }: { onRetry: () => void }) {
     });
     const summary = summarizeAttempt(test, attempt);
     mistakesRepository.addWrong(summary.wrongIds);
-    const game = gameRepository.track({
-      type: "test",
-      correct: summary.correct,
-      total: summary.total,
-      hardModule: Object.values(finalPaths).includes("hard"),
-    });
+    const game = gameRepository.track(
+      { type: "test", correct: summary.correct, total: summary.total, hardModule: Object.values(finalPaths).includes("hard") },
+      { type: "test", id: attempt.id, testId: SIMULATION_ID, questionIds: all.questions.map((q) => q.id), answers: all.answers },
+    );
     if (summary.accuracy >= 0.8) launchConfetti();
     setStage({ kind: "done", attempt, reward: { xp: game.gained, levelUp: game.levelUp, newMistakes: summary.wrongIds.length } });
     window.scrollTo({ top: 0, behavior: "smooth" });

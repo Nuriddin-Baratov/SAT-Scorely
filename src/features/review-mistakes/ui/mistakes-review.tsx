@@ -35,10 +35,10 @@ export function MistakesReview() {
       <QuestionDrill
         questions={session}
         onExit={() => setSession(null)}
-        onAnswer={(q, correct) => {
+        onAnswer={(q, correct, answer) => {
           const box = mistakesRepository.get()[q.id]?.box ?? 0;
           const { mastered } = mistakesRepository.review(q.id, correct);
-          const game = gameRepository.track({ type: "review", correct, mastered });
+          const game = gameRepository.track({ type: "review", correct, mastered }, { type: "review", questionId: q.id, answer, mastered });
           if (mastered) setMasteredNow((n) => n + 1);
           return (
             <span className="inline-flex items-center gap-1.5">

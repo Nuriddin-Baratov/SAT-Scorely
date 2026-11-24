@@ -2,7 +2,7 @@
 export const STORAGE_PREFIX = "scorely.";
 
 /** Qurilmaga xos sozlamalar — eksport/sinxronizatsiyaga kirmaydi */
-const LOCAL_ONLY = new Set(["scorely.theme.v1", "scorely.sync.v1", "scorely.syncbase.v1", "scorely.account.v1"]);
+const LOCAL_ONLY = new Set(["scorely.theme.v1", "scorely.sync.v1", "scorely.syncbase.v1", "scorely.account.v1", "scorely.outbox.v1"]);
 
 /** Bulutga sinxronlanadigan kalitmi */
 export const isSyncKey = (key: string) => key.startsWith(STORAGE_PREFIX) && !LOCAL_ONLY.has(key);

@@ -3,70 +3,34 @@ import "server-only";
 import { AuthError } from "./auth";
 import { newId, shortCode } from "./crypto";
 import { query, queryOne } from "./db";
+import { tashkentDay } from "./xp";
 
 // ---------------- Bulutga sinxronlash ----------------
 
-/** Brauzerdan keladigan qisqa statistika (reyting va o'qituvchi paneli uchun) */
-export interface SyncStats {
-  xp: number;
-  streak: number;
-  accuracy: number | null;
-  questions: number;
-  weakDomain: string | null;
-  lastActive: string | null;
-  /** Mijozning bugungi sanasi (`YYYY-MM-DD`) — XP tarixini kunlar bo'yicha yozish uchun */
-  today: string;
-}
-
-const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
-const int = (n: unknown, max = 10_000_000) => Math.max(0, Math.min(max, Math.round(Number(n) || 0)));
-
 /**
- * Progressni saqlaydi. `baseVersion` — mijoz oxirgi ko'rgan versiya: bazadagisi undan farq qilsa
+ * Progress nusxasini saqlaydi. XP, seriya va aniqlik bu yerda YOZILMAYDI — ular faqat server tekshirgan
+ * javoblardan hisoblanadi (`xp.ts`). `baseVersion` — mijoz oxirgi ko'rgan versiya: bazadagisi undan farq qilsa
  * (boshqa qurilma yozgan) hech narsa yozilmaydi va `null` qaytadi — mijoz birlashtirib qayta yuboradi.
  * `baseVersion` berilmasa (eski mijoz) — shartsiz yoziladi. Qaytaradi: yangi versiya.
  */
-export async function saveSnapshot(userId: string, snapshot: unknown, stats: SyncStats, baseVersion?: number): Promise<number | null> {
+export async function saveSnapshot(userId: string, snapshot: unknown, baseVersion?: number): Promise<number | null> {
   if (!snapshot || typeof snapshot !== "object") throw new AuthError("invalid");
-  const today = DAY_RE.test(stats.today) ? stats.today : new Date().toISOString().slice(0, 10);
-  const accuracy = typeof stats.accuracy === "number" && stats.accuracy >= 0 && stats.accuracy <= 1 ? stats.accuracy : null;
-  const lastActive = stats.lastActive && DAY_RE.test(stats.lastActive) ? stats.lastActive : null;
-  const xp = int(stats.xp);
-
   // `$2::text::jsonb`: postgres drayveri jsonb parametrni o'zi yana bir marta JSON qiladi (satr bo'lib qolardi) — text orqali aniq
   const saved = await queryOne<{ version: number }>(
-    `insert into user_data (user_id, snapshot, xp, streak, accuracy, questions, weak_domain, last_active, updated_at, version)
-     values ($1, $2::text::jsonb, $3, $4, $5, $6, $7, $8, now(), 1)
-     on conflict (user_id) do update set snapshot = excluded.snapshot, xp = excluded.xp, streak = excluded.streak,
-       accuracy = excluded.accuracy, questions = excluded.questions, weak_domain = excluded.weak_domain,
-       last_active = excluded.last_active, updated_at = now(), version = user_data.version + 1
-     where $9::integer is null or user_data.version = $9::integer
+    `insert into user_data (user_id, snapshot, updated_at, version)
+     values ($1, $2::text::jsonb, now(), 1)
+     on conflict (user_id) do update set snapshot = excluded.snapshot, updated_at = now(), version = user_data.version + 1
+     where $3::integer is null or user_data.version = $3::integer
      returning version`,
-    [
-      userId,
-      JSON.stringify(snapshot),
-      xp,
-      int(stats.streak, 10_000),
-      accuracy,
-      int(stats.questions),
-      stats.weakDomain?.slice(0, 40) ?? null,
-      lastActive,
-      baseVersion ?? null,
-    ],
+    [userId, JSON.stringify(snapshot), baseVersion ?? null],
   );
-  if (!saved) return null;
-  await query(
-    `insert into xp_daily (user_id, day, xp) values ($1, $2, $3)
-     on conflict (user_id, day) do update set xp = greatest(xp_daily.xp, excluded.xp)`,
-    [userId, today, xp],
-  );
-  return Number(saved.version);
+  return saved ? Number(saved.version) : null;
 }
 
 export async function loadSnapshot(userId: string) {
-  return queryOne<{ snapshot: unknown; updated_at: string; version: number }>(
+  return queryOne<{ snapshot: unknown; updated_at: string; version: number; xp: number }>(
     // Eski xato tufayli satr bo'lib saqlangan nusxalar ham to'g'ri o'qiladi
-    `select case when jsonb_typeof(snapshot) = 'string' then (snapshot #>> '{}')::jsonb else snapshot end as snapshot, updated_at, version
+    `select case when jsonb_typeof(snapshot) = 'string' then (snapshot #>> '{}')::jsonb else snapshot end as snapshot, updated_at, version, xp
      from user_data where user_id = $1`,
     [userId],
   );
@@ -93,14 +57,17 @@ function shortName(full: string) {
  * `classId` berilsa — faqat shu sinf a'zolari.
  */
 export async function leaderboard(scope: "week" | "all", weekStart: string, classId?: string, limit = 50): Promise<LeaderRow[]> {
+  const yesterday = tashkentDay(new Date(Date.now() - 86_400_000));
   const rows = await query<{ id: string; name: string; xp: number; streak: number; base: number | null }>(
     // left join: yangi ro'yxatdan o'tgan (hali progress sinxronlanmagan) o'quvchilar ham 0 XP bilan ko'rinadi
-    `select u.id, u.name, coalesce(d.xp, 0) as xp, coalesce(d.streak, 0) as streak,
+    `select u.id, u.name, coalesce(d.xp, 0) as xp, 
+       -- seriya faqat bugun yoki kecha faol bo'lganda davom etadi
+       case when d.last_active >= $2 then coalesce(d.streak, 0) else 0 end as streak,
        (select x.xp from xp_daily x where x.user_id = u.id and x.day < $1 order by x.day desc limit 1) as base
      from users u left join user_data d on d.user_id = u.id
      where u.public_profile = true and u.role = 'student'
-       ${classId ? "and exists (select 1 from class_members m where m.class_id = $2 and m.user_id = u.id)" : ""}`,
-    classId ? [weekStart, classId] : [weekStart],
+       ${classId ? "and exists (select 1 from class_members m where m.class_id = $3 and m.user_id = u.id)" : ""}`,
+    classId ? [weekStart, yesterday, classId] : [weekStart, yesterday],
   );
   return rows
     .map((r) => ({
@@ -183,11 +150,11 @@ export async function teacherClasses(teacherId: string) {
     weak_domain: string | null;
     last_active: string | null;
   }>(
-    `select m.class_id, u.id as user_id, u.name, u.email, d.xp, d.streak, d.accuracy, d.questions, d.weak_domain, d.last_active
+    `select m.class_id, u.id as user_id, u.name, u.email, d.xp, case when d.last_active >= $2 then d.streak else 0 end as streak, d.accuracy, d.questions, d.weak_domain, d.last_active
      from class_members m join classes c on c.id = m.class_id join users u on u.id = m.user_id
      left join user_data d on d.user_id = u.id
      where c.teacher_id = $1 order by u.name`,
-    [teacherId],
+    [teacherId, tashkentDay(new Date(Date.now() - 86_400_000))],
   );
   return classes.map((c) => ({
     ...c,

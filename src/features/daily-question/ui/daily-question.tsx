@@ -33,7 +33,10 @@ export function DailyQuestion({ className }: { className?: string }) {
     if (choice === null || !isAnswered(choice) || !today) return;
     const correct = isCorrect(question, choice);
     if (!correct) mistakesRepository.addWrong([question.id]);
-    const result = gameRepository.track({ type: "daily", date: today, questionId: question.id, choice, correct });
+    const result = gameRepository.track(
+      { type: "daily", date: today, questionId: question.id, choice, correct },
+      { type: "daily", date: today, choice },
+    );
     setGained(result.gained);
     if (correct) launchConfetti({ particles: 80, duration: 1800 });
   }

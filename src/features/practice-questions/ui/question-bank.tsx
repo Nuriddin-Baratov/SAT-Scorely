@@ -53,9 +53,9 @@ export function QuestionBank() {
       <QuestionDrill
         questions={session}
         onExit={() => setSession(null)}
-        onAnswer={(q, correct) => {
+        onAnswer={(q, correct, answer) => {
           if (!correct) mistakesRepository.addWrong([q.id]);
-          const game = gameRepository.track({ type: "practice", correct });
+          const game = gameRepository.track({ type: "practice", correct }, { type: "practice", questionId: q.id, answer });
           return (
             <span>
               <span className="font-semibold text-gold">+{game.gained} XP</span>

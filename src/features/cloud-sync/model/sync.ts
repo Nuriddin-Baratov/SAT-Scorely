@@ -1,7 +1,7 @@
 "use client";
 
-import { currentStreak, gameRepository } from "@/entities/gamification";
-import { attemptsRepository, domainPerformance } from "@/entities/practice-test";
+import { xpOutbox } from "@/entities/gamification";
+import { getPracticeTest, type TestAttempt } from "@/entities/practice-test";
 import { ApiError, api } from "@/shared/api";
 import { collectSnapshot, isSnapshot, isSyncKey, replaceSnapshot, toISODate } from "@/shared/lib";
 import { createStorageStore } from "@/shared/lib/react";
@@ -22,6 +22,7 @@ export const syncMeta = createStorageStore<SyncMeta>("scorely.sync.v1", { userId
 const baseStore = createStorageStore<Data | null>("scorely.syncbase.v1", null);
 
 const MAX_RETRIES = 4;
+const CLAIM_BATCH = 50;
 
 /** Tez “barmoq izi” (djb2) */
 function fingerprint(data: Data) {
@@ -45,30 +46,40 @@ function hasProgress(data: Data) {
   );
 }
 
-/** Reyting va o'qituvchi paneli uchun qisqa statistika */
-export function computeStats() {
-  const today = toISODate(new Date());
-  const game = gameRepository.get();
-  const perf = Object.entries(domainPerformance(attemptsRepository.list()));
-  const correct = perf.reduce((s, [, d]) => s + (d?.correct ?? 0), 0);
-  const total = perf.reduce((s, [, d]) => s + (d?.total ?? 0), 0);
-  const weak = perf
-    .filter(([, d]) => d && d.total >= 3)
-    .sort(([, a], [, b]) => a!.correct / a!.total - b!.correct / b!.total)[0];
-  return {
-    xp: game.xp ?? 0,
-    streak: currentStreak(game.activeDays ?? [], today),
-    accuracy: total ? correct / total : null,
-    questions: total,
-    weakDomain: weak && weak[1]!.correct / weak[1]!.total < 0.8 ? weak[0] : null,
-    lastActive: game.activeDays?.at(-1) ?? null,
-    today,
-  };
+/** Navbatdagi javoblarni serverga yuboradi (server tekshirib, XP beradi). Takror yuborish xavfsiz. */
+async function flushXp() {
+  for (let round = 0; round < 20; round++) {
+    const claims = xpOutbox.list().slice(0, CLAIM_BATCH).map((i) => i.claim);
+    if (!claims.length) return;
+    const { results } = await api<{ results: { id: string; xp: number }[] }>("/api/xp", { method: "POST", json: { claims } });
+    xpOutbox.remove(new Set([...results.map((r) => r.id), ...claims.map((c) => c.id)]));
+  }
+}
+
+/** Server bilmaydigan eski natijalar (hisob avval faqat shu qurilmada bo'lgan): javoblar tekshirish uchun yuboriladi */
+function queueLegacy(data: Data) {
+  const day = toISODate(new Date());
+  for (const attempt of (data["scorely.attempts.v1"] as TestAttempt[] | undefined) ?? []) {
+    const ids = attempt.questionIds ?? getPracticeTest(attempt.testId)?.questionIds;
+    if (!ids) continue;
+    xpOutbox.add({ type: "test", id: attempt.id, testId: attempt.testId, questionIds: ids, answers: attempt.answers, day }, 0, null);
+  }
+  for (const [word, status] of Object.entries((data["scorely.vocab.v1"] as Record<string, string> | undefined) ?? {})) {
+    if (status === "known") xpOutbox.add({ type: "word", id: `word-${word}`, word, choice: word, day }, 0, `word:${word}`);
+  }
+}
+
+/** XP — serverdagi son (+ hali yuborilmagan javoblar taxmini) */
+function withServerXp(data: Data, xp: number): Data {
+  const game = data["scorely.game.v1"] as { xp?: number } | undefined;
+  const value = xp + xpOutbox.pendingXp();
+  if (!game) return value ? { ...data, "scorely.game.v1": { xp: value, activeDays: [], badges: {}, unseen: [], daily: {} } } : data;
+  return game.xp === value ? data : { ...data, "scorely.game.v1": { ...game, xp: value } };
 }
 
 async function pull() {
-  const row = await api<{ snapshot: unknown; version: number }>("/api/sync", { cache: "no-store" });
-  return { data: isSnapshot(row.snapshot) ? syncable(row.snapshot.data) : null, version: row.version ?? 0 };
+  const row = await api<{ snapshot: unknown; version: number; xp: number }>("/api/sync", { cache: "no-store" });
+  return { data: isSnapshot(row.snapshot) ? syncable(row.snapshot.data) : null, version: row.version ?? 0, xp: row.xp ?? 0 };
 }
 
 /** Almashtirishdan oldin qurilmadagi nusxa (xato bo'lsa qaytarish uchun; sinxronlanmaydi) */
@@ -82,10 +93,20 @@ function backupLocal(data: Data) {
 }
 
 async function syncOnce(userId: string, askRestore: () => boolean) {
+  const owner = syncMeta.get().userId;
+  // Boshqa hisobning yuborilmagan javoblari bu hisobga yozilmaydi
+  if (owner && owner !== userId) xpOutbox.clear();
+
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const remote = await pull();
+    await flushXp();
+    let remote = await pull();
     const meta = syncMeta.get();
     const local = localData();
+    if (!remote.data && !meta.userId && hasProgress(local)) {
+      queueLegacy(local);
+      await flushXp();
+      remote = await pull();
+    }
     let base = meta.userId === userId ? baseStore.get() : null;
     // Oldingi yuborish yetib borgan, faqat javobi yo'qolgan — asos o'sha holat
     if (remote.data && meta.userId === userId && meta.pending && fingerprint(remote.data) === meta.pending) base = remote.data;
@@ -104,6 +125,8 @@ async function syncOnce(userId: string, askRestore: () => boolean) {
       next = mergeData(base, local, remote.data);
     }
 
+    next = withServerXp(next, remote.xp);
+
     // So'rov davomida foydalanuvchi yana nimadir ishlagan bo'lsa — eskisi bilan bosib ketmaymiz
     if (!same(localData(), local)) continue;
     if (!same(next, local)) replaceSnapshot(next);
@@ -120,7 +143,6 @@ async function syncOnce(userId: string, askRestore: () => boolean) {
         method: "PUT",
         json: {
           snapshot: { app: "scorely", version: 1, exportedAt: new Date().toISOString(), data: next },
-          stats: computeStats(),
           baseVersion: remote.version,
         },
       });
@@ -162,8 +184,9 @@ export async function restoreFromCloud(userId: string) {
   const remote = await pull();
   if (!remote.data) return false;
   backupLocal(localData());
-  replaceSnapshot(remote.data);
-  baseStore.set(remote.data);
+  const data = withServerXp(remote.data, remote.xp);
+  replaceSnapshot(data);
+  baseStore.set(data);
   syncMeta.set({ userId, lastSyncedAt: new Date().toISOString(), pending: null });
   return true;
 }
@@ -171,7 +194,7 @@ export async function restoreFromCloud(userId: string) {
 /** Oxirgi sinxronlashdan beri o'zgarish bormi */
 export function hasUnsynced() {
   const base = baseStore.get();
-  return !base || !same(base, localData());
+  return xpOutbox.list().length > 0 || !base || !same(base, localData());
 }
 
 /** Chiqishda: ma'lumot egasi eslab qolinadi, faqat kutilayotgan yuborish bekor bo'ladi */
