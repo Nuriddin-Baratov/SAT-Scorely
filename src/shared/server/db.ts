@@ -50,6 +50,9 @@ async function connect(): Promise<Db> {
       max: 5,
       idle_timeout: 20,
       prepare: false,
+      // Pooler bitta ulanishda ketma-ket (pipeline) so'rovlarni ko'tarmaydi: bir vaqtda ko'p so'rov kelsa javob qotib qolardi
+      max_pipeline: 1,
+      connect_timeout: 10,
       onnotice: () => {},
     });
     return {
