@@ -6,7 +6,7 @@ const CODE_RE = /^SP-\d{4}-[A-Z2-9]{5}-[A-Z2-9]{5}$/;
 export async function GET(request: Request, { params }: { params: Promise<{ code: string }> }) {
   try {
     if (!rateLimit(request, "verify", 30)) return json({ error: "rate" }, 429);
-    const code = decodeURIComponent((await params).code).trim().toUpperCase();
+    const code = (await params).code.trim().toUpperCase();
     const cert = CODE_RE.test(code) ? await findCertificate(code) : null;
     if (!cert) return json({ error: "not-found" }, 404);
     const { name, correct, total, scores, issuedAt } = cert;
