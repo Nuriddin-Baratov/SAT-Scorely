@@ -24,7 +24,8 @@ export const SCHEMA = [
     questions integer not null default 0,
     weak_domain text,
     last_active text,
-    updated_at timestamptz not null default now()
+    updated_at timestamptz not null default now(),
+    version integer not null default 0
   )`,
   `create table if not exists xp_daily (
     user_id text not null references users(id) on delete cascade,

@@ -82,22 +82,25 @@ export function RegisterForm({ toolbar }: { toolbar?: ReactNode }) {
         // Serverdagi sessiya → JourneyGate lokal akkauntni o'zi belgilaydi
         await authApi.login(email, values.password);
       } else {
-        let cloud = false;
-        try {
-          await authApi.register({ name, email, password: values.password, role: "student" });
-          cloud = true;
-        } catch (err) {
-          const code = err instanceof ApiError ? err.code : "offline";
-          if (code === "exists" || code === "rate") throw err;
-          // Baza ulanmagan / server yo'q — hisob shu qurilmada davom etadi
-        }
-        accountStore.set({ name, email, cloud, createdAt: new Date().toISOString() });
+        // Hisob faqat serverda ochilgandan keyin davom etiladi — qurilmadagi "soxta" hisob yo'q
+        await authApi.register({ name, email, password: values.password, role: "student" });
+        accountStore.set({ name, email, cloud: true, createdAt: new Date().toISOString() });
       }
       router.replace(href(routes.dashboard));
     } catch (err) {
       const code = err instanceof ApiError ? err.code : "offline";
       setFormError(
-        code === "exists" ? r.errors.exists : code === "rate" ? r.errors.rate : code === "invalid" ? r.errors.invalid : r.errors.offline,
+        code === "exists"
+          ? r.errors.exists
+          : code === "rate"
+            ? r.errors.rate
+            : code === "weak"
+              ? r.errors.password
+              : code === "invalid"
+                ? mode === "register"
+                  ? r.errors.email
+                  : r.errors.invalid
+                : r.errors.offline,
       );
       setPending(false);
     }

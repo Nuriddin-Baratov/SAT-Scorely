@@ -857,7 +857,7 @@ export const uz = {
   },
 
   sync: {
-    confirmRestore: "Bulutda saqlangan progress topildi. Uni shu qurilmaga yuklaymizmi?\n\n“Bekor qilish” — shu qurilmadagi ma'lumotlar bulutga yoziladi.",
+    confirmRestore: "Bulutda saqlangan progress topildi. Uni shu qurilmaga yuklaymizmi?\n\n“Bekor qilish” — shu qurilmadagi natijalar ham hisobingizga qo'shiladi.",
     saved: "Bulutga saqlandi.",
     nothing: "Bulutda hali ma'lumot yo'q.",
     confirmPull: "Shu qurilmadagi ma'lumotlar bulutdagisi bilan almashtiriladi. Davom etasizmi?",

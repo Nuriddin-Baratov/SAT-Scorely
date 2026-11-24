@@ -31,7 +31,7 @@ const uz = {
       exists: "Bu email bilan hisob allaqachon bor — kiring",
       invalid: "Email yoki parol noto'g'ri",
       rate: "Juda ko'p urinish. Birozdan keyin qayta urining",
-      offline: "Server bilan aloqa yo'q — kirish hozircha imkonsiz. Ro'yxatdan o'tib davom eting.",
+      offline: "Server bilan aloqa yo'q. Internetni tekshirib, qayta urining.",
     },
     stepsTitle: "3 qadamda boshlang",
     steps: [
@@ -172,7 +172,7 @@ const en: Texts = {
       exists: "An account with this email exists — log in",
       invalid: "Wrong email or password",
       rate: "Too many attempts. Try again shortly",
-      offline: "No connection to the server — log in is unavailable for now. Sign up to continue.",
+      offline: "No connection to the server. Check your internet and try again.",
     },
     stepsTitle: "Start in 3 steps",
     steps: [
@@ -310,7 +310,7 @@ const ru: Texts = {
       exists: "Аккаунт с этим email уже есть — войдите",
       invalid: "Неверный email или пароль",
       rate: "Слишком много попыток. Повторите позже",
-      offline: "Нет связи с сервером — вход пока недоступен. Зарегистрируйтесь, чтобы продолжить.",
+      offline: "Нет связи с сервером. Проверьте интернет и попробуйте снова.",
     },
     stepsTitle: "Начните за 3 шага",
     steps: [

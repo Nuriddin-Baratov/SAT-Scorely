@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 
 import { authApi, useSession } from "@/entities/user";
 import { BackupPanel } from "@/features/backup-data";
-import { SyncPanel, forgetSyncedUser } from "@/features/cloud-sync";
+import { SyncPanel, forgetSyncedUser, syncNow } from "@/features/cloud-sync";
 import { JoinClassPanel } from "@/features/join-class";
 import { LocaleSwitcher } from "@/features/switch-locale";
 import { TelegramPanel } from "@/features/telegram-link";
@@ -132,6 +132,8 @@ function AccountDetails() {
   async function logout() {
     setBusy(true);
     try {
+      // Oxirgi natijalar bulutda qolsin; tarmoq bo'lmasa ham chiqish to'xtamaydi
+      await syncNow(user.id).catch(() => {});
       await authApi.logout();
       forgetSyncedUser();
     } finally {

@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const user = await requireUser();
     const row = await loadSnapshot(user.id);
-    return json({ snapshot: row?.snapshot ?? null, updatedAt: row?.updated_at ?? null });
+    return json({ snapshot: row?.snapshot ?? null, updatedAt: row?.updated_at ?? null, version: Number(row?.version ?? 0) });
   } catch (error) {
     return handleError(error);
   }
@@ -19,10 +19,13 @@ export async function PUT(request: Request) {
   try {
     assertSameOrigin(request);
     const user = await requireUser();
-    const body = await readJson<{ snapshot?: unknown; stats?: SyncStats }>(request);
+    const body = await readJson<{ snapshot?: unknown; stats?: SyncStats; baseVersion?: unknown }>(request);
     if (!body.stats) return json({ error: "invalid" }, 400);
-    await saveSnapshot(user.id, body.snapshot, body.stats);
-    return json({ ok: true, savedAt: new Date().toISOString() });
+    const baseVersion = Number.isInteger(body.baseVersion) ? (body.baseVersion as number) : undefined;
+    const version = await saveSnapshot(user.id, body.snapshot, body.stats, baseVersion);
+    // Boshqa qurilma oldinroq yozgan — mijoz yangi nusxani olib, birlashtirib qayta yuboradi
+    if (version === null) return json({ error: "conflict" }, 409);
+    return json({ ok: true, version, savedAt: new Date().toISOString() });
   } catch (error) {
     return handleError(error);
   }

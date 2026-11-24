@@ -2,37 +2,33 @@
 
 import { useState } from "react";
 
+import { useSession } from "@/entities/user";
 import { localeTags, useI18n } from "@/shared/i18n";
-import { applySnapshot, isSnapshot } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Icon } from "@/shared/ui/icon";
 
-import { fingerprint, pullSnapshot, pushSnapshot, syncMeta } from "../model/sync";
+import { restoreFromCloud, syncMeta, syncNow } from "../model/sync";
 
 /** Sozlamalarda: oxirgi sinxronizatsiya, “Hozir saqlash” va “Bulutdan tiklash” */
 export function SyncPanel() {
   const { t, locale } = useI18n();
+  const session = useSession();
+  const userId = session.status === "user" ? session.user.id : null;
   const meta = syncMeta.useValue();
   const [busy, setBusy] = useState<"push" | "pull" | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   async function run(kind: "push" | "pull") {
+    if (!userId) return;
     setBusy(kind);
     setMessage(null);
     try {
       if (kind === "push") {
-        await pushSnapshot({ force: true });
+        await syncNow(userId);
         setMessage(t.sync.saved);
       } else {
-        const remote = await pullSnapshot();
-        if (!isSnapshot(remote.snapshot)) {
-          setMessage(t.sync.nothing);
-          return;
-        }
         if (!window.confirm(t.sync.confirmPull)) return;
-        applySnapshot(remote.snapshot);
-        syncMeta.set({ ...syncMeta.get(), hash: fingerprint(remote.snapshot), lastSyncedAt: new Date().toISOString() });
-        window.location.reload();
+        setMessage((await restoreFromCloud(userId)) ? t.sync.saved : t.sync.nothing);
       }
     } catch {
       setMessage(t.sync.failed);

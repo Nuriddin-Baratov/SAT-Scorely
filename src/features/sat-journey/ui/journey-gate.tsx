@@ -38,8 +38,10 @@ export function JourneyGate({ children, toolbar }: { children: ReactNode; toolba
       const { name, email } = session.user;
       accountStore.set({ name, email, cloud: true, createdAt: new Date().toISOString() });
     }
-    // Serverdagi akkauntdan chiqildi (yoki u o'chirildi) — qaytadan ro'yxatdan o'tish/kirish.
-    if (session.status === "guest" && account?.cloud) accountStore.clear();
+    // Server ishlayapti, lekin sessiya yo'q: akkauntdan chiqilgan, o'chirilgan yoki hisob avval faqat shu
+    // qurilmada ochilgan (bazada yo'q) — qaytadan ro'yxatdan o'tish/kirish. Qurilmadagi progress o'chmaydi:
+    // ro'yxatdan o'tgach, u yangi hisobga biriktiriladi.
+    if (session.status === "guest" && account) accountStore.clear();
   }, [session]);
 
   // Dashboard'da "profilni o'chirish" bosildi — eski reja ham bekor bo'ladi.

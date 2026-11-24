@@ -2,7 +2,7 @@
 // React hook'lari uchun: "@/shared/lib/react".
 export { cn } from "./cn";
 export { formatDuration } from "./duration";
-export { STORAGE_PREFIX, applySnapshot, clearSnapshot, collectSnapshot, isSnapshot, type Snapshot } from "./snapshot";
+export { STORAGE_PREFIX, applySnapshot, clearSnapshot, collectSnapshot, isSnapshot, isSyncKey, replaceSnapshot, type Snapshot } from "./snapshot";
 export {
   DAY_MS,
   MONTHS_SHORT,

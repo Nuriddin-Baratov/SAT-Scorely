@@ -24,6 +24,13 @@ npm run lint:fsd             # Steiger — FSD qoidalarini tekshiradi
 Server ishlamasa ham sayt to'liq ishlaydi — progress brauzerda (localStorage) saqlanadi.
 Login qilinganda u bulut bilan sinxronlanadi.
 
+### Supabase (production)
+
+- Baza va real-time — Supabase. Kalitlar Vercel'da `SB_` prefiksi bilan (integratsiya qo'shadi).
+- `supabase/setup.sql` — RLS, signal triggerlari va kanal siyosati. **Yangi jadval qo'shilsa, qayta bajaring** (RLS yoqilishi uchun):
+  `npx vercel env pull .vercel/prod.env --environment production && node --env-file=.vercel/prod.env scripts/supabase-setup.mjs`
+- Brauzerdagi ochiq kalit jadvallarni o'qiy olmaydi; u faqat "o'zgardi" signalini tinglaydi, ma'lumot API orqali olinadi.
+
 ## Telegram bot
 
 1. @BotFather'da bot yarating, tokenni oling.

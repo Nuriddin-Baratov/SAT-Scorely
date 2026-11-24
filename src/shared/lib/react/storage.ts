@@ -1,5 +1,8 @@
 import { useSyncExternalStore } from "react";
 
+/** Saqlangan ma'lumot o'zgarganda (shu oynada) — bulut sinxronizatsiyasi tinglaydi */
+export const STORAGE_CHANGE_EVENT = "satpro:storage";
+
 /**
  * localStorage'ga bog'langan kichik reaktiv store.
  * SSR va gidratsiya paytida `undefined` qaytaradi — bu "hali yuklanmagan" degani.
@@ -29,6 +32,7 @@ export function createStorageStore<T>(key: string, fallback: T) {
 
   function emit() {
     listeners.forEach((listener) => listener());
+    window.dispatchEvent(new Event(STORAGE_CHANGE_EVENT));
   }
 
   function subscribe(listener: () => void) {

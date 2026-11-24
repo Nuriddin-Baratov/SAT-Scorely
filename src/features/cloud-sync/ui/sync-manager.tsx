@@ -2,67 +2,60 @@
 
 import { useEffect } from "react";
 
-import { useSession } from "@/entities/user";
+import { refreshSession, useSession } from "@/entities/user";
+import { useLive } from "@/shared/api";
 import { useI18n } from "@/shared/i18n";
-import { applySnapshot, collectSnapshot, isSnapshot } from "@/shared/lib";
+import { STORAGE_CHANGE_EVENT } from "@/shared/lib/react";
 
-import { fingerprint, pullSnapshot, pushSnapshot, syncMeta } from "../model/sync";
+import { hasUnsynced, syncNow } from "../model/sync";
 
-const PUSH_INTERVAL_MS = 30_000;
+const PUSH_DELAY_MS = 1_200;
 
 /**
- * Ko'rinmas komponent: foydalanuvchi kirgan bo'lsa, brauzerdagi progressni bulut bilan sinxronlaydi.
- * Shu qurilmada birinchi marta kirilganda — bulutdagi nusxani tiklashni taklif qiladi.
+ * Ko'rinmas komponent: foydalanuvchi kirgan bo'lsa, progress bulut bilan real vaqtda sinxronlanadi —
+ * o'zgarish ~1 soniyada yuboriladi, boshqa qurilmadagi o'zgarish signal orqali darhol keladi.
  */
 export function SyncManager() {
   const session = useSession();
   const { t } = useI18n();
   const userId = session.status === "user" ? session.user.id : null;
+  const confirmText = t.sync.confirmRestore;
+
+  useLive(userId ? `user:${userId}` : null, () => {
+    if (!userId) return;
+    syncNow(userId).catch(() => {});
+    // Ism, rol yoki Telegram ulanishi boshqa joyda o'zgargan bo'lishi mumkin
+    void refreshSession();
+  });
 
   useEffect(() => {
     if (!userId) return;
-    let cancelled = false;
-
-    async function reconcile() {
-      const meta = syncMeta.get();
-      if (meta.userId === userId) return;
-      const remote = await pullSnapshot();
-      if (cancelled) return;
-      const local = collectSnapshot();
-      const localHasData = Object.keys(local.data).some((key) => key !== "scorely.sync.v1");
-
-      if (isSnapshot(remote.snapshot) && Object.keys(remote.snapshot.data).length > 0) {
-        if (!localHasData || window.confirm(t.sync.confirmRestore)) {
-          applySnapshot(remote.snapshot);
-          syncMeta.set({ userId, hash: fingerprint(remote.snapshot), lastSyncedAt: new Date().toISOString() });
-          window.location.reload();
-          return;
-        }
-      }
-      syncMeta.set({ ...syncMeta.get(), userId, hash: null });
-      await pushSnapshot({ force: true });
-    }
-
-    reconcile().catch(() => {
-      // Tarmoq xatosi — keyingi intervalda qayta urinamiz
+    syncNow(userId, () => window.confirm(confirmText)).catch(() => {
+      // Tarmoq xatosi — keyingi o'zgarishda yoki ilovaga qaytilganda qayta urinamiz
     });
 
-    const interval = window.setInterval(() => {
-      if (syncMeta.get().userId === userId) pushSnapshot().catch(() => {});
-    }, PUSH_INTERVAL_MS);
-    const onHide = () => {
-      if (document.visibilityState === "hidden" && syncMeta.get().userId === userId) {
-        pushSnapshot({ keepalive: true }).catch(() => {});
-      }
+    let timer: number | undefined;
+    const push = () => {
+      if (hasUnsynced()) syncNow(userId).catch(() => {});
     };
+    const onChange = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(push, PUSH_DELAY_MS);
+    };
+    // Ilova yopilayotganda kutmasdan yuboramiz
+    const onHide = () => {
+      if (document.visibilityState !== "hidden") return;
+      window.clearTimeout(timer);
+      push();
+    };
+    window.addEventListener(STORAGE_CHANGE_EVENT, onChange);
     document.addEventListener("visibilitychange", onHide);
-
     return () => {
-      cancelled = true;
-      window.clearInterval(interval);
+      window.clearTimeout(timer);
+      window.removeEventListener(STORAGE_CHANGE_EVENT, onChange);
       document.removeEventListener("visibilitychange", onHide);
     };
-  }, [userId, t.sync.confirmRestore]);
+  }, [userId, confirmText]);
 
   return null;
 }

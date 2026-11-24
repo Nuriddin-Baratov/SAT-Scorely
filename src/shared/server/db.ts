@@ -6,9 +6,19 @@ import { SCHEMA } from "./schema";
  * Ma'lumotlar bazasi: `DATABASE_URL` berilgan bo'lsa — haqiqiy Postgres (Vercel Postgres / Neon / o'zingizniki),
  * aks holda lokal ishlab chiqish uchun PGlite (Postgres WASM, `.data/pglite` papkasida saqlanadi).
  */
-/** Vercel/Neon integratsiyasi ba'zan faqat POSTGRES_URL ni qo'shadi — ikkalasini ham qabul qilamiz */
+/**
+ * Supabase (Vercel integratsiyasi `SB_` prefiksi bilan qo'shadi) birinchi o'rinda;
+ * bo'lmasa — oddiy DATABASE_URL / POSTGRES_URL.
+ */
 function databaseUrl() {
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL || "";
+  return process.env.SB_POSTGRES_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL || "";
+}
+
+/** Pooler'ga xos parametrlar drayverga kerak emas (aks holda server sozlamasi deb yuboriladi) */
+function cleanUrl(raw: string) {
+  const url = new URL(raw);
+  for (const key of ["supa", "pgbouncer", "sslmode", "channel_binding"]) url.searchParams.delete(key);
+  return url.toString();
 }
 
 /**
@@ -34,7 +44,14 @@ async function connect(): Promise<Db> {
   if (url) {
     const { default: postgres } = await import("postgres");
     const local = /localhost|127\.0\.0\.1/.test(url);
-    const sql = postgres(url, { ssl: local ? false : "require", max: 5, idle_timeout: 20 });
+    // `prepare: false` — Supabase pooler (transaction rejimi) bilan mos; onnotice — "already exists" xabarlari jurnalni to'ldirmasin
+    const sql = postgres(cleanUrl(url), {
+      ssl: local ? false : "require",
+      max: 5,
+      idle_timeout: 20,
+      prepare: false,
+      onnotice: () => {},
+    });
     return {
       query: async <T>(text: string, params: unknown[] = []) =>
         (await sql.unsafe(text, params as never[])) as unknown as T[],
@@ -55,6 +72,11 @@ async function init(): Promise<Db> {
   const db = await connect();
   // Jadvallar idempotent yaratiladi (CREATE … IF NOT EXISTS)
   for (const statement of SCHEMA) await db.query(statement);
+  // Eski bazalarda yo'q ustun (ALTER har ishga tushishda jadvalni bloklamasligi uchun avval tekshiriladi)
+  const [hasVersion] = await db.query(
+    "select 1 as ok from information_schema.columns where table_schema = current_schema() and table_name = 'user_data' and column_name = 'version'",
+  );
+  if (!hasVersion) await db.query("alter table user_data add column if not exists version integer not null default 0");
   return db;
 }
 

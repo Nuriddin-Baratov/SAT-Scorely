@@ -857,7 +857,7 @@ export const en: Dictionary = {
   },
 
   sync: {
-    confirmRestore: "Saved progress was found in the cloud. Load it onto this device?\n\n“Cancel” — this device's data will be written to the cloud instead.",
+    confirmRestore: "Saved progress was found in the cloud. Load it onto this device?\n\n“Cancel” — results from this device will also be added to your account.",
     saved: "Saved to the cloud.",
     nothing: "There's no cloud data yet.",
     confirmPull: "The data on this device will be replaced with the cloud copy. Continue?",

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { cachedLeaderboard, loadLeaderboard, type LeaderboardRow, type LeaderboardScope } from "@/entities/leaderboard";
 import { useSession } from "@/entities/user";
-import { api } from "@/shared/api";
+import { api, useLive } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
@@ -21,6 +21,9 @@ export function LeaderboardPage() {
   const [classes, setClasses] = useState<{ id: string; name: string }[]>([]);
   const [loaded, setLoaded] = useState<{ key: string; rows: LeaderboardRow[] } | null>(null);
   const [failed, setFailed] = useState(false);
+  // Kimningdir natijasi o'zgarsa — reyting sahifada turganda ham o'zi yangilanadi
+  const [tick, setTick] = useState(0);
+  useLive("leaderboard", () => setTick((n) => n + 1));
   const userRole = session.status === "user" ? session.user.role : null;
 
   useEffect(() => {
@@ -42,11 +45,11 @@ export function LeaderboardPage() {
         setLoaded({ key: `${scope}|${classId}`, rows: next });
         setFailed(false);
       })
-      .catch(() => !cancelled && setFailed(true));
+      .catch(() => !cancelled && tick === 0 && setFailed(true));
     return () => {
       cancelled = true;
     };
-  }, [scope, classId, session.status]);
+  }, [scope, classId, session.status, tick]);
 
   // Yangi ma'lumot kelguncha — oldindan olingan (keshdagi) reyting
   const rows = loaded?.key === `${scope}|${classId}` ? loaded.rows : session.status === "loading" ? null : cachedLeaderboard(scope, classId);

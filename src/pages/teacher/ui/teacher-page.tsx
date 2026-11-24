@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import type { DomainId } from "@/entities/sat";
 import { useSession } from "@/entities/user";
-import { api } from "@/shared/api";
+import { api, useLive } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { formatDay, useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
@@ -42,6 +42,11 @@ export function TeacherPage() {
     const data = await api<{ classes: TeacherClass[] }>("/api/classes", { cache: "no-store" });
     setClasses(data.classes);
   }, []);
+
+  // O'quvchi qo'shilsa yoki natijasi o'zgarsa — panel o'zi yangilanadi
+  useLive(session.status === "user" && isTeacher ? `teacher:${session.user.id}` : null, () => {
+    load().catch(() => {});
+  });
 
   useEffect(() => {
     if (!isTeacher) return;

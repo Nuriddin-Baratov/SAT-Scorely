@@ -50,7 +50,10 @@ export function refreshSession() {
       ),
     )
     // Server/baza mavjud bo'lmasa — sayt baribir brauzer rejimida ishlaydi
-    .catch(() => set({ status: "offline" }))
+    // Kirgan foydalanuvchi qisqa uzilishda "chiqib ketgan" bo'lib qolmasin
+    .catch(() => {
+      if (state.status !== "user") set({ status: "offline" });
+    })
     .finally(() => {
       inflight = null;
     });
