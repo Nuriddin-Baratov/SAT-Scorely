@@ -40,6 +40,7 @@ const PAGES = new Set([
   "simulator",
   "teacher",
   "tests",
+  "verify",
   "vocabulary",
 ]);
 

@@ -51,6 +51,17 @@ export const SCHEMA = [
   )`,
   `create unique index if not exists xp_events_dedupe_idx on xp_events(user_id, dedupe) where dedupe is not null`,
   `create index if not exists xp_events_day_idx on xp_events(user_id, awarded_on)`,
+  `create table if not exists certificates (
+    code text primary key,
+    user_id text not null references users(id) on delete cascade,
+    event_id text not null,
+    name text not null,
+    correct integer not null,
+    total integer not null,
+    scores jsonb not null,
+    issued_at timestamptz not null default now(),
+    unique (user_id, event_id)
+  )`,
   `create table if not exists classes (
     id text primary key,
     teacher_id text not null references users(id) on delete cascade,

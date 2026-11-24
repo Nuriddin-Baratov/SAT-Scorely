@@ -1,8 +1,41 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+
+import { api } from "@/shared/api";
 import { createStorageStore } from "@/shared/lib/react";
 
-/** Yakuniy test uchun berilgan sertifikat (id — urinish id'si bilan bir xil). */
+/** Server bergan (tekshiriladigan) sertifikat */
+export interface OfficialCertificate {
+  code: string;
+  eventId: string;
+  name: string;
+  correct: number;
+  total: number;
+  scores: { rw?: number; math?: number };
+  issuedAt: string;
+}
+
+let officialCache: OfficialCertificate[] | null = null;
+
+/** Serverdagi sertifikatlarim; `null` — hali yuklanmagan (yoki kirilmagan) */
+export function useOfficialCertificates(enabled: boolean) {
+  const [list, setList] = useState(officialCache);
+  const reload = useCallback(() => {
+    api<{ certificates: OfficialCertificate[] }>("/api/certificates", { cache: "no-store" })
+      .then((d) => {
+        officialCache = d.certificates;
+        setList(d.certificates);
+      })
+      .catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (enabled) reload();
+  }, [enabled, reload]);
+  return { list, reload };
+}
+
+/** Qurilmadagi nusxa: server rasmiysini bergunicha darhol ko'rsatish uchun (id — urinish id'si bilan bir xil). */
 export interface Certificate {
   id: string;
   name: string;
@@ -26,11 +59,4 @@ export const certificatesRepository = {
 /** `undefined` — yuklanmoqda; eng yangisi boshida */
 export function useCertificates() {
   return store.useValue();
-}
-
-/** Odamga qulay sertifikat raqami: SP-2026-XXXXXX */
-export function certificateNumber(cert: Pick<Certificate, "id" | "issuedAt">) {
-  let hash = 0;
-  for (const ch of cert.id) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
-  return `SP-${cert.issuedAt.slice(0, 4)}-${hash.toString(36).toUpperCase().padStart(6, "0").slice(-6)}`;
 }

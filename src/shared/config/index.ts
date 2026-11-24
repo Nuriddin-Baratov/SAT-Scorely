@@ -11,6 +11,7 @@ export const routes = {
   tests: "/tests",
   test: (id: string) => `/tests/${id}`,
   certificate: (id: string) => `/certificate?id=${encodeURIComponent(id)}`,
+  verify: (code: string) => `/verify?code=${encodeURIComponent(code)}`,
   results: "/results",
   calculator: "/calculator",
   practice: "/practice",

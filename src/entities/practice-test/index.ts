@@ -19,7 +19,7 @@ export {
   type AttemptSummary,
 } from "./model/tests";
 export { attemptsRepository, useTestAttempts } from "./model/attempts";
-export { certificateNumber, certificatesRepository, useCertificates, type Certificate } from "./model/certificates";
+export { certificatesRepository, useCertificates, useOfficialCertificates, type Certificate, type OfficialCertificate } from "./model/certificates";
 export { dailyQuestionFor } from "./model/daily";
 export { QuestionCard } from "./ui/question-card";
 export { QuestionDrill } from "./ui/question-drill";

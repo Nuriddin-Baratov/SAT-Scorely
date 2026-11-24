@@ -15,6 +15,7 @@ export {
   type PublicUser,
   type Role,
 } from "./auth";
+export { findCertificate, insertCertificate, listCertificates, uncertifiedTests, type CertificateRow } from "./certificates";
 export { DatabaseUnavailableError, databaseConfigured, query, queryOne } from "./db";
 export { assertSameOrigin, handleError, json, rateLimit, readJson } from "./http";
 export {

@@ -1,14 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 
-import { certificateNumber, useCertificates, type Certificate } from "@/entities/practice-test";
+import { useCertificates, useOfficialCertificates, type OfficialCertificate } from "@/entities/practice-test";
+import { useSession } from "@/entities/user";
 import { routes } from "@/shared/config";
 import { formatDay, useI18n } from "@/shared/i18n";
+import { cn } from "@/shared/lib";
 import { launchConfetti } from "@/shared/ui/confetti";
 import { Icon } from "@/shared/ui/icon";
 import { Container } from "@/shared/ui/primitives";
+import { QrCode } from "@/shared/ui/qr-code";
+
+/** `code` yo'q — server hali tasdiqlamagan (masalan, internet yo'q) */
+type ViewCertificate = Omit<OfficialCertificate, "code" | "eventId"> & { code: string | null };
 
 /** Oltin muhr (SVG) */
 function Seal() {
@@ -37,10 +43,12 @@ function Seal() {
   );
 }
 
-function CertificateView({ cert }: { cert: Certificate }) {
+function CertificateView({ cert }: { cert: ViewCertificate }) {
   const { t, locale } = useI18n();
   const c = t.certificate;
-  const pct = Math.round(cert.accuracy * 100);
+  const pct = Math.round((cert.correct / cert.total) * 100);
+  // Tilsiz (qisqa) havola: ochgan odamning o'z tiliga yo'naltiriladi, QR ham yirikroq katakli bo'ladi
+  const verifyUrl = cert.code ? `${window.location.origin}${routes.verify(cert.code)}` : null;
   const total = cert.scores.rw && cert.scores.math ? cert.scores.rw + cert.scores.math : null;
   const sections = [
     cert.scores.rw !== undefined && `R&W ${cert.scores.rw}`,
@@ -101,9 +109,10 @@ function CertificateView({ cert }: { cert: Certificate }) {
             <p className="mt-1 text-[10px] font-semibold tracking-wider text-[#0b1c3d]/60 uppercase">{c.signature}</p>
           </div>
           <Seal />
-          <div className="w-36 text-right sm:w-48">
-            <p className="font-mono text-sm font-semibold tracking-wider">{certificateNumber(cert)}</p>
-            <span className="block h-px bg-[#0b1c3d]/40" />
+          <div className="flex w-36 flex-col items-end text-right sm:w-48">
+            {verifyUrl && <QrCode value={verifyUrl} label={c.qrLabel} className="mb-1.5 size-24 rounded" />}
+            <p className={cn("font-mono font-semibold", cert.code ? "text-[10px] whitespace-nowrap sm:text-sm" : "text-xs text-[#b45309]")}>{cert.code ?? c.pending}</p>
+            <span className="block h-px w-full bg-[#0b1c3d]/40" />
             <p className="mt-1 text-[10px] font-semibold tracking-wider text-[#0b1c3d]/60 uppercase">{c.number}</p>
           </div>
         </div>
@@ -115,13 +124,26 @@ function CertificateView({ cert }: { cert: Certificate }) {
 export function CertificatePage({ id }: { id: string }) {
   const { t, href } = useI18n();
   const c = t.certificate;
+  const session = useSession();
   const certs = useCertificates();
-  const cert = certs?.find((x) => x.id === id);
+  const { list: official, reload } = useOfficialCertificates(session.status === "user");
+  const verified = official?.find((x) => x.eventId === id);
+  const local = certs?.find((x) => x.id === id);
+  const cert: ViewCertificate | undefined = verified ?? (local ? { ...local, code: null } : undefined);
+  const waiting = session.status === "user" && !verified;
+  const poll = useEffectEvent(reload);
+
+  // Test javoblari serverga yetib borguncha (odatda 1–2 soniya) tasdiqni kutamiz
+  useEffect(() => {
+    if (!waiting) return;
+    const timer = window.setInterval(poll, 3_000);
+    return () => window.clearInterval(timer);
+  }, [waiting]);
 
   // Sertifikat ochilganda bir marta tabrik konfettisi
   useEffect(() => {
     if (cert) launchConfetti({ particles: 120 });
-  }, [cert?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [!cert]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <main className="relative flex-1">
@@ -141,11 +163,16 @@ export function CertificatePage({ id }: { id: string }) {
                 <Icon name="medal" className="size-4" /> {c.print}
               </button>
               <p className="text-xs text-muted">{c.printHint}</p>
+              {cert.code && (
+                <Link prefetch href={href(routes.verify(cert.code))} className="text-xs font-semibold text-accent hover:underline">
+                  {c.verifyLink} →
+                </Link>
+              )}
             </div>
           )}
         </div>
 
-        {certs === undefined ? (
+        {certs === undefined || (!cert && session.status === "user" && official === null) ? (
           <div className="mx-auto aspect-[1.414] max-w-5xl animate-pulse rounded-[1.25rem] bg-surface-2" />
         ) : cert ? (
           <CertificateView cert={cert} />

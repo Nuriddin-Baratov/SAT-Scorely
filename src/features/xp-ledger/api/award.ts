@@ -2,6 +2,7 @@ import "server-only";
 
 import { dedupeKey, xpFor, type XpClaim } from "@/entities/gamification";
 import {
+  FINAL_TEST_ID,
   SIMULATION_ID,
   chooseAdaptivePath,
   dailyQuestionFor,
@@ -14,6 +15,8 @@ import {
 } from "@/entities/practice-test";
 import { vocabWords } from "@/entities/vocab";
 import { alreadyMastered, recordXp, refreshTestStats, tashkentDay, type XpEvent } from "@/shared/server";
+
+import { ensureCertificates } from "./certificates";
 
 export const MAX_CLAIMS = 60;
 
@@ -117,6 +120,7 @@ async function grade(userId: string, claim: XpClaim): Promise<XpEvent | null> {
 export async function awardXp(userId: string, claims: XpClaim[]) {
   const results: { id: string; xp: number }[] = [];
   let hasTest = false;
+  let hasFinal = false;
   for (const claim of claims.slice(0, MAX_CLAIMS)) {
     const event = await grade(userId, claim);
     if (!event) {
@@ -126,7 +130,10 @@ export async function awardXp(userId: string, claims: XpClaim[]) {
     const { awarded } = await recordXp(userId, event);
     results.push({ id: event.eventId, xp: awarded });
     hasTest ||= event.kind === "test";
+    hasFinal ||= event.kind === "test" && event.ref === FINAL_TEST_ID;
   }
   if (hasTest) await refreshTestStats(userId);
+  // Xato bo'lsa ham XP javobi to'xtamaydi — sertifikat sahifasi ochilganda qayta uriniladi
+  if (hasFinal) await ensureCertificates(userId).catch((error) => console.error("[certificate]", error));
   return results;
 }

@@ -7,7 +7,7 @@ import { useStudentProfile } from "@/entities/student";
 import { useSession } from "@/entities/user";
 import { useI18n } from "@/shared/i18n";
 
-import { accountStore, activePlanStore, answersStore, guardRedirect, useJourneyStage } from "../model/store";
+import { PUBLIC, accountStore, activePlanStore, answersStore, guardRedirect, useJourneyStage } from "../model/store";
 import { RegisterForm } from "./register-form";
 import { StudentOnboarding } from "./student-onboarding";
 
@@ -27,9 +27,9 @@ export function JourneyGate({ children, toolbar }: { children: ReactNode; toolba
 
   const path = (pathname ?? "/").replace(new RegExp(`^/${locale}(?=/|$)`), "") || "/";
   const redirect = stage ? guardRedirect(stage, path, !!answers) : null;
-  const showRegister = stage === "register" && path !== "/login";
+  const showRegister = stage === "register" && !PUBLIC.includes(path);
   // /onboarding sahifasi so'rovnomani o'zi ko'rsatadi — ikki marta ochilmasin
-  const showOnboarding = stage === "onboarding" && path !== "/login" && path !== "/onboarding";
+  const showOnboarding = stage === "onboarding" && !PUBLIC.includes(path) && path !== "/onboarding";
 
   useEffect(() => {
     const account = accountStore.get();
