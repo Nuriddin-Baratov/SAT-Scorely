@@ -48,5 +48,5 @@ export function ButtonLink({
   className,
   ...props
 }: ComponentProps<typeof Link> & AnchorHTMLAttributes<HTMLAnchorElement> & StyleProps) {
-  return <Link className={buttonClass({ variant, size }, className)} {...props} />;
+  return <Link prefetch className={buttonClass({ variant, size }, className)} {...props} />;
 }

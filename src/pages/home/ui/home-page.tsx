@@ -412,7 +412,7 @@ export function HomePage({ locale }: { locale: Locale }) {
           <SectionHeading eyebrow={h.tools.eyebrow} title={h.tools.title} description={h.tools.description} />
           <div className="mt-14 grid gap-4 md:grid-cols-3">
             {tools.map((tool) => (
-              <Link
+              <Link prefetch
                 key={tool.path}
                 href={href(tool.path)}
                 className="reveal group flex flex-col rounded-[1.75rem] border border-border bg-surface p-7 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-lift"

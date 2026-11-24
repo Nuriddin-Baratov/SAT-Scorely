@@ -128,7 +128,7 @@ export function CertificatePage({ id }: { id: string }) {
       <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
       <Container className="relative py-5 sm:py-12">
         <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-3">
-          <Link href={href(routes.tests)} className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-fg">
+          <Link prefetch href={href(routes.tests)} className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-fg">
             <Icon name="arrowLeft" className="size-4" /> {c.back}
           </Link>
           {cert && (
@@ -156,7 +156,7 @@ export function CertificatePage({ id }: { id: string }) {
             </span>
             <h1 className="mt-5 text-2xl font-bold">{c.notFound}</h1>
             <p className="mt-2 text-muted">{c.notFoundText}</p>
-            <Link
+            <Link prefetch
               href={href(routes.tests)}
               className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-accent-fg"
             >

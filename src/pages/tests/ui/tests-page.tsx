@@ -46,7 +46,7 @@ function FeaturedRow({
   return (
     <div className="relative overflow-hidden rounded-2xl bg-ink text-white shadow-lift">
       <span className="pointer-events-none absolute -top-16 -right-10 size-48 rounded-full bg-white/10 blur-2xl" aria-hidden />
-      <Link href={href} className="relative flex items-center gap-3.5 p-4 sm:gap-5 sm:p-6">
+      <Link prefetch href={href} className="relative flex items-center gap-3.5 p-4 sm:gap-5 sm:p-6">
         <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-white/15 sm:size-14">
           <Icon name={icon} className="size-6" />
         </span>
@@ -99,7 +99,7 @@ export function TestsPage() {
             cta={finalOwn.length ? f.retry : f.start}
             extra={
               cert && (
-                <Link
+                <Link prefetch
                   href={href(routes.certificate(cert.id))}
                   className="relative flex items-center gap-2 border-t border-white/15 px-4 py-2.5 text-sm font-semibold text-white/90 hover:bg-white/5 sm:px-6"
                 >
@@ -128,7 +128,7 @@ export function TestsPage() {
               const style = kindStyle[test.kind];
               return (
                 <li key={test.id}>
-                  <Link
+                  <Link prefetch
                     href={href(routes.test(test.id))}
                     className="flex items-center gap-3.5 rounded-2xl border border-border bg-surface p-3.5 shadow-card transition active:scale-[0.99] sm:p-5 sm:hover:border-accent/40"
                   >

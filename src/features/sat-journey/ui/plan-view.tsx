@@ -131,7 +131,7 @@ export function PlanView({ modal }: { modal?: boolean }) {
             {p.retake}
           </button>
         ) : (
-          <Link href={href(flowRoutes.quiz)} className="text-sm text-white/55 hover:text-white">
+          <Link prefetch href={href(flowRoutes.quiz)} className="text-sm text-white/55 hover:text-white">
             {p.retake}
           </Link>
         )}
@@ -167,7 +167,7 @@ export function PlanPanel() {
           <h2 className="font-display text-lg font-bold sm:text-2xl">
             <span className="pro-gradient-text">{p.yourPlan}</span>
           </h2>
-          <Link href={href(flowRoutes.plan)} className="text-sm text-white/55 hover:text-white">
+          <Link prefetch href={href(flowRoutes.plan)} className="text-sm text-white/55 hover:text-white">
             {p.edit} →
           </Link>
         </div>

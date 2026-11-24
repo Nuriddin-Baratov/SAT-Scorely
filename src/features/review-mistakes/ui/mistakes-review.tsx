@@ -159,7 +159,7 @@ export function MistakesReview() {
       </Card>
 
       <p className="text-center text-sm text-muted">
-        <Link href={href(routes.practice)} className="font-medium text-accent hover:underline">
+        <Link prefetch href={href(routes.practice)} className="font-medium text-accent hover:underline">
           {t.nav.practice}
         </Link>{" "}
         — {t.mistakes.practiceHint}

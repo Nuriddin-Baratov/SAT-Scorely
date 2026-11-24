@@ -51,6 +51,8 @@ export function RootLayout({ children, locale }: Readonly<{ children: ReactNode;
   return (
     <html
       lang={locale}
+      // Sahifa almashganda tepaga birdan o'tadi (silliq scroll faqat sahifa ichidagi #havolalarda)
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${jakarta.variable} h-full antialiased`}
     >

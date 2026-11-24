@@ -295,53 +295,6 @@ dialog::backdrop {
 
 .animate-fade-up { animation: fade-up 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
-/* ---------- Yuklanish (loader) ---------- */
-
-/* Logotipdagi o'sish chizig'i o'zini chizadi: pathLength=100 */
-.loader-line {
-  stroke-dasharray: 100;
-  animation: loader-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-@keyframes loader-draw {
-  0% { stroke-dashoffset: 100; }
-  55% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: -100; }
-}
-
-/* Logotip atrofidagi yumshoq to'lqin */
-.loader-halo {
-  animation: loader-halo 1.6s ease-out infinite;
-}
-@keyframes loader-halo {
-  0% { transform: scale(1); opacity: 0.55; }
-  100% { transform: scale(1.65); opacity: 0; }
-}
-
-/* Ingichka progress chizig'i ichidagi yugurayotgan bo'lak */
-.loader-bar {
-  animation: loader-slide 1.3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-@keyframes loader-slide {
-  0% { transform: translateX(-110%); }
-  100% { transform: translateX(260%); }
-}
-
-/* Sahifa almashayotganda yuqoridagi progress chizig'i */
-.nav-progress {
-  transform-origin: left;
-  animation: nav-progress 8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
-}
-@keyframes nav-progress {
-  0% { transform: scaleX(0); }
-  10% { transform: scaleX(0.45); }
-  100% { transform: scaleX(0.92); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .loader-line { animation: none; stroke-dasharray: none; }
-  .loader-halo, .loader-bar { animation: none; }
-}
-
 /* Harakatni kamaytirishni so'ragan foydalanuvchilar va zaif qurilmalar uchun — cheksiz animatsiyalar o'chadi */
 @media (prefers-reduced-motion: reduce) {
   .aurora > span,

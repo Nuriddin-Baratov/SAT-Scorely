@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { currentStreak, levelOf, useGameState } from "@/entities/gamification";
+import { preloadLeaderboard } from "@/entities/leaderboard";
 import { dueMistakes, useMistakes } from "@/entities/mistake";
 import { useSession } from "@/entities/user";
 import { LocaleSwitcher } from "@/features/switch-locale";
@@ -16,7 +17,6 @@ import { useToday } from "@/shared/lib/react";
 import { ButtonLink } from "@/shared/ui/button";
 import { Icon, type IconName } from "@/shared/ui/icon";
 import { Logo } from "@/shared/ui/logo";
-import { NavProgress } from "@/shared/ui/nav-progress";
 
 interface NavItem {
   path: string;
@@ -32,7 +32,7 @@ function useNavGroups() {
     {
       title: t.nav.groups.learn,
       items: [
-        { path: routes.home, label: t.nav.home, icon: "home" },
+        { path: routes.dashboard, label: t.nav.home, icon: "home" },
         { path: routes.satGuide, label: t.nav.sat, icon: "book" },
         { path: routes.vocabulary, label: t.nav.vocabulary, icon: "cards" },
       ],
@@ -88,7 +88,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 const active = isActive(item.path);
                 return (
                   <li key={item.path}>
-                    <Link
+                    <Link prefetch
                       href={href(item.path)}
                       onClick={onNavigate}
                       aria-current={active ? "page" : undefined}
@@ -99,7 +99,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     >
                       <Icon name={item.icon} className={cn("size-[18px] shrink-0", active ? "text-accent" : "text-muted group-hover:text-fg")} />
                       <span className="truncate">{item.label}</span>
-                      <NavProgress />
                       {item.path === routes.mistakes && dueCount > 0 ? (
                         <span className="ml-auto rounded-full bg-warning px-1.5 py-px text-[11px] font-bold text-white tabular-nums">{dueCount}</span>
                       ) : (
@@ -120,7 +119,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         {session.status === "loading" ? (
           <div className="h-14 animate-pulse rounded-2xl bg-surface-2" />
         ) : session.status === "user" ? (
-          <Link
+          <Link prefetch
             href={href(routes.settings)}
             onClick={onNavigate}
             className="flex items-center gap-3 rounded-2xl bg-surface-2/70 p-2.5 transition hover:bg-surface-2"
@@ -215,7 +214,7 @@ function MobileTabBar({ menuOpen, onMenu }: { menuOpen: boolean; onMenu: () => v
           const active = isActive(tab.path);
           return (
             <li key={tab.path} className="flex min-w-0 flex-1">
-              <Link href={href(tab.path)} aria-current={active ? "page" : undefined} className={itemCls(active)}>
+              <Link prefetch href={href(tab.path)} aria-current={active ? "page" : undefined} className={itemCls(active)}>
                 <span className={iconWrap(active)}>
                   <Icon name={tab.icon} className="size-5" strokeWidth={active ? 2.2 : 1.8} />
                 </span>
@@ -247,6 +246,19 @@ function MobileTabBar({ menuOpen, onMenu }: { menuOpen: boolean; onMenu: () => v
 export function SiteSidebar() {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
+
+  const { href } = useI18n();
+  const router = useRouter();
+
+  // Orqa fonda: reyting ma'lumoti va menyuning ko'rinmay turgan (pastki) sahifalari oldindan yuklanadi —
+  // bosilganda kutmasdan ochiladi. Ko'rinib turgan havolalarni `<Link prefetch>` o'zi yuklaydi.
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      preloadLeaderboard();
+      for (const path of [routes.results, routes.calculator, routes.leaderboard, routes.achievements, routes.settings]) router.prefetch(href(path));
+    }, 1500);
+    return () => window.clearTimeout(id);
+  }, [router, href]);
 
   // Mobil menyu ochiqligida: Esc bilan yopish va fonni aylantirishni to'xtatish.
   useEffect(() => {

@@ -299,7 +299,7 @@ function HistoryCard({ runs }: { runs: Run[] }) {
           const sections = Object.entries(summary.sectionScores) as [SectionId, number][];
           return (
             <li key={attempt.id}>
-              <Link
+              <Link prefetch
                 href={href(test.simulation ? routes.simulator : routes.test(test.id))}
                 className="flex items-center gap-3 px-4 py-3 transition hover:bg-surface-2/60 sm:px-6"
               >

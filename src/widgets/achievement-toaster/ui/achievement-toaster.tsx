@@ -35,7 +35,7 @@ export function AchievementToaster() {
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold tracking-wide text-gold uppercase">{t.game.badgeUnlocked}</p>
           <p className="truncate font-bold">{t.badges[badge.id].title}</p>
-          <Link href={href(routes.achievements)} onClick={() => gameRepository.markSeen([badge.id])} className="text-xs text-accent hover:underline">
+          <Link prefetch href={href(routes.achievements)} onClick={() => gameRepository.markSeen([badge.id])} className="text-xs text-accent hover:underline">
             {t.game.viewAll}
           </Link>
         </div>

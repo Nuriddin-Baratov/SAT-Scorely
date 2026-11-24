@@ -40,7 +40,7 @@ export function SiteFooter() {
             <ul className="mt-4 space-y-2.5 text-sm text-white/55">
               {platform.map((item) => (
                 <li key={item.path}>
-                  <Link className="transition hover:text-white" href={href(item.path)}>
+                  <Link prefetch className="transition hover:text-white" href={href(item.path)}>
                     {item.label}
                   </Link>
                 </li>

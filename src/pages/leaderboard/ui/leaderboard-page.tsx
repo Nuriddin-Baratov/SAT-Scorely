@@ -2,39 +2,24 @@
 
 import { useEffect, useState } from "react";
 
+import { cachedLeaderboard, loadLeaderboard, type LeaderboardRow, type LeaderboardScope } from "@/entities/leaderboard";
 import { useSession } from "@/entities/user";
 import { api } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { useI18n } from "@/shared/i18n";
-import { addDays, cn, toISODate, weekdayIndex } from "@/shared/lib";
+import { cn } from "@/shared/lib";
 import { ButtonLink } from "@/shared/ui/button";
 import { Icon } from "@/shared/ui/icon";
 import { Card, Container, SectionHeading } from "@/shared/ui/primitives";
-
-interface Row {
-  rank: number;
-  name: string;
-  xp: number;
-  weeklyXp: number;
-  streak: number;
-  me: boolean;
-}
-
-type Scope = "week" | "all";
-
-function weekStart() {
-  const now = new Date();
-  return toISODate(addDays(now, -weekdayIndex(now)));
-}
 
 export function LeaderboardPage() {
   const { t, href } = useI18n();
   const l = t.leaderboard;
   const session = useSession();
-  const [scope, setScope] = useState<Scope>("week");
+  const [scope, setScope] = useState<LeaderboardScope>("week");
   const [classId, setClassId] = useState<string>("");
   const [classes, setClasses] = useState<{ id: string; name: string }[]>([]);
-  const [rows, setRows] = useState<Row[] | null>(null);
+  const [loaded, setLoaded] = useState<{ key: string; rows: LeaderboardRow[] } | null>(null);
   const [failed, setFailed] = useState(false);
   const userRole = session.status === "user" ? session.user.role : null;
 
@@ -51,11 +36,10 @@ export function LeaderboardPage() {
 
   useEffect(() => {
     let cancelled = false;
-    const params = new URLSearchParams({ scope, weekStart: weekStart(), ...(classId ? { class: classId } : {}) });
-    api<{ rows: Row[] }>(`/api/leaderboard?${params}`, { cache: "no-store" })
-      .then((d) => {
+    loadLeaderboard(scope, classId)
+      .then((next) => {
         if (cancelled) return;
-        setRows(d.rows);
+        setLoaded({ key: `${scope}|${classId}`, rows: next });
         setFailed(false);
       })
       .catch(() => !cancelled && setFailed(true));
@@ -63,6 +47,9 @@ export function LeaderboardPage() {
       cancelled = true;
     };
   }, [scope, classId, session.status]);
+
+  // Yangi ma'lumot kelguncha — oldindan olingan (keshdagi) reyting
+  const rows = loaded?.key === `${scope}|${classId}` ? loaded.rows : session.status === "loading" ? null : cachedLeaderboard(scope, classId);
 
   const medal = ["bg-[#bfdbfe] text-ink", "bg-zinc-300 text-ink", "bg-[#d79b6a] text-ink"];
 
@@ -120,7 +107,7 @@ export function LeaderboardPage() {
           {failed || session.status === "offline" ? (
             <p className="p-10 text-center text-muted">{l.unavailable}</p>
           ) : rows === null ? (
-            <div className="h-64 animate-pulse bg-surface-2" />
+            <div className="h-64" aria-busy />
           ) : rows.length === 0 ? (
             <p className="p-10 text-center text-muted">{l.empty}</p>
           ) : (
