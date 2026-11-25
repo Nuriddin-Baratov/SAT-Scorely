@@ -21,6 +21,7 @@ export const routes = {
   simulator: "/simulator",
   settings: "/settings",
   login: "/login",
+  install: "/install",
   leaderboard: "/leaderboard",
   teacher: "/teacher",
 } as const;

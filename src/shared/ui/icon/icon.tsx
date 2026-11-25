@@ -39,6 +39,9 @@ const paths = {
   play: "M7 4.5v15l12-7.5-12-7.5z",
   trophy: "M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM17 6h3a3 3 0 01-3 4M7 6H4a3 3 0 003 4",
   monitor: "M3 5h18v11H3zM8 21h8M12 16v5",
+  download: "M12 4v11M7.5 11l4.5 4.5 4.5-4.5M5 20h14",
+  share: "M12 15V3.5M8 7l4-3.5L16 7M7 11H5.5v9.5h13V11H17",
+  plusSquare: "M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zM12 8.5v7M8.5 12h7",
 } as const;
 
 export type IconName = keyof typeof paths;

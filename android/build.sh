@@ -52,4 +52,7 @@ PASS=$(grep '^storePassword=' "$PROPS" | cut -d= -f2)
   --out dist/SAT-Pro.apk build/aligned.apk
 "$BT/apksigner.bat" verify dist/SAT-Pro.apk
 
+# Saytdagi yuklab olish sahifasi (/install) uchun
+mkdir -p ../public/download && cp dist/SAT-Pro.apk ../public/download/SAT-Pro.apk
+
 echo "Tayyor: android/dist/SAT-Pro.apk ($(du -h dist/SAT-Pro.apk | cut -f1))"

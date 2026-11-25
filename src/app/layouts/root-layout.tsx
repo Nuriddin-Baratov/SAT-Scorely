@@ -36,11 +36,15 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     title: { default: `${siteConfig.name} — ${meta.tagline}`, template: `%s · ${siteConfig.name}` },
     description: meta.description,
     alternates: { canonical: localizePath(locale, "/"), languages: languageAlternates("/") },
-    icons: { icon: "/icon.svg", apple: "/icon-192.png" },
+    icons: { icon: "/icon.svg", apple: "/apple-touch-icon.png" },
+    // iPhone bosh ekranidagi nomi va status bar
+    appleWebApp: { capable: true, title: siteConfig.name, statusBarStyle: "default" },
   };
 }
 
 export const viewport: Viewport = {
+  // iPhone: pastki chiziq (home indicator) joyi `env(safe-area-inset-bottom)` orqali hisobga olinadi
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#111827" },

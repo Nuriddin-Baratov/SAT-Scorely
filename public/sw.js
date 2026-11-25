@@ -1,5 +1,5 @@
 /* SAT Pro service worker — oflayn ishlash uchun oddiy kesh strategiyasi. */
-const VERSION = "satpro-v4"; // ko'k dizayn — eski kesh tozalanadi
+const VERSION = "satpro-v5"; // yangi ikonka — eski kesh tozalanadi
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const PRECACHE = ["/icon-192.png", "/icon-512.png", "/icon.svg"];
@@ -54,7 +54,7 @@ self.addEventListener("fetch", (event) => {
   // Lokal ishlab chiqishda kesh eski kodni berib, hydration xatolariga sabab bo'ladi.
   if (self.location.hostname === "localhost" || self.location.hostname === "127.0.0.1") return;
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
+  if (url.origin !== self.location.origin || url.pathname.startsWith("/api/") || url.pathname.startsWith("/download/")) return;
 
   if (url.pathname.startsWith("/_next/static/") || /\.(png|svg|ico|woff2?)$/.test(url.pathname)) {
     event.respondWith(cacheFirst(request));

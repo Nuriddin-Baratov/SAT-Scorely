@@ -5,6 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "SAT Pro — Digital SAT",
     short_name: "SAT Pro",
     description: "Digital SAT'ga shaxsiy tayyorgarlik: reja, testlar, xatolar daftari va lug'at.",
+    id: "/",
     start_url: "/",
     scope: "/",
     display: "standalone",

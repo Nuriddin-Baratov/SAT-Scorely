@@ -563,6 +563,15 @@ dialog::backdrop {
   .cert-shine { display: none !important; }
 }
 
+/* iPhone: 16px dan kichik maydonga yozayotganda Safari ekranni kattalashtirib yuboradi */
+@supports (-webkit-touch-callout: none) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* ---------- Fokus rejimi: test paytida mobil navbar va sarlavha yashiriladi ---------- */
 @media (max-width: 1023px) {
   [data-focus] .app-tabbar,

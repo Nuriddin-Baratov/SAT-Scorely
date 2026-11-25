@@ -13,7 +13,7 @@ import { ThemeToggle } from "@/features/toggle-theme";
 import { routes } from "@/shared/config";
 import { stripLocale, useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
-import { useToday } from "@/shared/lib/react";
+import { usePlatform, useToday } from "@/shared/lib/react";
 import { ButtonLink } from "@/shared/ui/button";
 import { Icon, type IconName } from "@/shared/ui/icon";
 import { Logo } from "@/shared/ui/logo";
@@ -28,6 +28,7 @@ function useNavGroups() {
   const { t } = useI18n();
   const session = useSession();
   const isTeacher = session.status === "user" && session.user.role === "teacher";
+  const platform = usePlatform();
   return [
     {
       title: t.nav.groups.learn,
@@ -54,6 +55,8 @@ function useNavGroups() {
         { path: routes.leaderboard, label: t.nav.leaderboard, icon: "trophy" },
         ...(isTeacher ? [{ path: routes.teacher, label: t.nav.teacher, icon: "chart" as const }] : []),
         { path: routes.settings, label: t.nav.settings, icon: "sun" },
+        // Ilova ichida ko'rinmaydi
+        ...(platform && platform !== "app" ? [{ path: routes.install, label: t.nav.install, icon: "download" as const }] : []),
       ],
     },
   ] satisfies { title: string; items: NavItem[] }[];

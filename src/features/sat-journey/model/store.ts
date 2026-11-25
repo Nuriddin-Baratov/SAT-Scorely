@@ -37,8 +37,8 @@ export function useJourneyStage(): Stage | undefined {
 }
 
 export const flowRoutes = { quiz: "/quiz", plan: "/plan" } as const;
-/** Ro'yxatdan o'tmasdan ochiladigan sahifalar (`/verify` — sertifikatni istalgan odam tekshiradi) */
-export const PUBLIC = ["/login", "/verify"];
+/** Ro'yxatdan o'tmasdan ochiladigan sahifalar (`/verify` — sertifikat tekshirish, `/install` — ilovani yuklab olish) */
+export const PUBLIC = ["/login", "/verify", "/install"];
 
 /**
  * Qayerga yo'naltirish kerak (yoki `null`).

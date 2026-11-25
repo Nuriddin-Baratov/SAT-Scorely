@@ -11,7 +11,7 @@ import { TelegramPanel } from "@/features/telegram-link";
 import { ThemeToggle } from "@/features/toggle-theme";
 import { routes } from "@/shared/config";
 import { useI18n } from "@/shared/i18n";
-import { useInstallPrompt } from "@/shared/lib/react";
+import { useInstallPrompt, usePlatform } from "@/shared/lib/react";
 import { Button, ButtonLink } from "@/shared/ui/button";
 import { Icon, type IconName } from "@/shared/ui/icon";
 import { Badge, Card, Container, IconTile, SectionHeading } from "@/shared/ui/primitives";
@@ -38,6 +38,7 @@ export function SettingsPage() {
   const s = t.settings;
   const session = useSession();
   const { canInstall, installed, install } = useInstallPrompt();
+  const platform = usePlatform();
 
   return (
     <main className="relative flex-1">
@@ -108,7 +109,15 @@ export function SettingsPage() {
                 <Icon name="monitor" className="size-4" /> {s.app.install}
               </Button>
             ) : (
-              <p className="text-sm text-muted">{s.app.manual}</p>
+              platform === "app" ? (
+                <Badge tone="success">
+                  <Icon name="check" className="size-3" /> {s.app.installed}
+                </Badge>
+              ) : (
+                <ButtonLink href={href(routes.install)} size="sm">
+                  <Icon name="download" className="size-4" /> {t.nav.install}
+                </ButtonLink>
+              )
             )}
           </Section>
 

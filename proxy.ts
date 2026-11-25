@@ -27,6 +27,7 @@ const PAGES = new Set([
   "calculator",
   "certificate",
   "dashboard",
+  "install",
   "leaderboard",
   "login",
   "mistakes",
