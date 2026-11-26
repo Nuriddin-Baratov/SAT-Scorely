@@ -7,6 +7,7 @@ import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 import { useFocusMode } from "@/shared/lib/react";
 import { Button } from "@/shared/ui/button";
+import { confirmDialog } from "@/shared/ui/confirm";
 import { Icon } from "@/shared/ui/icon";
 import { Card } from "@/shared/ui/primitives";
 
@@ -86,7 +87,16 @@ export function ModuleRunner({
 
   useFocusMode(!done);
 
-  const confirmFinish = () => window.confirm(confirmText(unanswered)) && finish(false);
+  const confirmFinish = async () => {
+    const ok = await confirmDialog({
+      title: finishLabel,
+      text: confirmText(unanswered),
+      tone: unanswered > 0 ? "warning" : "accent",
+      confirm: finishLabel,
+      cancel: t.confirm.back,
+    });
+    if (ok) finish(false);
+  };
 
   const answeredCount = questions.length - unanswered;
   const isLast = index >= questions.length - 1;

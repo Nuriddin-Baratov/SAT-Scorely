@@ -21,6 +21,7 @@ import { useToday } from "@/shared/lib/react";
 import { Button, ButtonLink } from "@/shared/ui/button";
 import { Icon, type IconName } from "@/shared/ui/icon";
 import { Card, Container } from "@/shared/ui/primitives";
+import { confirmDialog } from "@/shared/ui/confirm";
 
 import { toneOf } from "./meter";
 import { ProgressChart } from "./progress-chart";
@@ -286,7 +287,7 @@ function HistoryCard({ runs }: { runs: Run[] }) {
           variant="ghost"
           size="sm"
           className="text-muted hover:bg-danger-soft hover:text-danger"
-          onClick={() => window.confirm(r.confirmClear) && attemptsRepository.clear()}
+          onClick={async () => (await confirmDialog({ title: r.confirmClear, tone: "danger" })) && attemptsRepository.clear()}
           aria-label={r.clear}
         >
           <Icon name="trash" className="size-4" />

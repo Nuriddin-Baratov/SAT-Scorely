@@ -9,6 +9,7 @@ import { routes } from "@/shared/config";
 import { formatDay, useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 import { Button, ButtonLink } from "@/shared/ui/button";
+import { confirmDialog } from "@/shared/ui/confirm";
 import { Icon } from "@/shared/ui/icon";
 import { Badge, Card, Container, SectionHeading } from "@/shared/ui/primitives";
 
@@ -134,13 +135,13 @@ function ClassCard({ cls, onChange }: { cls: TeacherClass; onChange: () => Promi
   }
 
   async function removeClass() {
-    if (!window.confirm(c.confirmDelete)) return;
+    if (!(await confirmDialog({ title: c.confirmDelete, tone: "danger" }))) return;
     await api(`/api/classes/${encodeURIComponent(cls.id)}`, { method: "DELETE" });
     await onChange();
   }
 
   async function removeMember(userId: string) {
-    if (!window.confirm(c.confirmRemove)) return;
+    if (!(await confirmDialog({ title: c.confirmRemove, tone: "danger", icon: "x" }))) return;
     await api(`/api/classes/${encodeURIComponent(cls.id)}/members/${encodeURIComponent(userId)}`, { method: "DELETE" });
     await onChange();
   }

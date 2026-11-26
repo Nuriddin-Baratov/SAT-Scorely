@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ApiError, api } from "@/shared/api";
 import { useI18n } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
+import { confirmDialog } from "@/shared/ui/confirm";
 import { Icon } from "@/shared/ui/icon";
 
 interface JoinedClass {
@@ -54,7 +55,7 @@ export function JoinClassPanel() {
   }
 
   async function leave(id: string) {
-    if (!window.confirm(c.confirmLeave)) return;
+    if (!(await confirmDialog({ title: c.confirmLeave, tone: "danger", icon: "x" }))) return;
     await api(`/api/classes/${encodeURIComponent(id)}`, { method: "DELETE" });
     await load();
   }

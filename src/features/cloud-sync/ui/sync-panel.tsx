@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useSession } from "@/entities/user";
 import { localeTags, useI18n } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
+import { confirmDialog } from "@/shared/ui/confirm";
 import { Icon } from "@/shared/ui/icon";
 
 import { restoreFromCloud, syncMeta, syncNow } from "../model/sync";
@@ -27,7 +28,7 @@ export function SyncPanel() {
         await syncNow(userId);
         setMessage(t.sync.saved);
       } else {
-        if (!window.confirm(t.sync.confirmPull)) return;
+        if (!(await confirmDialog({ title: t.sync.confirmPull, tone: "warning", icon: "refresh" }))) return;
         setMessage((await restoreFromCloud(userId)) ? t.sync.saved : t.sync.nothing);
       }
     } catch {

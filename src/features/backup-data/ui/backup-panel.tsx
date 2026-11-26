@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { useI18n } from "@/shared/i18n";
 import { applySnapshot, clearSnapshot, collectSnapshot, isSnapshot, toISODate } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
+import { confirmDialog } from "@/shared/ui/confirm";
 import { Icon } from "@/shared/ui/icon";
 
 /** Progressni JSON faylga eksport qilish va boshqa qurilmada tiklash. */
@@ -30,7 +31,7 @@ export function BackupPanel() {
     try {
       const parsed: unknown = JSON.parse(await file.text());
       if (!isSnapshot(parsed)) throw new Error("invalid");
-      if (!window.confirm(b.confirmImport)) return;
+      if (!(await confirmDialog({ title: b.confirmImport, tone: "warning", icon: "refresh" }))) return;
       applySnapshot(parsed);
       window.location.reload();
     } catch {
@@ -38,8 +39,8 @@ export function BackupPanel() {
     }
   }
 
-  function resetAll() {
-    if (!window.confirm(b.confirmReset)) return;
+  async function resetAll() {
+    if (!(await confirmDialog({ title: b.confirmReset, tone: "danger" }))) return;
     clearSnapshot();
     window.location.reload();
   }

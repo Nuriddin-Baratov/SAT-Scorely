@@ -79,6 +79,7 @@ export const ru: Dictionary = {
       "SAT® — зарегистрированный товарный знак College Board. Эта платформа не связана с College Board.",
   },
 
+  confirm: { ok: "Да, продолжить", cancel: "Отмена", back: "Вернуться к тесту" },
   common: {
     loading: "Загрузка…",
     questions: "вопр.",

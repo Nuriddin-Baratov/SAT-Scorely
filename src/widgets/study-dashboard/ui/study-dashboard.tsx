@@ -89,7 +89,7 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
         <div className="bg-grid-dark pointer-events-none absolute inset-0" aria-hidden />
         <div className="relative grid gap-8 p-4 sm:gap-10 sm:p-10 lg:grid-cols-[1.25fr_1fr] lg:items-center [&>*]:min-w-0">
           <div>
-            <Eyebrow className="text-[#bfdbfe]">{d.eyebrow}</Eyebrow>
+            <Eyebrow className="text-white/80">{d.eyebrow}</Eyebrow>
             <h1 className="mt-2 text-2xl leading-none sm:mt-4 sm:text-6xl">
               {d.hello} <span className="text-gradient-light font-serif font-normal tracking-normal italic">{firstName(profile)}</span>
             </h1>

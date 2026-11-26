@@ -6,6 +6,7 @@ import { refreshSession, useSession } from "@/entities/user";
 import { useLive } from "@/shared/api";
 import { useI18n } from "@/shared/i18n";
 import { STORAGE_CHANGE_EVENT } from "@/shared/lib/react";
+import { confirmDialog } from "@/shared/ui/confirm";
 
 import { hasUnsynced, syncNow } from "../model/sync";
 
@@ -30,7 +31,7 @@ export function SyncManager() {
 
   useEffect(() => {
     if (!userId) return;
-    syncNow(userId, () => window.confirm(confirmText)).catch(() => {
+    syncNow(userId, () => confirmDialog({ title: confirmText, icon: "refresh" })).catch(() => {
       // Tarmoq xatosi — keyingi o'zgarishda yoki ilovaga qaytilganda qayta urinamiz
     });
 

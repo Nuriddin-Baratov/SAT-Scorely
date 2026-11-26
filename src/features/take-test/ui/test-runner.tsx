@@ -26,6 +26,7 @@ import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 import { useFocusMode } from "@/shared/lib/react";
 import { Button, ButtonLink } from "@/shared/ui/button";
+import { confirmDialog } from "@/shared/ui/confirm";
 import { launchConfetti } from "@/shared/ui/confetti";
 import { Icon } from "@/shared/ui/icon";
 import { Card } from "@/shared/ui/primitives";
@@ -151,12 +152,17 @@ function TestRun({
     setPhase("break");
   }
 
-  function confirmFinish() {
-    if (awaitingModuleTwo) {
-      if (window.confirm(t.adaptive.confirmModule(unanswered))) endModuleOne();
-      return;
-    }
-    if (window.confirm(t.runner.confirmFinish(unanswered))) finish();
+  async function confirmFinish() {
+    const ok = await confirmDialog({
+      title: awaitingModuleTwo ? t.adaptive.finishModule : t.runner.finish,
+      text: awaitingModuleTwo ? t.adaptive.confirmModule(unanswered) : t.runner.confirmFinish(unanswered),
+      tone: unanswered > 0 ? "warning" : "accent",
+      confirm: awaitingModuleTwo ? t.adaptive.finishModule : t.runner.finish,
+      cancel: t.confirm.back,
+    });
+    if (!ok) return;
+    if (awaitingModuleTwo) endModuleOne();
+    else finish();
   }
 
   function toggleMark() {

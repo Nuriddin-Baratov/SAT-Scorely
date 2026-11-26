@@ -13,6 +13,7 @@ import { routes } from "@/shared/config";
 import { useI18n } from "@/shared/i18n";
 import { useInstallPrompt, usePlatform } from "@/shared/lib/react";
 import { Button, ButtonLink } from "@/shared/ui/button";
+import { confirmDialog } from "@/shared/ui/confirm";
 import { Icon, type IconName } from "@/shared/ui/icon";
 import { Badge, Card, Container, IconTile, SectionHeading } from "@/shared/ui/primitives";
 
@@ -43,7 +44,7 @@ export function SettingsPage() {
   return (
     <main className="relative flex-1">
       <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
-      <Container className="relative max-w-4xl space-y-4 py-5 sm:space-y-5 sm:py-16">
+      <Container className="relative max-w-6xl space-y-4 py-5 sm:space-y-5 sm:py-16">
         <SectionHeading eyebrow={s.eyebrow} title={s.title} description={s.description} />
 
         <div className="space-y-5 pt-5">
@@ -151,7 +152,7 @@ function AccountDetails() {
   }
 
   async function remove() {
-    if (!window.confirm(s.confirmDelete)) return;
+    if (!(await confirmDialog({ title: s.confirmDelete, tone: "danger" }))) return;
     await authApi.deleteAccount();
     forgetSyncedUser();
   }

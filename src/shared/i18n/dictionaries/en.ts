@@ -79,6 +79,7 @@ export const en: Dictionary = {
       "SAT® is a registered trademark of the College Board. This platform is not affiliated with the College Board.",
   },
 
+  confirm: { ok: "Yes, continue", cancel: "Cancel", back: "Back to the test" },
   common: {
     loading: "Loading…",
     questions: "questions",

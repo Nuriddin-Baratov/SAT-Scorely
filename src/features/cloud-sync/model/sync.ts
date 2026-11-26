@@ -92,7 +92,7 @@ function backupLocal(data: Data) {
   }
 }
 
-async function syncOnce(userId: string, askRestore: () => boolean) {
+async function syncOnce(userId: string, askRestore: () => Promise<boolean>) {
   const owner = syncMeta.get().userId;
   // Boshqa hisobning yuborilmagan javoblari bu hisobga yozilmaydi
   if (owner && owner !== userId) xpOutbox.clear();
@@ -118,7 +118,7 @@ async function syncOnce(userId: string, askRestore: () => boolean) {
       next = remote.data ?? {};
     } else if (!remote.data) {
       next = local;
-    } else if (!meta.userId && hasProgress(local) && hasProgress(remote.data) && !same(local, remote.data) && askRestore()) {
+    } else if (!meta.userId && hasProgress(local) && hasProgress(remote.data) && !same(local, remote.data) && (await askRestore())) {
       backupLocal(local);
       next = remote.data;
     } else {
@@ -163,7 +163,7 @@ let running: Promise<void> | null = null;
 let again = false;
 
 /** Bulut bilan ikki tomonlama sinxronlash. Bir vaqtda bittasi ishlaydi; oradagi so'rovlar bittaga yig'iladi. */
-export function syncNow(userId: string, askRestore: () => boolean = () => false): Promise<void> {
+export function syncNow(userId: string, askRestore: () => Promise<boolean> = async () => false): Promise<void> {
   if (running) {
     again = true;
     return running;

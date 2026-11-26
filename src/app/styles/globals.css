@@ -580,6 +580,12 @@ dialog::backdrop {
   }
 }
 
+/* Tasdiqlash oynasi: yumshoq paydo bo'lish */
+.confirm-dialog[open] { animation: confirm-in 0.18s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.confirm-dialog::backdrop { background: rgb(15 23 42 / 0.5); backdrop-filter: blur(3px); }
+@keyframes confirm-in { from { opacity: 0; transform: translateY(8px) scale(0.97); } }
+@media (prefers-reduced-motion: reduce) { .confirm-dialog[open] { animation: none; } }
+
 /* Javob variantlari: bosilganda yengil "bosildi" hissi */
 .choice-press:active:not(:disabled) {
   transform: scale(0.985);

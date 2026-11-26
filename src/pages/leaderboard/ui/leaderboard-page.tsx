@@ -59,7 +59,7 @@ export function LeaderboardPage() {
   return (
     <main className="relative flex-1">
       <div className="glow pointer-events-none absolute inset-x-0 top-0 h-96 opacity-50" aria-hidden />
-      <Container className="relative max-w-4xl py-5 sm:py-16">
+      <Container className="relative py-5 sm:py-16">
         <SectionHeading eyebrow={l.eyebrow} title={l.title} description={l.description} />
 
         <div className="mt-4 flex flex-wrap items-center gap-3 sm:mt-10">

@@ -77,6 +77,7 @@ export const uz = {
       "SAT® — College Board'ning ro'yxatdan o'tgan savdo belgisi. Ushbu platforma College Board bilan bog'liq emas.",
   },
 
+  confirm: { ok: "Ha, davom etish", cancel: "Bekor qilish", back: "Testga qaytish" },
   common: {
     loading: "Yuklanmoqda…",
     questions: "savol",

@@ -6,6 +6,7 @@ import { refreshSession, type TelegramStatus } from "@/entities/user";
 import { api } from "@/shared/api";
 import { useI18n } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
+import { confirmDialog } from "@/shared/ui/confirm";
 import { Icon } from "@/shared/ui/icon";
 import { Badge } from "@/shared/ui/primitives";
 
@@ -36,7 +37,7 @@ export function TelegramPanel({ status }: { status: TelegramStatus }) {
   }
 
   async function disconnect() {
-    if (!window.confirm(tt.confirmUnlink)) return;
+    if (!(await confirmDialog({ title: tt.confirmUnlink, tone: "danger", icon: "x" }))) return;
     setBusy(true);
     try {
       await api("/api/telegram/link", { method: "DELETE" });
