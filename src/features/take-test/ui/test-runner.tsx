@@ -153,13 +153,16 @@ function TestRun({
   }
 
   async function confirmFinish() {
-    const ok = await confirmDialog({
+    // Hamma savolga javob berilgan — so'ramasdan yakunlaymiz; javobsiz qolgan bo'lsa ogohlantiramiz
+    const ok =
+      unanswered === 0 ||
+      (await confirmDialog({
       title: awaitingModuleTwo ? t.adaptive.finishModule : t.runner.finish,
       text: awaitingModuleTwo ? t.adaptive.confirmModule(unanswered) : t.runner.confirmFinish(unanswered),
-      tone: unanswered > 0 ? "warning" : "accent",
+      tone: "warning",
       confirm: awaitingModuleTwo ? t.adaptive.finishModule : t.runner.finish,
       cancel: t.confirm.back,
-    });
+    }));
     if (!ok) return;
     if (awaitingModuleTwo) endModuleOne();
     else finish();

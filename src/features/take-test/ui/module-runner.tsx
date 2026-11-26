@@ -88,13 +88,16 @@ export function ModuleRunner({
   useFocusMode(!done);
 
   const confirmFinish = async () => {
-    const ok = await confirmDialog({
-      title: finishLabel,
-      text: confirmText(unanswered),
-      tone: unanswered > 0 ? "warning" : "accent",
-      confirm: finishLabel,
-      cancel: t.confirm.back,
-    });
+    // Hamma savolga javob berilgan — so'ramasdan yakunlaymiz; javobsiz qolgan bo'lsa ogohlantiramiz
+    const ok =
+      unanswered === 0 ||
+      (await confirmDialog({
+        title: finishLabel,
+        text: confirmText(unanswered),
+        tone: "warning",
+        confirm: finishLabel,
+        cancel: t.confirm.back,
+      }));
     if (ok) finish(false);
   };
 
