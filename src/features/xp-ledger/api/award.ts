@@ -13,6 +13,7 @@ import {
   type AnswerValue,
   type Question,
 } from "@/entities/practice-test";
+import { getListeningLesson } from "@/entities/skill";
 import { vocabWords } from "@/entities/vocab";
 import { alreadyMastered, recordXp, refreshTestStats, tashkentDay, type XpEvent } from "@/shared/server";
 
@@ -110,6 +111,15 @@ async function grade(userId: string, claim: XpClaim): Promise<XpEvent | null> {
     case "word": {
       if (claim.choice !== claim.word || !vocabWords.some((w) => w.word === claim.word)) return null;
       return { ...base, kind: "word", ref: claim.word, dedupe: dedupeKey(claim, day), xp: xpFor({ type: "word" }) };
+    }
+    case "listening": {
+      const lesson = getListeningLesson(String(claim.lessonId));
+      const answers = claim.answers;
+      if (!lesson || !Array.isArray(answers) || answers.length !== lesson.questions.length || !answers.every(isAnswer)) return null;
+      if (answers.every((a) => a === null)) return null;
+      const correct = lesson.questions.filter((q, i) => answers[i] === q.answer).length;
+      const total = lesson.questions.length;
+      return { ...base, kind: "listening", ref: lesson.id, dedupe: dedupeKey(claim, day), xp: xpFor({ type: "listening", correct, total }), correct, total };
     }
     default:
       return null;

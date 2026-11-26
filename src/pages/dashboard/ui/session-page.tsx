@@ -14,7 +14,7 @@ export function SessionPage({ id }: { id: string }) {
   const profile = useStudentProfile();
   return (
     <main className="flex-1">
-      <Container className="max-w-3xl py-4 sm:py-10">{profile ? <Player profile={profile} id={id} /> : <div className="h-64" aria-busy />}</Container>
+      <Container className="py-4 sm:py-10">{profile ? <Player profile={profile} id={id} /> : <div className="h-64" aria-busy />}</Container>
     </main>
   );
 }

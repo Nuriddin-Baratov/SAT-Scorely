@@ -17,6 +17,8 @@ export function xpFor(event: GameEvent): number {
       return (event.correct ? 8 : 2) + (event.mastered ? 15 : 0);
     case "word":
       return 2;
+    case "listening":
+      return event.correct * 5 + (event.correct === event.total && event.total > 0 ? 10 : 0);
   }
 }
 
@@ -131,7 +133,7 @@ export function applyEvent(prev: GameState, event: GameEvent, now: Date, gained 
 
   const activeDays = prev.activeDays.includes(today) ? prev.activeDays : [...prev.activeDays, today].sort();
   // Faollik xaritasi: testda — savollar soni, qolgan hodisalarda — 1
-  const units = event.type === "test" ? Math.max(1, event.total) : 1;
+  const units = event.type === "test" || event.type === "listening" ? Math.max(1, event.total) : 1;
   const activity = { ...prev.activity, [today]: (prev.activity?.[today] ?? 0) + units };
 
   const next: GameState = {

@@ -46,7 +46,7 @@ export function VerifyPage({ code }: { code: string }) {
 
   return (
     <main className="flex-1">
-      <Container className="max-w-xl space-y-4 py-6 sm:py-14">
+      <Container className="space-y-4 py-6 sm:py-14">
         <header>
           <h1 className="text-2xl font-bold sm:text-4xl">{v.title}</h1>
           <p className="mt-1 text-sm text-muted">{v.text}</p>

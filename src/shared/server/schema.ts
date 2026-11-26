@@ -91,4 +91,23 @@ export const SCHEMA = [
     correct boolean not null,
     primary key (chat_id, day)
   )`,
+  `create table if not exists ai_usage (
+    user_id text not null references users(id) on delete cascade,
+    day text not null,
+    count integer not null default 0,
+    primary key (user_id, day)
+  )`,
 ];
+
+/**
+ * Eski bazalarga keyin qo'shilgan ustunlar. ALTER har ishga tushishda jadvalni bloklamasligi uchun
+ * avval `information_schema` orqali tekshiriladi, faqat yo'q bo'lsa bajariladi.
+ */
+export const COLUMNS: { table: string; column: string; sql: string }[] = [
+  { table: "user_data", column: "version", sql: "alter table user_data add column if not exists version integer not null default 0" },
+  { table: "users", column: "plan", sql: "alter table users add column if not exists plan text not null default 'free'" },
+  { table: "users", column: "plan_until", sql: "alter table users add column if not exists plan_until timestamptz" },
+];
+
+export const COLUMN_CHECK =
+  "select 1 as ok from information_schema.columns where table_schema = current_schema() and table_name = $1 and column_name = $2";

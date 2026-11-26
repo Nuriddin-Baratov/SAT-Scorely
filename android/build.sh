@@ -12,8 +12,8 @@ export JAVA_HOME="$TOOLS/jdk"
 export PATH="$JAVA_HOME/bin:$PATH"
 
 # Har bir yangi versiyada oshiring (telefon yangilanishni faqat kattaroq raqam bilan qabul qiladi)
-VERSION_CODE=3
-VERSION_NAME="1.2"
+VERSION_CODE=4
+VERSION_NAME="1.3"
 
 KEYSTORE=keystore/satpro-release.jks
 PROPS=keystore/keystore.properties

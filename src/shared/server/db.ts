@@ -1,6 +1,6 @@
 import "server-only";
 
-import { SCHEMA } from "./schema";
+import { COLUMNS, COLUMN_CHECK, SCHEMA } from "./schema";
 
 /**
  * Ma'lumotlar bazasi: `DATABASE_URL` berilgan bo'lsa — haqiqiy Postgres (Vercel Postgres / Neon / o'zingizniki),
@@ -75,11 +75,11 @@ async function init(): Promise<Db> {
   const db = await connect();
   // Jadvallar idempotent yaratiladi (CREATE … IF NOT EXISTS)
   for (const statement of SCHEMA) await db.query(statement);
-  // Eski bazalarda yo'q ustun (ALTER har ishga tushishda jadvalni bloklamasligi uchun avval tekshiriladi)
-  const [hasVersion] = await db.query(
-    "select 1 as ok from information_schema.columns where table_schema = current_schema() and table_name = 'user_data' and column_name = 'version'",
-  );
-  if (!hasVersion) await db.query("alter table user_data add column if not exists version integer not null default 0");
+  // Eski bazalarda yo'q ustunlar (ALTER har ishga tushishda jadvalni bloklamasligi uchun avval tekshiriladi)
+  for (const c of COLUMNS) {
+    const [has] = await db.query(COLUMN_CHECK, [c.table, c.column]);
+    if (!has) await db.query(c.sql);
+  }
   return db;
 }
 

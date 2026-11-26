@@ -12,7 +12,7 @@ export const DAILY_XP_CAP = 1500;
 
 export interface XpEvent {
   eventId: string;
-  kind: "test" | "daily" | "practice" | "review" | "word";
+  kind: "test" | "daily" | "practice" | "review" | "word" | "listening";
   /** Nima uchun: test, savol, so'z yoki sana */
   ref: string;
   /** Takrorlanmas kalit (masalan, `word:abundant`); `null` — faqat `eventId` bo'yicha */

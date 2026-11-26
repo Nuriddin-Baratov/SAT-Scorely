@@ -24,7 +24,7 @@ export function InstallPage() {
 
   return (
     <main className="flex-1">
-      <Container className="max-w-2xl space-y-4 py-5 sm:py-14">
+      <Container className="space-y-4 py-5 sm:py-14">
         <header className="flex items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icon-192.png" alt="" width={64} height={64} className="size-16 shrink-0 rounded-2xl shadow-lift" />

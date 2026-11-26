@@ -1,11 +1,13 @@
 package uz.satpro.app;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -13,11 +15,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.util.Base64;
 import android.view.View;
 import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -27,7 +35,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * SAT Pro — internetdagi saytni (Vercel) to'liq ekranda ochadigan ilova.
@@ -38,12 +50,23 @@ public class MainActivity extends Activity {
     static final String HOME = "https://" + HOST + "/";
     static final int REQ_FILE = 1;
     static final int REQ_SAVE = 2;
+    /** Mikrofon ruxsati: nutqni tanish uchun / sahifadagi ovoz yozish uchun */
+    static final int REQ_MIC_LISTEN = 3;
+    static final int REQ_MIC_WEB = 4;
 
     WebView web;
     ValueCallback<Uri[]> fileCallback;
     byte[] pendingSave;
     String failedUrl;
     boolean showingOffline;
+
+    // Ovoz: WebView'da speechSynthesis va SpeechRecognition yo'q — tizim xizmatlari ishlatiladi
+    TextToSpeech tts;
+    boolean ttsReady;
+    SpeechRecognizer recognizer;
+    String listenId;
+    String pendingListenId;
+    PermissionRequest pendingWebPermission;
 
     /** Sahifaga qo'shiladigan yordamchi: fayl saqlash, chop etish va nusxa olish ilova orqali ishlaydi */
     static final String HELPERS =
@@ -102,6 +125,7 @@ public class MainActivity extends Activity {
         cookies.setAcceptThirdPartyCookies(web, true);
 
         web.addJavascriptInterface(new Bridge(), "SATProApp");
+        initTts();
         web.setWebViewClient(new Client());
         web.setWebChromeClient(new Chrome());
 
@@ -143,8 +167,17 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (tts != null) tts.shutdown();
+        if (recognizer != null) recognizer.destroy();
+        super.onDestroy();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        if (tts != null) tts.stop();
+        if (recognizer != null) recognizer.cancel();
         CookieManager.getInstance().flush(); // kirish sessiyasi saqlanib qolsin
         web.onPause();
     }
@@ -257,6 +290,126 @@ public class MainActivity extends Activity {
             }
             return true;
         }
+
+        /** Sahifa mikrofon so'rasa (Speaking: ovoz yozish) — faqat o'z saytimizga, faqat audio */
+        @Override
+        public void onPermissionRequest(final PermissionRequest request) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    boolean own = request.getOrigin() != null && HOST.equals(request.getOrigin().getHost());
+                    boolean audio = false;
+                    for (String r : request.getResources()) if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(r)) audio = true;
+                    if (!own || !audio) {
+                        request.deny();
+                        return;
+                    }
+                    if (hasMic()) {
+                        request.grant(new String[] { PermissionRequest.RESOURCE_AUDIO_CAPTURE });
+                        return;
+                    }
+                    if (pendingWebPermission != null) pendingWebPermission.deny();
+                    pendingWebPermission = request;
+                    requestPermissions(new String[] { Manifest.permission.RECORD_AUDIO }, REQ_MIC_WEB);
+                }
+            });
+        }
+    }
+
+    // ---------------- Ovoz (TTS va nutqni tanish) ----------------
+
+    /** Sahifaga natija: window.__satproSpeech(id, tur, matn) */
+    void speechEvent(final String id, final String type, final String payload) {
+        if (id == null) return;
+        final String js = "window.__satproSpeech&&window.__satproSpeech(" + JSONObject.quote(id) + "," + JSONObject.quote(type) + ","
+            + JSONObject.quote(payload == null ? "" : payload) + ")";
+        runOnUiThread(new Runnable() {
+            public void run() {
+                web.evaluateJavascript(js, null);
+            }
+        });
+    }
+
+    void initTts() {
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            public void onInit(int status) {
+                if (status != TextToSpeech.SUCCESS) return;
+                int lang = tts.setLanguage(Locale.US);
+                ttsReady = lang != TextToSpeech.LANG_MISSING_DATA && lang != TextToSpeech.LANG_NOT_SUPPORTED;
+                if (!ttsReady) ttsReady = tts.setLanguage(Locale.ENGLISH) >= TextToSpeech.LANG_AVAILABLE;
+            }
+        });
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            public void onStart(String id) {}
+            public void onDone(String id) { speechEvent(id, "end", ""); }
+            @SuppressWarnings("deprecation")
+            public void onError(String id) { speechEvent(id, "error", "tts"); }
+            @Override
+            public void onStop(String id, boolean interrupted) { speechEvent(id, "end", ""); }
+        });
+    }
+
+    boolean hasMic() {
+        return Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    void startListening(final String id) {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            speechEvent(id, "error", "unsupported");
+            return;
+        }
+        if (recognizer == null) recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        else recognizer.cancel();
+        listenId = id;
+        recognizer.setRecognitionListener(new RecognitionListener() {
+            String best(Bundle b) {
+                ArrayList<String> list = b == null ? null : b.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                return list == null || list.isEmpty() ? "" : list.get(0);
+            }
+            public void onReadyForSpeech(Bundle params) {}
+            public void onBeginningOfSpeech() {}
+            public void onRmsChanged(float rms) {}
+            public void onBufferReceived(byte[] buffer) {}
+            public void onEndOfSpeech() {}
+            public void onEvent(int type, Bundle params) {}
+            public void onPartialResults(Bundle partial) {
+                String text = best(partial);
+                if (!text.isEmpty() && id.equals(listenId)) speechEvent(id, "partial", text);
+            }
+            public void onResults(Bundle results) {
+                if (!id.equals(listenId)) return;
+                listenId = null;
+                speechEvent(id, "result", best(results));
+            }
+            public void onError(int error) {
+                if (!id.equals(listenId)) return;
+                listenId = null;
+                String code = error == SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS ? "permission"
+                    : error == SpeechRecognizer.ERROR_NO_MATCH || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT ? "no-speech"
+                    : error == SpeechRecognizer.ERROR_NETWORK || error == SpeechRecognizer.ERROR_NETWORK_TIMEOUT ? "network" : "error";
+                speechEvent(id, "error", code);
+            }
+        });
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2500L);
+        recognizer.startListening(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int request, String[] permissions, int[] results) {
+        boolean granted = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
+        if (request == REQ_MIC_LISTEN) {
+            String id = pendingListenId;
+            pendingListenId = null;
+            if (granted) startListening(id);
+            else speechEvent(id, "error", "permission");
+        } else if (request == REQ_MIC_WEB && pendingWebPermission != null) {
+            if (granted) pendingWebPermission.grant(new String[] { PermissionRequest.RESOURCE_AUDIO_CAPTURE });
+            else pendingWebPermission.deny();
+            pendingWebPermission = null;
+        }
     }
 
     @Override
@@ -329,6 +482,44 @@ public class MainActivity extends Activity {
                     } catch (Exception ignored) {
                         // rang hex bo'lmasa — joriy rang qoladi
                     }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void speak(final String id, final String text, final float rate) {
+            if (!ttsReady) {
+                speechEvent(id, "error", "tts");
+                return;
+            }
+            tts.setSpeechRate(Math.max(0.5f, Math.min(2f, rate)));
+            if (tts.speak(text, TextToSpeech.QUEUE_FLUSH, new Bundle(), id) != TextToSpeech.SUCCESS) speechEvent(id, "error", "tts");
+        }
+
+        @JavascriptInterface
+        public void stopSpeak() {
+            if (tts != null) tts.stop();
+        }
+
+        @JavascriptInterface
+        public void listen(final String id, final String lang) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (hasMic()) {
+                        startListening(id);
+                        return;
+                    }
+                    pendingListenId = id;
+                    requestPermissions(new String[] { Manifest.permission.RECORD_AUDIO }, REQ_MIC_LISTEN);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void stopListen() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (recognizer != null) recognizer.stopListening();
                 }
             });
         }

@@ -48,4 +48,5 @@ export type GameEvent =
   | { type: "daily"; date: string; questionId: string; choice: number | string; correct: boolean }
   | { type: "practice"; correct: boolean }
   | { type: "review"; correct: boolean; mastered: boolean }
-  | { type: "word" };
+  | { type: "word" }
+  | { type: "listening"; correct: number; total: number };

@@ -9,7 +9,8 @@ export type XpClaimBody =
   | { type: "daily"; date: string; choice: Answer }
   | { type: "practice"; questionId: string; answer: Answer }
   | { type: "review"; questionId: string; answer: Answer; mastered: boolean }
-  | { type: "word"; word: string; choice: string };
+  | { type: "word"; word: string; choice: string }
+  | { type: "listening"; lessonId: string; answers: Answer[] };
 
 export type XpClaim = XpClaimBody & { id: string; day: string };
 
@@ -26,5 +27,7 @@ export function dedupeKey(claim: XpClaimBody, day: string): string | null {
       return `review:${claim.questionId}:${day}`;
     case "word":
       return `word:${claim.word}`;
+    case "listening":
+      return `listening:${claim.lessonId}:${day}`;
   }
 }

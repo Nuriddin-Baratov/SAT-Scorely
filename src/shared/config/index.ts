@@ -25,4 +25,8 @@ export const routes = {
   install: "/install",
   leaderboard: "/leaderboard",
   teacher: "/teacher",
+  listening: "/listening",
+  speaking: "/speaking",
+  tutor: "/tutor",
+  plans: "/plans",
 } as const;

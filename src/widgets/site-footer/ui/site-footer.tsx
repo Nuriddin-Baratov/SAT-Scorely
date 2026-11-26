@@ -23,7 +23,7 @@ export function SiteFooter() {
   ];
 
   return (
-    <footer className="mx-auto mt-16 w-full max-w-[100rem] px-4 pb-4 sm:px-6 lg:px-8">
+    <footer className="mx-auto mt-16 w-full max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
       <div className="noise relative overflow-hidden rounded-[2.25rem] bg-ink text-white">
         <div
           className="pointer-events-none absolute inset-0"

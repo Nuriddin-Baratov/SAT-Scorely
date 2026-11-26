@@ -108,7 +108,7 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
         <div className="relative overflow-hidden rounded-[2.25rem] bg-ink text-white">
           <Particles />
           <div className="bg-grid-dark pointer-events-none absolute inset-0 opacity-60" aria-hidden />
-          <div className="relative mx-auto grid max-w-6xl gap-12 px-6 pt-14 pb-16 sm:px-10 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:pt-20 lg:pb-20">
+          <div className="relative mx-auto grid max-w-7xl gap-12 px-6 pt-14 pb-16 sm:px-10 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:pt-20 lg:pb-20">
             <div className="pro-in">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3.5 py-1.5 text-xs font-medium text-white/85 ring-1 ring-white/10">
                 <Icon name="book" className="size-3.5 text-[#93c5fd]" /> {g.badge}
@@ -189,7 +189,7 @@ export function SatGuidePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-4 sm:px-6 lg:grid-cols-[250px_1fr] lg:py-20">
+      <div className="mx-auto grid max-w-7xl gap-12 px-4 py-4 sm:px-6 lg:grid-cols-[250px_1fr] lg:py-20">
         <aside className="hidden lg:block">
           <TocSpy items={toc} label={g.tocLabel} progressLabel={g.readProgress} />
         </aside>
