@@ -2,12 +2,15 @@
 
 import { getSessionSkill, sessionKindLabels, SessionKindIcon, type PlanSession } from "@/entities/study-plan";
 import { CompleteButton } from "@/features/track-progress";
+import { routes } from "@/shared/config";
+import { ButtonLink } from "@/shared/ui/button";
+import { Icon } from "@/shared/ui/icon";
 import { formatDay, useI18n, weekdayNames } from "@/shared/i18n";
 import { parseISODate, weekdayIndex } from "@/shared/lib";
 import { Badge } from "@/shared/ui/primitives";
 
 export function SessionDetail({ session, done }: { session: PlanSession; done: boolean }) {
-  const { t, locale } = useI18n();
+  const { t, locale, href } = useI18n();
   const d = t.dashboard;
   const skill = getSessionSkill(session, locale);
   return (
@@ -77,8 +80,11 @@ export function SessionDetail({ session, done }: { session: PlanSession; done: b
         </p>
       )}
 
-      <div className="flex justify-end border-t border-border pt-5">
+      <div className="flex flex-col-reverse gap-2 border-t border-border pt-5 sm:flex-row sm:justify-end">
         <CompleteButton sessionId={session.id} done={done} />
+        <ButtonLink href={href(routes.session(session.id))}>
+          <Icon name="play" className="size-4" /> {d.start}
+        </ButtonLink>
       </div>
     </div>
   );

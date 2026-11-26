@@ -37,6 +37,7 @@ const PAGES = new Set([
   "quiz",
   "results",
   "sat",
+  "session",
   "settings",
   "simulator",
   "teacher",

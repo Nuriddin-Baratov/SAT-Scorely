@@ -10,6 +10,11 @@ export const progressRepository = {
       current.includes(sessionId) ? current.filter((id) => id !== sessionId) : [...current, sessionId],
     );
   },
+  /** "Bajarildi" (takror chaqirish xavfsiz) */
+  complete(sessionId: string) {
+    const current = progressStore.get();
+    if (!current.includes(sessionId)) progressStore.set([...current, sessionId]);
+  },
   reset: () => progressStore.clear(),
 };
 

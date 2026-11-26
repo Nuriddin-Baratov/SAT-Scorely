@@ -64,7 +64,8 @@ export function RootLayout({ children, locale }: Readonly<{ children: ReactNode;
         <InlineScript html={themeInitScript} />
         <InlineScript html={splashInitScript} />
       </head>
-      <body className="min-h-full">
+      {/* Brauzer kengaytmalari (masalan, valyuta/o'lchov konvertorlari) body'ga o'z atributini qo'shadi — bu xato emas */}
+      <body className="min-h-full" suppressHydrationWarning>
         <Providers locale={locale}>
           <SplashScreen text={journeyTexts[locale].splash} />
           <JourneyGate toolbar={<><LocaleSwitcher /><ThemeToggle className="hidden sm:flex" /></>}>

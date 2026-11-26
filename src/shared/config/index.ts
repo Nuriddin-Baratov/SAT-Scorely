@@ -21,6 +21,7 @@ export const routes = {
   simulator: "/simulator",
   settings: "/settings",
   login: "/login",
+  session: (id: string) => `/session?id=${encodeURIComponent(id)}`,
   install: "/install",
   leaderboard: "/leaderboard",
   teacher: "/teacher",

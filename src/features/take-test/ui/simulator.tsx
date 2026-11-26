@@ -44,12 +44,12 @@ interface Collected {
   times: number[];
 }
 
-export function Simulator() {
+export function Simulator({ onFinish }: { onFinish?: (result: { correct: number; total: number }) => void } = {}) {
   const [run, setRun] = useState(0);
-  return <SimulatorRun key={run} onRetry={() => setRun((n) => n + 1)} />;
+  return <SimulatorRun key={run} onRetry={() => setRun((n) => n + 1)} onFinish={onFinish} />;
 }
 
-function SimulatorRun({ onRetry }: { onRetry: () => void }) {
+function SimulatorRun({ onRetry, onFinish }: { onRetry: () => void; onFinish?: (result: { correct: number; total: number }) => void }) {
   const { t } = useI18n();
   const s = t.simulator;
   const [stage, setStage] = useState<Stage>({ kind: "intro" });
@@ -93,6 +93,7 @@ function SimulatorRun({ onRetry }: { onRetry: () => void }) {
       { type: "test", id: attempt.id, testId: SIMULATION_ID, questionIds: all.questions.map((q) => q.id), answers: all.answers },
     );
     if (summary.accuracy >= 0.8) launchConfetti();
+    onFinish?.({ correct: summary.correct, total: summary.total });
     setStage({ kind: "done", attempt, reward: { xp: game.gained, levelUp: game.levelUp, newMistakes: summary.wrongIds.length } });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }

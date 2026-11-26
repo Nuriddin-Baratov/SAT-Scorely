@@ -2,20 +2,17 @@
 
 import { useMemo, useState } from "react";
 
-import { domainPerformance, useTestAttempts } from "@/entities/practice-test";
 import { firstName, useStudentProfile, type StudentProfile } from "@/entities/student";
 import {
   computeProgress,
   currentWeekIndex,
   findNextSession,
   difficultyLabels,
-  generateStudyPlan,
   phaseMetaFor,
   sessionKindLabels,
   SessionKindIcon,
   useCompletedSessions,
   type PlanSession,
-  type DomainAccuracy,
   type StudyPlan,
 } from "@/entities/study-plan";
 import { ResetProfileButton } from "@/features/reset-profile";
@@ -29,6 +26,7 @@ import { Dialog } from "@/shared/ui/dialog";
 import { Icon, type IconName } from "@/shared/ui/icon";
 import { Badge, Card, Eyebrow, IconTile, ProgressBar } from "@/shared/ui/primitives";
 
+import { useStudyPlan } from "../model/use-study-plan";
 import { SessionDetail } from "./session-detail";
 
 export function StudyDashboard() {
@@ -53,19 +51,8 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
   const phaseMeta = phaseMetaFor(locale);
   const kindLabel = sessionKindLabels(locale);
   const days = weekdayNames(locale);
-  const attempts = useTestAttempts();
-  // Kamida 3 ta savol yechilgan domenlar bo'yicha aniqlik — rejani moslashtirish uchun
-  const performance = useMemo(() => {
-    const result: DomainAccuracy = {};
-    let questions = 0;
-    for (const [id, stat] of Object.entries(domainPerformance(attempts ?? []))) {
-      if (!stat || stat.total < 3) continue;
-      result[id as keyof DomainAccuracy] = stat.correct / stat.total;
-      questions += stat.total;
-    }
-    return { accuracy: result, questions };
-  }, [attempts]);
-  const plan = useMemo(() => generateStudyPlan(profile, locale, performance.accuracy), [profile, locale, performance]);
+  const { plan, adaptedFrom } = useStudyPlan(profile);
+  const performance = { questions: adaptedFrom };
   const progress = computeProgress(plan, completed);
   const next = findNextSession(plan, completed, today);
   const thisWeek = currentWeekIndex(plan, today);
@@ -195,7 +182,7 @@ function Dashboard({ profile, completed, today }: { profile: StudentProfile; com
 
       {/* ============ KEYINGI MASHG'ULOT ============ */}
       {next ? (
-        <NextSessionCard session={next} today={today} onOpen={() => setOpenSession(next)} />
+        <NextSessionCard session={next} today={today} onDetails={() => setOpenSession(next)} />
       ) : (
         <Card className="p-6 text-center sm:p-10">
           <IconTile tone="gold" className="mx-auto size-14">
@@ -375,8 +362,8 @@ function SectionScore({ label, from, to }: { label: string; from: number; to: nu
   );
 }
 
-function NextSessionCard({ session, today, onOpen }: { session: PlanSession; today: string; onOpen: () => void }) {
-  const { t, locale } = useI18n();
+function NextSessionCard({ session, today, onDetails }: { session: PlanSession; today: string; onDetails: () => void }) {
+  const { t, locale, href } = useI18n();
   const d = t.dashboard;
   const diff = daysBetween(parseISODate(today), parseISODate(session.date));
   const when = diff === 0 ? t.dashboard.today : diff === 1 ? d.tomorrow : diff < 0 ? d.missed(-diff) : formatDay(session.date, locale);
@@ -400,10 +387,15 @@ function NextSessionCard({ session, today, onOpen }: { session: PlanSession; tod
             <Badge className="px-3 py-1">{session.questions} {t.common.questions}</Badge>
             <Badge tone="gold" className="px-3 py-1">{difficultyLabels(locale)[session.difficulty]}</Badge>
           </div>
-          <Button size="lg" onClick={onOpen} className="mt-4 w-full sm:mt-8 sm:w-auto">
-            <Icon name="play" className="size-4" />
-            {d.start}
-          </Button>
+          <div className="mt-4 flex flex-col gap-2 sm:mt-8 sm:flex-row">
+            <ButtonLink href={href(routes.session(session.id))} size="lg" className="w-full sm:w-auto">
+              <Icon name="play" className="size-4" />
+              {d.start}
+            </ButtonLink>
+            <Button variant="ghost" size="lg" onClick={onDetails} className="w-full sm:w-auto">
+              {d.sessionDetails}
+            </Button>
+          </div>
         </div>
         <ol className="relative hidden space-y-2 before:absolute lg:block before:top-5 before:bottom-5 before:left-[1.35rem] before:w-px before:bg-border">
           {session.blocks.map((b, i) => (

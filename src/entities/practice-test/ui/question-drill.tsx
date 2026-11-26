@@ -21,11 +21,14 @@ export function QuestionDrill({
   onAnswer,
   onExit,
   doneExtra,
+  exitLabel,
 }: {
   questions: Question[];
   onAnswer: (question: Question, correct: boolean, answer: AnswerValue) => ReactNode | void;
   onExit: () => void;
   doneExtra?: ReactNode;
+  /** Yakuniy tugma matni (standart — "Ro'yxatga qaytish") */
+  exitLabel?: string;
 }) {
   const { t } = useI18n();
   const [index, setIndex] = useState(0);
@@ -50,7 +53,7 @@ export function QuestionDrill({
         </p>
         {doneExtra}
         <Button className="mt-8" onClick={onExit}>
-          {t.practice.backToList}
+          {exitLabel ?? t.practice.backToList}
         </Button>
       </Card>
     );

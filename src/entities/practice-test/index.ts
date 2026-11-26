@@ -1,6 +1,7 @@
 export type { AdaptivePath, AnswerValue, ChoiceQuestion, PracticeTest, Question, SprQuestion, TestAttempt } from "./model/types";
 export { correctAnswerText, formatAnswer, isAnswered, isCorrect } from "./model/answer";
 export { getQuestion, questions } from "./model/questions";
+export { pickQuestions } from "./model/pick";
 export {
   FINAL_TEST_ID,
   SIMULATION_ID,

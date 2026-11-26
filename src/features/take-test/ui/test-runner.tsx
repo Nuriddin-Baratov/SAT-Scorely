@@ -33,9 +33,10 @@ import { Card } from "@/shared/ui/primitives";
 import { Countdown } from "./countdown";
 import { TestReview, type TestReward } from "./test-review";
 
-export function TestRunner({ test }: { test: PracticeTest }) {
+/** `onFinish` — test yakunlanganda (masalan, reja mashg'ulotini "bajarildi" qilish uchun) */
+export function TestRunner({ test, onFinish }: { test: PracticeTest; onFinish?: (result: { correct: number; total: number }) => void }) {
   const [run, setRun] = useState(0);
-  return <TestRun key={run} test={test} onRetry={() => setRun((n) => n + 1)} />;
+  return <TestRun key={run} test={test} onRetry={() => setRun((n) => n + 1)} onFinish={onFinish} />;
 }
 
 type Phase = "running" | "break";
@@ -46,7 +47,15 @@ type Phase = "running" | "break";
  */
 const nowMs = () => Date.now();
 
-function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void }) {
+function TestRun({
+  test,
+  onRetry,
+  onFinish,
+}: {
+  test: PracticeTest;
+  onRetry: () => void;
+  onFinish?: (result: { correct: number; total: number }) => void;
+}) {
   const { t, locale, href } = useI18n();
   const limitMs = test.minutes * 60_000;
   const isAdaptive = !!test.adaptive;
@@ -121,6 +130,7 @@ function TestRun({ test, onRetry }: { test: PracticeTest; onRetry: () => void })
       { type: "test", id: attempt.id, testId: test.id, questionIds: questions.map((item) => item.id), answers },
     );
     if (summary.accuracy >= 0.8) launchConfetti();
+    onFinish?.({ correct: summary.correct, total: summary.total });
     setResult({ attempt, timedOut, reward: { xp: game.gained, levelUp: game.levelUp, newMistakes: summary.wrongIds.length } });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
