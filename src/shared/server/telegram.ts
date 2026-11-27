@@ -5,7 +5,8 @@ import { query, queryOne } from "./db";
 
 // ---------------- Telegram Bot API ----------------
 
-const API = "https://api.telegram.org";
+/** `TELEGRAM_API_URL` — faqat sinov uchun (soxta server); odatda rasmiy manzil */
+const API = process.env.TELEGRAM_API_URL ?? "https://api.telegram.org";
 
 export function telegramConfigured() {
   return !!process.env.TELEGRAM_BOT_TOKEN;
@@ -19,6 +20,22 @@ export async function tg<T = unknown>(method: string, body: Record<string, unkno
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+  const data = (await res.json().catch(() => null)) as { ok: boolean; result: T; description?: string } | null;
+  if (!data?.ok) {
+    console.warn(`[telegram] ${method} failed:`, data?.description ?? res.status);
+    return null;
+  }
+  return data.result;
+}
+
+/** Fayl bilan yuborish (masalan, `sendPhoto`) — multipart */
+export async function tgUpload<T = unknown>(method: string, fields: Record<string, string>, file: { field: string; name: string; type: string; data: Buffer }) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return null;
+  const form = new FormData();
+  for (const [key, value] of Object.entries(fields)) form.append(key, value);
+  form.append(file.field, new Blob([new Uint8Array(file.data)], { type: file.type }), file.name);
+  const res = await fetch(`${API}/bot${token}/${method}`, { method: "POST", body: form });
   const data = (await res.json().catch(() => null)) as { ok: boolean; result: T; description?: string } | null;
   if (!data?.ok) {
     console.warn(`[telegram] ${method} failed:`, data?.description ?? res.status);

@@ -2,6 +2,7 @@ import "server-only";
 
 import { dailyQuestionFor, getQuestion, isCorrect, type Question } from "@/entities/practice-test";
 import { getDictionary, hasLocale, localizePath, type Locale } from "@/shared/i18n";
+import { handlePaymentDecision } from "./payments";
 import {
   claimLinkCode,
   dailyRecipients,
@@ -85,8 +86,8 @@ interface TgUpdate {
   callback_query?: {
     id: string;
     data?: string;
-    from?: { language_code?: string };
-    message?: { chat: { id: number }; message_id: number; text?: string };
+    from?: { id: number; language_code?: string };
+    message?: { chat: { id: number }; message_id: number; text?: string; caption?: string };
   };
 }
 
@@ -95,6 +96,7 @@ async function reply(chatId: number, text: string, keyboard?: unknown) {
 }
 
 export async function handleUpdate(update: TgUpdate) {
+  if (update.callback_query?.data?.startsWith("pay:")) return handlePaymentDecision(update.callback_query);
   if (update.callback_query) return handleAnswer(update.callback_query);
   const message = update.message;
   if (!message?.text) return;
@@ -123,6 +125,9 @@ export async function handleUpdate(update: TgUpdate) {
     case "/savol":
     case "/question":
       return sendDailyQuestion(chatId, locale);
+    // Admin sozlash uchun: chat raqami (ADMIN_TELEGRAM_CHAT_ID)
+    case "/id":
+      return reply(chatId, `Chat ID: <code>${chatId}</code>`);
     case "/stats":
       if (!link) return reply(chatId, t.notLinked);
       return reply(chatId, t.stats(Number(link.xp ?? 0), Number(link.streak ?? 0)));

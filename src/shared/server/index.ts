@@ -43,7 +43,9 @@ export {
   setDailyEnabled,
   telegramConfigured,
   tg,
+  tgUpload,
   unlink,
 } from "./telegram";
 export { DAILY_XP_CAP, alreadyMastered, recordXp, refreshTestStats, tashkentDay, type XpEvent } from "./xp";
 export { AI_LIMITS, aiConfigured, aiStatus, refundAiQuota, takeAiQuota, type Plan } from "./ai";
+export { PRO_PRICE, createPayment, decidePayment, deletePayment, latestPayment, payConfig, paymentUser, type PaymentRow, type PaymentStatus } from "./payments";

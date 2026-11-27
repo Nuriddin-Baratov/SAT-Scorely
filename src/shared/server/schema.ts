@@ -97,6 +97,16 @@ export const SCHEMA = [
     count integer not null default 0,
     primary key (user_id, day)
   )`,
+  `create table if not exists payments (
+    id text primary key,
+    user_id text not null references users(id) on delete cascade,
+    amount integer not null,
+    months integer not null default 1,
+    status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+    created_at timestamptz not null default now(),
+    decided_at timestamptz
+  )`,
+  `create index if not exists payments_user_idx on payments(user_id, created_at desc)`,
 ];
 
 /**
