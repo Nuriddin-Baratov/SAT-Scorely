@@ -97,16 +97,25 @@ export const SCHEMA = [
     count integer not null default 0,
     primary key (user_id, day)
   )`,
-  `create table if not exists payments (
+  // To'lov buyurtmalari (Payme / Click). `seq` — Click'ga raqamli identifikator kerak
+  `create table if not exists orders (
     id text primary key,
+    seq bigserial unique,
     user_id text not null references users(id) on delete cascade,
+    provider text not null check (provider in ('payme', 'click')),
     amount integer not null,
     months integer not null default 1,
-    status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
-    created_at timestamptz not null default now(),
-    decided_at timestamptz
+    status text not null default 'new' check (status in ('new', 'paid', 'cancelled')),
+    ext_id text,
+    pay_state integer,
+    create_time bigint,
+    perform_time bigint,
+    cancel_time bigint,
+    cancel_reason integer,
+    created_at timestamptz not null default now()
   )`,
-  `create index if not exists payments_user_idx on payments(user_id, created_at desc)`,
+  `create unique index if not exists orders_provider_ext_idx on orders(provider, ext_id) where ext_id is not null`,
+  `create index if not exists orders_user_idx on orders(user_id, created_at desc)`,
 ];
 
 /**

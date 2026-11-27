@@ -2,7 +2,6 @@ import "server-only";
 
 import { dailyQuestionFor, getQuestion, isCorrect, type Question } from "@/entities/practice-test";
 import { getDictionary, hasLocale, localizePath, type Locale } from "@/shared/i18n";
-import { handlePaymentDecision } from "./payments";
 import {
   claimLinkCode,
   dailyRecipients,
@@ -96,7 +95,6 @@ async function reply(chatId: number, text: string, keyboard?: unknown) {
 }
 
 export async function handleUpdate(update: TgUpdate) {
-  if (update.callback_query?.data?.startsWith("pay:")) return handlePaymentDecision(update.callback_query);
   if (update.callback_query) return handleAnswer(update.callback_query);
   const message = update.message;
   if (!message?.text) return;
