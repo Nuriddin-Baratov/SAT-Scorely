@@ -287,7 +287,7 @@ export const uz = {
     text: "Telefoningizga o'rnating. Bepul.",
     already: "Ilova o'rnatilgan, siz uning ichidasiz.",
     downloadApk: "APK yuklab olish",
-    apkMeta: "Versiya 1.3 · 80 KB · Android 5.0 va undan yuqori",
+    apkMeta: "Versiya 1.4 · 80 KB · Android 5.0 va undan yuqori",
     android: [
       "Yuqoridagi tugmani bosib, SAT-Pro.apk faylini yuklab oling.",
       "Faylni oching. Telefon so'rasa, shu brauzer (yoki Telegram) uchun “noma'lum manbalardan o'rnatish”ga ruxsat bering.",

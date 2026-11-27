@@ -289,7 +289,7 @@ export const en: Dictionary = {
     text: "Install it on your phone. Free.",
     already: "The app is installed and you are in it.",
     downloadApk: "Download APK",
-    apkMeta: "Version 1.3 · 80 KB · Android 5.0 or later",
+    apkMeta: "Version 1.4 · 80 KB · Android 5.0 or later",
     android: [
       "Tap the button above to download SAT-Pro.apk.",
       "Open the file. If asked, allow this browser (or Telegram) to install unknown apps.",
