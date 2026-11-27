@@ -72,17 +72,75 @@ function MicButton({ active, onClick, disabled, label }: { active: boolean; onCl
   );
 }
 
+/** Bitta sessiyada nechta mashq */
+const PER_ROUND = 2;
+
+/** `round`-chi to'plam: ro'yxatdan ketma-ket 2 tadan (B1 → B2 → C1 → qaytadan) */
+function roundOf<T>(list: T[], round: number) {
+  const start = (round * PER_ROUND) % list.length;
+  return Array.from({ length: PER_ROUND }, (_, i) => list[(start + i) % list.length]);
+}
+
+const scoreTone = (score: number) => (score >= 85 ? "bg-success" : score >= 60 ? "bg-accent" : "bg-warning");
+
+/** Natija sahifasi: katta foiz/ko'rsatkich, mashqlar ro'yxati va tugmalar */
+function Summary({
+  headline,
+  caption,
+  verdict,
+  children,
+  onRetry,
+  onNext,
+}: {
+  headline: string;
+  caption: string;
+  verdict: string;
+  children: React.ReactNode;
+  onRetry: () => void;
+  onNext: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <Card className="mx-auto max-w-4xl overflow-hidden p-0">
+      <div className="bg-gradient-to-br from-[#1d4ed8] to-[#3b82f6] px-6 py-8 text-center text-white sm:py-10">
+        <p className="text-xs font-semibold tracking-[0.16em] text-white/70 uppercase">{t.speaking.summary.title}</p>
+        <p className="mt-3 font-display text-6xl font-bold tabular-nums sm:text-7xl">{headline}</p>
+        <p className="mt-1 text-sm text-white/80">{caption}</p>
+        <p className="mx-auto mt-4 inline-block rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold">{verdict}</p>
+      </div>
+      <div className="space-y-3 p-5 sm:p-8">{children}</div>
+      <div className="flex flex-wrap gap-3 border-t border-border p-5 sm:px-8">
+        <Button variant="outline" onClick={onRetry}>
+          <Icon name="refresh" className="size-4" />
+          {t.speaking.summary.retry}
+        </Button>
+        <Button onClick={onNext}>
+          {t.speaking.summary.newSet}
+          <Icon name="arrowRight" className="size-4" />
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
 function ReadAloud() {
   const { t } = useI18n();
+  const ts = t.speaking.summary;
   const caps = useCapabilities();
   const recorder = useRecorder();
+  const [round, setRound] = useState(0);
   const [index, setIndex] = useState(0);
+  /** Har bir matn natijasi: foiz (`null` — tanilmadi/o'tkazildi) */
+  const [scores, setScores] = useState<(number | null)[]>([]);
+  const [finished, setFinished] = useState(false);
   const [heard, setHeard] = useState("");
   const [active, setActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ReturnType<typeof compareWords> | null>(null);
   const stopRef = useRef<(() => void) | null>(null);
-  const item = readAloudTexts[index];
+  const items = roundOf(readAloudTexts, round);
+  const item = items[index];
+  const last = index === items.length - 1;
   const speechError = (code: string) =>
     ["not-allowed", "service-not-allowed", "permission", "audio-capture"].includes(code)
       ? t.speaking.micDenied
@@ -109,11 +167,13 @@ function ReadAloud() {
     setActive(true);
     // Foydalanuvchi "To'xtatish"ni bosguncha tinglaydi; matn to'liq o'qilsa — o'zi tugaydi
     let done = false;
+    const target = item.text;
+    const at = index;
     stopRef.current = listen({
       maxMs: 90_000,
       onText: (text) => {
         setHeard(text);
-        if (!done && compareWords(item.text, text).score === 100) {
+        if (!done && compareWords(target, text).score === 100) {
           done = true;
           window.setTimeout(() => stopRef.current?.(), 400);
         }
@@ -121,7 +181,14 @@ function ReadAloud() {
       onEnd: (text) => {
         setActive(false);
         stopRef.current = null;
-        if (text) setResult(compareWords(item.text, text));
+        if (!text) return;
+        const r = compareWords(target, text);
+        setResult(r);
+        setScores((list) => {
+          const next = [...list];
+          next[at] = r.score;
+          return next;
+        });
       },
       onError: (code) => setError(speechError(code)),
     });
@@ -136,22 +203,70 @@ function ReadAloud() {
     stopRef.current?.();
   };
 
-  const next = () => {
+  const clearItem = () => {
     stopRef.current?.();
     recorder.reset();
-    setIndex((i) => (i + 1) % readAloudTexts.length);
     setHeard("");
     setResult(null);
     setError(null);
   };
 
+  const next = () => {
+    clearItem();
+    if (last) setFinished(true);
+    else setIndex((i) => i + 1);
+  };
+
+  const restart = (nextRound: boolean) => {
+    clearItem();
+    if (nextRound) setRound((r) => r + 1);
+    setIndex(0);
+    setScores([]);
+    setFinished(false);
+  };
+
+  if (finished) {
+    const valid = items.map((_, i) => scores[i] ?? null);
+    const counted = valid.filter((s): s is number => s !== null);
+    const avg = counted.length ? Math.round(counted.reduce((a, b) => a + b, 0) / counted.length) : null;
+    return (
+      <Summary
+        headline={avg === null ? "—" : `${avg}%`}
+        caption={ts.average}
+        verdict={avg === null ? ts.noScore : avg >= 85 ? ts.great : avg >= 60 ? ts.good : ts.practice}
+        onRetry={() => restart(false)}
+        onNext={() => restart(true)}
+      >
+        {items.map((it, i) => (
+          <div key={it.id} className="rounded-2xl border border-border p-4">
+            <div className="flex items-center gap-2">
+              <Badge tone={levelTone[it.level]}>{it.level}</Badge>
+              <span className="ml-auto font-display text-lg font-bold tabular-nums">{valid[i] === null ? ts.skipped : `${valid[i]}%`}</span>
+            </div>
+            <p className="mt-2 leading-relaxed">{it.text}</p>
+            {valid[i] !== null && (
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-2">
+                <div className={cn("h-full rounded-full", scoreTone(valid[i]!))} style={{ width: `${valid[i]}%` }} />
+              </div>
+            )}
+          </div>
+        ))}
+      </Summary>
+    );
+  }
+
   return (
     <Card className="mx-auto max-w-4xl p-5 sm:p-8">
       <div className="flex items-center justify-between gap-3">
         <Badge tone={levelTone[item.level]}>{item.level}</Badge>
-        <span className="text-sm font-medium text-muted tabular-nums">
-          {index + 1} / {readAloudTexts.length}
-        </span>
+        <div className="flex items-center gap-2">
+          {items.map((_, i) => (
+            <span key={i} className={cn("h-1.5 w-8 rounded-full", i < index || (i === index && result) ? "bg-accent" : i === index ? "bg-accent/40" : "bg-surface-2")} />
+          ))}
+          <span className="ml-1 text-sm font-medium text-muted tabular-nums">
+            {index + 1} / {items.length}
+          </span>
+        </div>
       </div>
       <p className="mt-3 text-sm text-muted">{t.speaking.readHint}</p>
       <div className="mt-5 rounded-3xl bg-surface-2/60 p-5 sm:p-7">
@@ -165,7 +280,7 @@ function ReadAloud() {
           {heard && <p className="mt-1 text-sm text-muted italic">“{heard}”</p>}
           {result && (
             <div className="mt-2 h-2 w-full max-w-xs overflow-hidden rounded-full bg-surface-2 max-sm:mx-auto">
-              <div className={cn("h-full rounded-full", result.score >= 85 ? "bg-success" : result.score >= 60 ? "bg-accent" : "bg-warning")} style={{ width: `${result.score}%` }} />
+              <div className={cn("h-full rounded-full", scoreTone(result.score))} style={{ width: `${result.score}%` }} />
             </div>
           )}
         </div>
@@ -177,10 +292,7 @@ function ReadAloud() {
         )}
       </div>
 
-      {recorder.url && (
-
-        <audio controls src={recorder.url} className="mt-5 w-full" />
-      )}
+      {recorder.url && <audio controls src={recorder.url} className="mt-5 w-full" />}
       <div className="mt-5 space-y-3">
         {!caps.listen && <Notice>{t.speaking.noRecognition}</Notice>}
         {(error || recorder.state === "denied") && <Notice>{error ?? t.speaking.micDenied}</Notice>}
@@ -192,9 +304,9 @@ function ReadAloud() {
             {t.speaking.tryAgain}
           </Button>
         )}
-        <Button variant={result ? "primary" : "ghost"} onClick={next} disabled={active}>
-          {t.speaking.next}
-          <Icon name="arrowRight" className="size-4" />
+        <Button variant={result || recorder.url ? "primary" : "ghost"} onClick={next} disabled={active}>
+          {last ? ts.show : t.speaking.next}
+          <Icon name={last ? "chart" : "arrowRight"} className="size-4" />
         </Button>
       </div>
     </Card>
@@ -203,22 +315,35 @@ function ReadAloud() {
 
 type Phase = "idle" | "prep" | "talk" | "done";
 
+interface TalkResult {
+  seconds: number;
+  words: number;
+  url: string | null;
+}
+
 function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
   const { t } = useI18n();
   const tt = t.speaking.topic;
+  const ts = t.speaking.summary;
   const caps = useCapabilities();
   const recorder = useRecorder();
+  const [round, setRound] = useState(0);
   const [index, setIndex] = useState(0);
+  const [results, setResults] = useState<(TalkResult | null)[]>([]);
+  const [finished, setFinished] = useState(false);
   const [phase, setPhase] = useState<Phase>("idle");
   const [left, setLeft] = useState(0);
   const [transcript, setTranscript] = useState("");
   const [spoke, setSpoke] = useState(0);
   const stopListen = useRef<(() => void) | null>(null);
   const startedAt = useRef(0);
-  const topic = speakingTopics[index];
+  const topics = roundOf(speakingTopics, round);
+  const topic = topics[index];
+  const last = index === topics.length - 1;
   const talkSeconds = TALK_SECONDS[topic.level];
   // Ilovada tizim tanuvchisi bir gapdan keyin to'xtaydi — uzun nutq uchun faqat yozib olamiz
   const liveTranscript = caps.listen && !caps.nativeApp;
+  const words = transcript.split(/\s+/).filter(Boolean).length;
 
   const finish = () => {
     recorder.stop();
@@ -239,6 +364,7 @@ function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
     setPhase("talk");
     if (liveTranscript)
       stopListen.current = listen({
+        maxMs: (talkSeconds + 5) * 1000,
         onText: setTranscript,
         onEnd: (text) => text && setTranscript(text),
       });
@@ -268,16 +394,78 @@ function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
     [],
   );
 
-  const reset = (nextTopic = false) => {
+  const clearTopic = () => {
     stopListen.current?.();
     recorder.stop();
     recorder.reset();
     setTranscript("");
     setPhase("idle");
-    if (nextTopic) setIndex((i) => (i + 1) % speakingTopics.length);
   };
 
-  const words = transcript.split(/\s+/).filter(Boolean).length;
+  /** Shu mavzu natijasini saqlab, keyingisiga (yoki yakuniy natijaga) o'tadi */
+  const next = () => {
+    const record: TalkResult | null = phase === "done" ? { seconds: spoke, words, url: recorder.url } : null;
+    setResults((list) => {
+      const copy = [...list];
+      copy[index] = record;
+      return copy;
+    });
+    clearTopic();
+    if (last) setFinished(true);
+    else setIndex((i) => i + 1);
+  };
+
+  const restart = (nextRound: boolean) => {
+    clearTopic();
+    if (nextRound) setRound((r) => r + 1);
+    setIndex(0);
+    setResults([]);
+    setFinished(false);
+  };
+
+  if (finished) {
+    const done = topics.map((_, i) => results[i] ?? null);
+    const total = done.reduce((sum, r) => sum + (r?.seconds ?? 0), 0);
+    const goal = topics.reduce((sum, tp) => sum + TALK_SECONDS[tp.level], 0);
+    const fill = goal ? Math.min(100, Math.round((total / goal) * 100)) : 0;
+    return (
+      <Summary
+        headline={`${total}s`}
+        caption={ts.spokeOf(total, goal)}
+        verdict={fill >= 85 ? ts.great : fill >= 50 ? ts.good : ts.practice}
+        onRetry={() => restart(false)}
+        onNext={() => restart(true)}
+      >
+        {topics.map((tp, i) => {
+          const r = done[i];
+          return (
+            <div key={tp.id} className="rounded-2xl border border-border p-4">
+              <div className="flex items-center gap-2">
+                <Badge tone={levelTone[tp.level]}>{tp.level}</Badge>
+                <span className="ml-auto font-display text-lg font-bold tabular-nums">{r ? `${r.seconds}s / ${TALK_SECONDS[tp.level]}s` : ts.skipped}</span>
+              </div>
+              <p className="mt-2 font-semibold">{tp.prompt}</p>
+              {r && (
+                <>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-2">
+                    <div className={cn("h-full rounded-full", scoreTone(Math.round((r.seconds / TALK_SECONDS[tp.level]) * 100)))} style={{ width: `${Math.min(100, (r.seconds / TALK_SECONDS[tp.level]) * 100)}%` }} />
+                  </div>
+                  {r.words > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Badge tone="accent">{tt.words(r.words)}</Badge>
+                      <Badge tone="neutral">{tt.wpm(Math.round((r.words / r.seconds) * 60))}</Badge>
+                    </div>
+                  )}
+                  {r.url && <audio controls src={r.url} className="mt-3 w-full" />}
+                </>
+              )}
+            </div>
+          );
+        })}
+      </Summary>
+    );
+  }
+
   const total = phase === "prep" ? PREP_SECONDS : talkSeconds;
   const pct = phase === "prep" || phase === "talk" ? (left / total) * 100 : 0;
 
@@ -288,6 +476,9 @@ function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
           <Badge tone={levelTone[topic.level]}>{topic.level}</Badge>
           <span className="text-sm text-muted">
             {PREP_SECONDS}s + {talkSeconds}s
+          </span>
+          <span className="ml-auto text-sm font-medium text-muted tabular-nums">
+            {index + 1} / {topics.length}
           </span>
         </div>
         <p className="mt-4 font-display text-2xl leading-snug font-bold sm:text-3xl">{topic.prompt}</p>
@@ -349,13 +540,19 @@ function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
             )}
             {phase === "done" && (
               <>
-                <Button size="lg" variant="outline" onClick={() => reset()}>
+                <Button size="lg" onClick={next}>
+                  {last ? ts.show : tt.next}
+                  <Icon name={last ? "chart" : "arrowRight"} className="size-5" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => {
+                    clearTopic();
+                  }}
+                >
                   <Icon name="refresh" className="size-5" />
                   {tt.again}
-                </Button>
-                <Button size="lg" variant="ghost" onClick={() => reset(true)}>
-                  {tt.next}
-                  <Icon name="arrowRight" className="size-5" />
                 </Button>
               </>
             )}
@@ -375,7 +572,6 @@ function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
             {recorder.url && (
               <div>
                 <p className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">{tt.recording}</p>
-                
                 <audio controls src={recorder.url} className="w-full" />
               </div>
             )}
@@ -392,6 +588,12 @@ function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
               </Button>
             )}
           </div>
+        )}
+        {phase === "idle" && (
+          <Button variant="ghost" className="mt-5" onClick={next}>
+            {last ? ts.show : tt.next}
+            <Icon name="arrowRight" className="size-4" />
+          </Button>
         )}
         <div className="mt-5 space-y-3">
           {recorder.state === "denied" && <Notice>{t.speaking.micDenied}</Notice>}

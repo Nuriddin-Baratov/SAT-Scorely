@@ -10,6 +10,8 @@ export function useRecorder() {
   const [url, setUrl] = useState<string | null>(null);
   const rec = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
+  /** Yaratilgan barcha yozuvlar — natija sahifasida qayta eshitish uchun saqlanadi, chiqishda tozalanadi */
+  const made = useRef<string[]>([]);
 
   const release = () => rec.current?.stream.getTracks().forEach((t) => t.stop());
 
@@ -25,10 +27,9 @@ export function useRecorder() {
       recorder.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
       recorder.onstop = () => {
         const blob = new Blob(chunks.current, { type: recorder.mimeType || "audio/webm" });
-        setUrl((old) => {
-          if (old) URL.revokeObjectURL(old);
-          return URL.createObjectURL(blob);
-        });
+        const next = URL.createObjectURL(blob);
+        made.current.push(next);
+        setUrl(next);
         stream.getTracks().forEach((t) => t.stop());
         setState("idle");
       };
@@ -46,17 +47,13 @@ export function useRecorder() {
     if (rec.current?.state === "recording") rec.current.stop();
   }, []);
 
-  const reset = useCallback(() => {
-    setUrl((old) => {
-      if (old) URL.revokeObjectURL(old);
-      return null;
-    });
-  }, []);
+  const reset = useCallback(() => setUrl(null), []);
 
   useEffect(
     () => () => {
       if (rec.current?.state === "recording") rec.current.stop();
       release();
+      made.current.forEach((u) => URL.revokeObjectURL(u));
     },
     [],
   );
