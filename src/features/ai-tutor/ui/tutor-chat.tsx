@@ -353,7 +353,7 @@ function Segmented<T extends string | number>({ value, onChange, options }: { va
           aria-pressed={o.value === value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "h-9 flex-1 rounded-xl px-2 text-sm font-semibold transition",
+            "h-9 flex-1 truncate rounded-xl px-2 text-sm font-semibold whitespace-nowrap transition",
             o.value === value ? "bg-surface text-accent shadow-card" : "text-muted hover:text-fg",
           )}
         >

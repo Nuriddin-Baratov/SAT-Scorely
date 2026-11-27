@@ -1139,7 +1139,7 @@ export const en: Dictionary = {
     greeting: "Hi! I'm your SAT AI tutor. Send a photo of a problem or type your question.",
     suggestions: ["Solve this step by step", "Give me a hint, not the answer", "Explain my mistake", "Give me 3 similar problems", "Make me a 2-week plan"],
     panel: { title: "Build a test", level: "Level", count: "Questions", section: "Section", make: "Build test" },
-    sections: { math: "Math", rw: "Reading & Writing" },
+    sections: { math: "Math", rw: "English" },
     makePrompt: (n: number, level: number, section: string) =>
       `Write ${n} SAT-style ${section} questions at difficulty level ${level} (1 = easy, 5 = hardest). Give each A–D options. Put the answers with short explanations separately at the end.`,
     features: {
