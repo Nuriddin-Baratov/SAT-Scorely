@@ -32,7 +32,7 @@ function Notice({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SpeakingZone({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
+export function SpeakingZone() {
   const { t } = useI18n();
   const [tab, setTab] = useState<"read" | "topic">("read");
   return (
@@ -48,7 +48,7 @@ export function SpeakingZone({ onAskAi }: { onAskAi?: (prompt: string) => void }
           { value: "topic", label: t.speaking.tabs.topic, icon: <Icon name="chat" className="size-4" /> },
         ]}
       />
-      {tab === "read" ? <ReadAloud /> : <TopicTalk onAskAi={onAskAi} />}
+      {tab === "read" ? <ReadAloud /> : <TopicTalk />}
     </div>
   );
 }
@@ -321,7 +321,7 @@ interface TalkResult {
   url: string | null;
 }
 
-function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
+function TopicTalk() {
   const { t } = useI18n();
   const tt = t.speaking.topic;
   const ts = t.speaking.summary;
@@ -580,12 +580,6 @@ function TopicTalk({ onAskAi }: { onAskAi?: (prompt: string) => void }) {
                 <Badge tone="accent">{tt.words(words)}</Badge>
                 <Badge tone="neutral">{tt.wpm(Math.round((words / spoke) * 60))}</Badge>
               </div>
-            )}
-            {onAskAi && words >= 5 && (
-              <Button variant="outline" onClick={() => onAskAi(tt.aiPrompt(topic.prompt, transcript))}>
-                <Icon name="sparkles" className="size-4" />
-                {tt.askAi}
-              </Button>
             )}
           </div>
         )}

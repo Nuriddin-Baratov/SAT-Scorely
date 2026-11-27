@@ -35,7 +35,6 @@ function useNavGroups() {
       items: [
         { path: routes.dashboard, label: t.nav.home, icon: "home" },
         { path: routes.satGuide, label: t.nav.sat, icon: "book" },
-        { path: routes.tutor, label: t.nav.tutor, icon: "sparkles" },
         { path: routes.vocabulary, label: t.nav.vocabulary, icon: "cards" },
         { path: routes.listening, label: t.nav.listening, icon: "headphones" },
         { path: routes.speaking, label: t.nav.speaking, icon: "mic" },
@@ -261,7 +260,7 @@ export function SiteSidebar() {
   useEffect(() => {
     const id = window.setTimeout(() => {
       preloadLeaderboard();
-      for (const path of [routes.results, routes.calculator, routes.leaderboard, routes.achievements, routes.settings, routes.tutor, routes.listening, routes.speaking]) router.prefetch(href(path));
+      for (const path of [routes.results, routes.calculator, routes.leaderboard, routes.achievements, routes.settings, routes.listening, routes.speaking]) router.prefetch(href(path));
     }, 1500);
     return () => window.clearTimeout(id);
   }, [router, href]);

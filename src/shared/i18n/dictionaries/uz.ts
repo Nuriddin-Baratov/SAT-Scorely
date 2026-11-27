@@ -6,7 +6,6 @@ export const uz = {
     pages: {
       listening: { title: "Listening zonasi", description: "Inglizcha matnlarni tinglab tushunish va diktant mashqlari." },
       speaking: { title: "Speaking zonasi", description: "Talaffuz va ravon gapirish mashqlari: ovoz chiqarib o'qish va mavzu bo'yicha gapirish." },
-      tutor: { title: "AI ustoz", description: "SAT bo'yicha AI ustoz: masalani yechadi, ishora beradi, xatoni tushuntiradi." },
       sat: {
         title: "Digital SAT qo'llanmasi",
         description:
@@ -39,7 +38,7 @@ export const uz = {
   },
 
   nav: {
-    listening: "Listening", speaking: "Speaking", tutor: "AI ustoz",
+    listening: "Listening", speaking: "Speaking",
     simulator: "SAT simulyatori",
     leaderboard: "Reyting",
     teacher: "O'qituvchi paneli",
@@ -1120,42 +1119,7 @@ export const uz = {
       wpm: (n: number) => `${n} so'z/daqiqa`,
       again: "Qayta gapirish",
       next: "Boshqa mavzu",
-      askAi: "AI ustozga baholatish",
-      aiPrompt: (topic: string, text: string) =>
-        `Men speaking mashqida quyidagi mavzuda gapirdim: "${topic}".\nNutqim (avtomatik yozib olingan): "${text}"\n\nGrammatika, so'z boyligi va mantiqiy tuzilishni baholab ber, 3 ta aniq maslahat va yaxshilangan namunani yoz.`,
     },
-  },
-
-  tutor: {
-    eyebrow: "AI ustoz",
-    title: "AI ustoz",
-    description: "SAT bo'yicha shaxsiy ustoz: masalani yechadi, javobni aytmasdan ishora beradi, xatoingizni tushuntiradi va o'xshash masalalar tuzadi.",
-    online: "Onlayn",
-    placeholder: "Savol yozing yoki rasm tashlang…",
-    send: "Yuborish",
-    attach: "Rasm biriktirish",
-    removeImage: "Rasmni olib tashlash",
-    imageTooBig: "Rasm juda katta (10 MB gacha).",
-    greeting: "Salom! Men SAT bo'yicha AI ustozingizman. Masala rasmini tashlang yoki savolingizni yozing.",
-    suggestions: ["Bu masalani bosqichma-bosqich yech", "Javobni aytmasdan ishora ber", "Xatoimni tushuntir", "O'xshash 3 ta masala ber", "Menga 2 haftalik reja tuz"],
-    panel: { title: "Test tuzish", level: "Daraja", count: "Savollar", section: "Bo'lim", make: "Test tuzish" },
-    sections: { math: "Matematika", rw: "Ingliz tili" },
-    makePrompt: (n: number, level: number, section: string) =>
-      `${section} bo'limidan ${level}-qiyinlik darajasida (1 — oson, 5 — eng qiyin) ${n} ta SAT uslubidagi savol tuz. Har birida A–D variantlar bo'lsin. Javoblar va qisqa tushuntirishlarni oxirida alohida ber.`,
-    features: {
-      title: "Imkoniyatlar",
-      items: ["Rasmdan masala yechish", "Javobsiz ishora", "Xatoni tushuntirish", "O'xshash masalalar", "Shaxsiy reja"],
-    },
-    thinking: "O'ylayapti…",
-    you: "Siz",
-    clear: "Yangi suhbat",
-    slowDown: "Juda tez yuboryapsiz — bir daqiqa kutib, qayta urinib ko'ring.",
-    loginRequired: "AI ustozdan foydalanish uchun hisobingizga kiring.",
-    offTitle: "AI ustoz hali ulanmagan",
-    offText: "Sayt egasi AI kalitini qo'shishi bilan ustoz ishlay boshlaydi.",
-    error: "Javob olishda xatolik. Qayta urinib ko'ring.",
-    refused: "Bu so'rovga javob bera olmayman. Savolni boshqacha yozib ko'ring.",
-    disclaimer: "AI xato qilishi mumkin — muhim javoblarni tekshiring.",
   },
 
   notFound: { title: "Sahifa topilmadi", text: "Bu manzil mavjud emas yoki o'chirilgan. Bosh sahifaga qayting yoki testlardan birini ishlang." },

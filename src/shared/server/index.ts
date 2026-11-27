@@ -47,4 +47,3 @@ export {
   unlink,
 } from "./telegram";
 export { DAILY_XP_CAP, alreadyMastered, recordXp, refreshTestStats, tashkentDay, type XpEvent } from "./xp";
-export { aiConfigured } from "./ai";

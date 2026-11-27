@@ -27,5 +27,4 @@ export const routes = {
   teacher: "/teacher",
   listening: "/listening",
   speaking: "/speaking",
-  tutor: "/tutor",
 } as const;

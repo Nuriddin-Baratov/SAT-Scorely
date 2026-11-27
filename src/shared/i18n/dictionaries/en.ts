@@ -8,7 +8,6 @@ export const en: Dictionary = {
     pages: {
       listening: { title: "Listening zone", description: "English listening comprehension and dictation practice." },
       speaking: { title: "Speaking zone", description: "Pronunciation and fluency practice: read aloud and topic talk." },
-      tutor: { title: "AI tutor", description: "An AI SAT tutor that solves problems, gives hints and explains mistakes." },
       sat: {
         title: "Digital SAT guide",
         description:
@@ -41,7 +40,7 @@ export const en: Dictionary = {
   },
 
   nav: {
-    listening: "Listening", speaking: "Speaking", tutor: "AI tutor",
+    listening: "Listening", speaking: "Speaking",
     simulator: "SAT simulator",
     leaderboard: "Leaderboard",
     teacher: "Teacher panel",
@@ -1120,42 +1119,7 @@ export const en: Dictionary = {
       wpm: (n: number) => `${n} words/min`,
       again: "Speak again",
       next: "Another topic",
-      askAi: "Get AI feedback",
-      aiPrompt: (topic: string, text: string) =>
-        `I did a speaking exercise on this topic: "${topic}".\nMy answer (auto-transcribed): "${text}"\n\nEvaluate my grammar, vocabulary and structure, give 3 specific tips and an improved model answer.`,
     },
-  },
-
-  tutor: {
-    eyebrow: "AI tutor",
-    title: "AI tutor",
-    description: "Your personal SAT tutor: solves problems, gives hints without the answer, explains your mistakes and writes similar practice questions.",
-    online: "Online",
-    placeholder: "Ask a question or drop a photo…",
-    send: "Send",
-    attach: "Attach a photo",
-    removeImage: "Remove photo",
-    imageTooBig: "The photo is too large (max 10 MB).",
-    greeting: "Hi! I'm your SAT AI tutor. Send a photo of a problem or type your question.",
-    suggestions: ["Solve this step by step", "Give me a hint, not the answer", "Explain my mistake", "Give me 3 similar problems", "Make me a 2-week plan"],
-    panel: { title: "Build a test", level: "Level", count: "Questions", section: "Section", make: "Build test" },
-    sections: { math: "Math", rw: "English" },
-    makePrompt: (n: number, level: number, section: string) =>
-      `Write ${n} SAT-style ${section} questions at difficulty level ${level} (1 = easy, 5 = hardest). Give each A–D options. Put the answers with short explanations separately at the end.`,
-    features: {
-      title: "What I can do",
-      items: ["Solve from a photo", "Hints without answers", "Explain mistakes", "Similar problems", "Personal plan"],
-    },
-    thinking: "Thinking…",
-    you: "You",
-    clear: "New chat",
-    slowDown: "You're sending too fast — wait a minute and try again.",
-    loginRequired: "Sign in to use the AI tutor.",
-    offTitle: "The AI tutor isn't connected yet",
-    offText: "It will start working as soon as the site owner adds an AI key.",
-    error: "Couldn't get a reply. Please try again.",
-    refused: "I can't help with that request. Try rephrasing your question.",
-    disclaimer: "AI can make mistakes — double-check important answers.",
   },
 
   notFound: { title: "Page not found", text: "This address doesn't exist or was removed. Go back home or try one of the tests." },
