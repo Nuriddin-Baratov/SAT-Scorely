@@ -57,7 +57,6 @@ function useNavGroups() {
       items: [
         { path: routes.leaderboard, label: t.nav.leaderboard, icon: "trophy" },
         ...(isTeacher ? [{ path: routes.teacher, label: t.nav.teacher, icon: "chart" as const }] : []),
-        { path: routes.plans, label: t.nav.plans, icon: "crown" },
         { path: routes.settings, label: t.nav.settings, icon: "sun" },
         // Ilova ichida ko'rinmaydi
         ...(platform && platform !== "app" ? [{ path: routes.install, label: t.nav.install, icon: "download" as const }] : []),
@@ -262,7 +261,7 @@ export function SiteSidebar() {
   useEffect(() => {
     const id = window.setTimeout(() => {
       preloadLeaderboard();
-      for (const path of [routes.results, routes.calculator, routes.leaderboard, routes.achievements, routes.settings, routes.tutor, routes.listening, routes.speaking, routes.plans]) router.prefetch(href(path));
+      for (const path of [routes.results, routes.calculator, routes.leaderboard, routes.achievements, routes.settings, routes.tutor, routes.listening, routes.speaking]) router.prefetch(href(path));
     }, 1500);
     return () => window.clearTimeout(id);
   }, [router, href]);

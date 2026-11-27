@@ -34,7 +34,6 @@ const PAGES = new Set([
   "mistakes",
   "onboarding",
   "plan",
-  "plans",
   "practice",
   "quiz",
   "results",

@@ -16,8 +16,6 @@ export interface TutorMessage {
 export interface TutorStatus {
   enabled: boolean;
   user: boolean;
-  plan?: "free" | "pro";
-  planUntil?: string | null;
   used?: number;
   limit?: number;
 }

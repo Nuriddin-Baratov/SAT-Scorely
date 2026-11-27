@@ -220,11 +220,6 @@ function Chat() {
           <div className="mx-3 mb-2 flex items-center gap-2 rounded-xl bg-warning-soft px-3 py-2 text-sm text-warning sm:mx-5">
             <Icon name="flag" className="size-4 shrink-0" />
             <span className="min-w-0 flex-1">{notice}</span>
-            {notice === tt.limitReached && (
-              <ButtonLink href={href(routes.plans)} size="sm" variant="outline">
-                {tt.upgrade}
-              </ButtonLink>
-            )}
             {notice === tt.loginRequired && (
               <ButtonLink href={href(routes.login)} size="sm" variant="outline">
                 {t.auth.login}
@@ -327,12 +322,6 @@ function Chat() {
               </li>
             ))}
           </ul>
-          {status?.plan === "free" && (
-            <ButtonLink href={href(routes.plans)} variant="outline" size="sm" className="mt-4 w-full">
-              <Icon name="crown" className="size-4" />
-              {tt.upgrade}
-            </ButtonLink>
-          )}
         </Card>
       </div>
     </div>

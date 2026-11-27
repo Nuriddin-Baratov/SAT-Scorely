@@ -47,5 +47,4 @@ export {
   unlink,
 } from "./telegram";
 export { DAILY_XP_CAP, alreadyMastered, recordXp, refreshTestStats, tashkentDay, type XpEvent } from "./xp";
-export { AI_LIMITS, aiConfigured, aiStatus, refundAiQuota, takeAiQuota, type Plan } from "./ai";
-export { PRO_PRICE, activatePro, billing, createOrder, getOrder, orderByExt, revokePro, userOrder, type OrderRow, type Provider } from "./orders";
+export { AI_DAILY_LIMIT, aiConfigured, aiStatus, refundAiQuota, takeAiQuota } from "./ai";

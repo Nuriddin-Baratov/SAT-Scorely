@@ -28,5 +28,4 @@ export const routes = {
   listening: "/listening",
   speaking: "/speaking",
   tutor: "/tutor",
-  plans: "/plans",
 } as const;

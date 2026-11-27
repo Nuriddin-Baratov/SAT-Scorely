@@ -97,25 +97,6 @@ export const SCHEMA = [
     count integer not null default 0,
     primary key (user_id, day)
   )`,
-  // To'lov buyurtmalari (Payme / Click). `seq` — Click'ga raqamli identifikator kerak
-  `create table if not exists orders (
-    id text primary key,
-    seq bigserial unique,
-    user_id text not null references users(id) on delete cascade,
-    provider text not null check (provider in ('payme', 'click')),
-    amount integer not null,
-    months integer not null default 1,
-    status text not null default 'new' check (status in ('new', 'paid', 'cancelled')),
-    ext_id text,
-    pay_state integer,
-    create_time bigint,
-    perform_time bigint,
-    cancel_time bigint,
-    cancel_reason integer,
-    created_at timestamptz not null default now()
-  )`,
-  `create unique index if not exists orders_provider_ext_idx on orders(provider, ext_id) where ext_id is not null`,
-  `create index if not exists orders_user_idx on orders(user_id, created_at desc)`,
 ];
 
 /**
@@ -124,8 +105,6 @@ export const SCHEMA = [
  */
 export const COLUMNS: { table: string; column: string; sql: string }[] = [
   { table: "user_data", column: "version", sql: "alter table user_data add column if not exists version integer not null default 0" },
-  { table: "users", column: "plan", sql: "alter table users add column if not exists plan text not null default 'free'" },
-  { table: "users", column: "plan_until", sql: "alter table users add column if not exists plan_until timestamptz" },
 ];
 
 export const COLUMN_CHECK =

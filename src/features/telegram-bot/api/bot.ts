@@ -123,9 +123,6 @@ export async function handleUpdate(update: TgUpdate) {
     case "/savol":
     case "/question":
       return sendDailyQuestion(chatId, locale);
-    // Admin sozlash uchun: chat raqami (ADMIN_TELEGRAM_CHAT_ID)
-    case "/id":
-      return reply(chatId, `Chat ID: <code>${chatId}</code>`);
     case "/stats":
       if (!link) return reply(chatId, t.notLinked);
       return reply(chatId, t.stats(Number(link.xp ?? 0), Number(link.streak ?? 0)));
