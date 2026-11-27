@@ -114,7 +114,7 @@ function Chat() {
       else {
         // Javob kelmadi — bo'sh javob o'chadi (savol qoladi), chala javob xato belgisi bilan qoladi
         setMessages((list) => list.filter((m) => m.id !== reply.id || m.text).map((m) => (m.id === reply.id ? { ...m, status: "error" } : m)));
-        setNotice(result === "login" ? tt.loginRequired : result === "limit" ? tt.limitReached : result === "off" ? tt.offText : tt.error);
+        setNotice(result === "login" ? tt.loginRequired : result === "rate" ? tt.slowDown : result === "off" ? tt.offText : tt.error);
       }
     } catch {
       if (!controller.signal.aborted) {
@@ -126,7 +126,6 @@ function Chat() {
       setMessages((list) => list.map((m) => (m.id === user.id ? { ...m, image: undefined } : m)));
       setBusy(false);
       abortRef.current = null;
-      refreshStatus();
     }
   };
 
@@ -138,8 +137,7 @@ function Chat() {
 
   const off = status && !status.enabled;
   const guest = session.status === "guest";
-  const left = status?.limit !== undefined ? status.limit - (status.used ?? 0) : null;
-  const disabled = busy || !!off || guest || left === 0;
+  const disabled = busy || !!off || guest;
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-6">
@@ -156,12 +154,7 @@ function Chat() {
               {off ? tt.offTitle : tt.online}
             </p>
           </div>
-          {left !== null && status?.limit !== undefined && (
-            <span className="ml-auto hidden rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium text-muted tabular-nums sm:inline">
-              {tt.limit(status.used ?? 0, status.limit)}
-            </span>
-          )}
-          <Button variant="ghost" size="sm" className={cn(left === null && "ml-auto", "px-2.5!")} onClick={clear} disabled={!messages.length} aria-label={tt.clear} title={tt.clear}>
+          <Button variant="ghost" size="sm" className="ml-auto px-2.5!" onClick={clear} disabled={!messages.length} aria-label={tt.clear} title={tt.clear}>
             <Icon name="refresh" className="size-4" />
             <span className="hidden sm:inline">{tt.clear}</span>
           </Button>

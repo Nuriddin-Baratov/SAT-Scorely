@@ -91,12 +91,6 @@ export const SCHEMA = [
     correct boolean not null,
     primary key (chat_id, day)
   )`,
-  `create table if not exists ai_usage (
-    user_id text not null references users(id) on delete cascade,
-    day text not null,
-    count integer not null default 0,
-    primary key (user_id, day)
-  )`,
 ];
 
 /**

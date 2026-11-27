@@ -16,8 +16,6 @@ export interface TutorMessage {
 export interface TutorStatus {
   enabled: boolean;
   user: boolean;
-  used?: number;
-  limit?: number;
 }
 
 /** Suhbat shu qurilmada saqlanadi (bulutga sinxronlanmaydi) */
@@ -83,7 +81,7 @@ export function profileContext(profile: StudentProfile | null | undefined) {
     .join("; ");
 }
 
-export type SendResult = "ok" | "login" | "limit" | "off" | "error";
+export type SendResult = "ok" | "login" | "rate" | "off" | "error";
 
 /** Xabarni yuboradi; javob bo'laklari `onText` ga keladi */
 export async function sendChat(
@@ -100,10 +98,8 @@ export async function sendChat(
     signal,
   });
   if (res.status === 401) return "login";
-  if (res.status === 429) {
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
-    return body.error === "limit" ? "limit" : "error";
-  }
+  // Juda tez-tez yuborilgan (spamdan himoya)
+  if (res.status === 429) return "rate";
   if (res.status === 503) return "off";
   if (!res.ok || !res.body) return "error";
 

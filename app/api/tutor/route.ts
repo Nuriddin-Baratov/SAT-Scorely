@@ -3,7 +3,6 @@ import { connection } from "next/server";
 
 import {
   aiConfigured,
-  aiStatus,
   assertSameOrigin,
   databaseConfigured,
   getCurrentUser,
@@ -11,9 +10,7 @@ import {
   json,
   rateLimit,
   readJson,
-  refundAiQuota,
   requireUser,
-  takeAiQuota,
 } from "@/shared/server";
 
 /** Javob uzun bo'lishi mumkin (masalan, 10 ta savolli test) */
@@ -70,7 +67,7 @@ export async function GET() {
     if (!databaseConfigured()) return json({ enabled, user: false });
     const user = await getCurrentUser();
     if (!user) return json({ enabled, user: false });
-    return json({ enabled, user: true, ...(await aiStatus(user.id)) });
+    return json({ enabled, user: true });
   } catch (error) {
     return handleError(error);
   }
@@ -82,7 +79,7 @@ export async function POST(request: Request) {
     assertSameOrigin(request);
     const user = await requireUser();
     if (!aiConfigured()) return json({ error: "ai-off" }, 503);
-    if (!rateLimit(request, `tutor:${user.id}`, 8)) return json({ error: "rate" }, 429);
+    if (!rateLimit(request, `tutor:${user.id}`, 20)) return json({ error: "rate" }, 429);
 
     const body = await readJson<{ messages?: unknown[]; locale?: string; context?: string }>(request, 6_000_000);
     const list = Array.isArray(body.messages) ? body.messages.slice(-MAX_MESSAGES) : [];
@@ -101,8 +98,6 @@ ${m.text}`, image: m.image ?? prev.image };
     const last = messages.at(-1);
     if (!last || last.role !== "user" || (!last.text.trim() && !last.image)) return json({ error: "invalid" }, 400);
 
-    const status = await aiStatus(user.id);
-    if (!(await takeAiQuota(user.id, status.limit))) return json({ error: "limit", ...status }, 429);
 
     const params: Anthropic.Beta.MessageCreateParamsStreaming["messages"] = messages.map((m, i) => {
       const isLast = i === messages.length - 1;
@@ -132,25 +127,20 @@ ${m.text}`, image: m.image ?? prev.image };
     });
 
     const encoder = new TextEncoder();
-    const userId = user.id;
     const readable = new ReadableStream<Uint8Array>({
       async start(controller) {
-        let sent = false;
         try {
           for await (const event of stream) {
             if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-              sent = true;
               controller.enqueue(encoder.encode(event.delta.text));
             }
           }
           const final = await stream.finalMessage();
           if (final.stop_reason === "refusal") {
             controller.enqueue(encoder.encode("\u0000refused"));
-            if (!sent) await refundAiQuota(userId);
           }
         } catch (error) {
           if (!(error instanceof Anthropic.APIUserAbortError)) console.error("[tutor]", error instanceof Anthropic.APIError ? `${error.status} ${error.message}` : error);
-          if (!sent) await refundAiQuota(userId).catch(() => {});
           try {
             controller.enqueue(encoder.encode("\u0000error"));
           } catch {
