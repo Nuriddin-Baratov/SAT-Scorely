@@ -83,6 +83,16 @@ function ReadAloud() {
   const [result, setResult] = useState<ReturnType<typeof compareWords> | null>(null);
   const stopRef = useRef<(() => void) | null>(null);
   const item = readAloudTexts[index];
+  const speechError = (code: string) =>
+    ["not-allowed", "service-not-allowed", "permission", "audio-capture"].includes(code)
+      ? t.speaking.micDenied
+      : code === "network"
+        ? t.speaking.network
+        : code === "no-speech"
+          ? t.speaking.noSpeech
+          : code === "unsupported" || code === "language-not-supported"
+            ? t.speaking.noRecognition
+            : t.speaking.failed;
 
   useEffect(() => () => stopRef.current?.(), []);
 
@@ -97,14 +107,23 @@ function ReadAloud() {
       return;
     }
     setActive(true);
+    // Foydalanuvchi "To'xtatish"ni bosguncha tinglaydi; matn to'liq o'qilsa — o'zi tugaydi
+    let done = false;
     stopRef.current = listen({
-      onText: setHeard,
+      maxMs: 90_000,
+      onText: (text) => {
+        setHeard(text);
+        if (!done && compareWords(item.text, text).score === 100) {
+          done = true;
+          window.setTimeout(() => stopRef.current?.(), 400);
+        }
+      },
       onEnd: (text) => {
         setActive(false);
         stopRef.current = null;
         if (text) setResult(compareWords(item.text, text));
       },
-      onError: (code) => setError(code === "not-allowed" || code === "service-not-allowed" || code === "permission" ? t.speaking.micDenied : null),
+      onError: (code) => setError(speechError(code)),
     });
   };
 

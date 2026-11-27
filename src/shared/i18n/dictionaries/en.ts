@@ -1093,6 +1093,9 @@ export const en: Dictionary = {
     next: "Next",
     noRecognition: "This browser can't recognize speech — only recording works. Open in Chrome for the full experience.",
     micDenied: "Microphone access was denied. Allow it in your browser or phone settings.",
+    network: "Speech recognition needs internet. Check your connection and try again.",
+    noSpeech: "We couldn't hear you. Speak closer to the microphone and a bit louder.",
+    failed: "Couldn't recognize your speech. Please try again.",
     topic: {
       prep: "Prepare",
       talk: "Speak",

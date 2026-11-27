@@ -134,67 +134,118 @@ export interface ListenHandlers {
   onError?: (code: string) => void;
 }
 
-/** Ingliz tilidagi nutqni tinglaydi. Qaytaradi: to'xtatish funksiyasi. */
-export function listen({ onText, onEnd, onError }: ListenHandlers): () => void {
-  let finalText = "";
+/** Qayta urinib bo'lmaydigan xatolar — tinglash to'xtaydi va sababi ko'rsatiladi */
+const FATAL = new Set(["not-allowed", "service-not-allowed", "permission", "audio-capture", "unsupported", "language-not-supported", "busy"]);
+
+/**
+ * Ingliz tilidagi nutqni tinglaydi — foydalanuvchi to'xtatmaguncha (yoki `maxMs` o'tguncha).
+ * Brauzer/telefon har jimlikdan keyin tanishni o'zi tugatadi; shunda jimgina qayta boshlaymiz va matnni yig'amiz.
+ * Qaytaradi: to'xtatish funksiyasi (yig'ilgan matn `onEnd` ga keladi).
+ */
+export function listen({ onText, onEnd, onError, maxMs = 120_000 }: ListenHandlers & { maxMs?: number }): () => void {
+  let committed = "";
+  let stopped = false;
   let ended = false;
-  const finish = (text: string) => {
+  let quick = 0;
+  let networkFails = 0;
+  let stopSegment: () => void = () => {};
+  const join = (segment: string) => `${committed} ${segment}`.replace(/\s+/g, " ").trim();
+
+  const finish = () => {
     if (ended) return;
     ended = true;
-    onEnd(text.trim());
+    window.clearTimeout(limit);
+    onEnd(committed);
+  };
+  const fail = (code: string) => {
+    if (ended) return;
+    stopped = true;
+    onError?.(code);
+    finish();
+  };
+  const stop = () => {
+    if (stopped) return;
+    stopped = true;
+    stopSegment();
+    // Tanuvchi javob bermay qolsa ham tugatamiz
+    window.setTimeout(finish, 1500);
+  };
+  const limit = window.setTimeout(stop, maxMs);
+
+  /** Bo'lak tugadi: to'xtatilmagan bo'lsa — qayta boshlaymiz */
+  const segmentEnded = (startedAt: number, heard: boolean, code?: string) => {
+    if (code && FATAL.has(code)) return fail(code);
+    if (code === "network" && ++networkFails >= 3) return fail(code);
+    if (stopped) return finish();
+    // Hech narsa eshitmay ketma-ket tez tugasa — mikrofon ishlamayapti
+    if (!heard && Date.now() - startedAt < 1500) {
+      if (++quick >= 6) return fail("no-speech");
+    } else quick = 0;
+    window.setTimeout(() => !stopped && startSegment(), 200);
   };
 
   const bridge = native();
-  if (bridge?.listen) {
-    const id = `l${++seq}`;
-    let last = "";
-    callbacks.set(id, (type, payload) => {
-      if (type === "partial") onText((last = payload));
-      else if (type === "result") {
-        last = payload;
-        onText(payload);
-        callbacks.delete(id);
-        finish(payload);
-      } else if (type === "error") {
-        callbacks.delete(id);
-        onError?.(payload);
-        finish(last);
+  const Ctor = recognitionCtor();
+
+  function startSegment() {
+    const startedAt = Date.now();
+    if (bridge?.listen) {
+      const id = `l${++seq}`;
+      let heard = false;
+      callbacks.set(id, (type, payload) => {
+        if (type === "partial") {
+          heard ||= !!payload;
+          onText(join(payload));
+        } else if (type === "result") {
+          callbacks.delete(id);
+          if (payload) {
+            heard = true;
+            committed = join(payload);
+            onText(committed);
+          }
+          segmentEnded(startedAt, heard);
+        } else if (type === "error") {
+          callbacks.delete(id);
+          segmentEnded(startedAt, heard, payload === "no-speech" || payload === "error" ? undefined : payload);
+        }
+      });
+      stopSegment = () => bridge.stopListen?.();
+      bridge.listen(id, "en-US");
+      return;
+    }
+    if (!Ctor) return fail("unsupported");
+    const rec = new Ctor();
+    rec.lang = "en-US";
+    rec.continuous = true;
+    rec.interimResults = true;
+    let segment = "";
+    let errorCode: string | undefined;
+    rec.onresult = (e) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) segment += `${r[0].transcript} `;
+        else interim += r[0].transcript;
       }
-    });
-    bridge.listen(id, "en-US");
-    return () => bridge.stopListen?.();
+      onText(join(`${segment}${interim}`));
+    };
+    rec.onerror = (e) => {
+      if (e.error !== "no-speech" && e.error !== "aborted") errorCode = e.error;
+    };
+    rec.onend = () => {
+      if (segment.trim()) committed = join(segment);
+      segmentEnded(startedAt, !!segment.trim(), errorCode);
+    };
+    stopSegment = () => rec.stop();
+    try {
+      rec.start();
+    } catch {
+      fail("busy");
+    }
   }
 
-  const Ctor = recognitionCtor();
-  if (!Ctor) {
-    onError?.("unsupported");
-    finish("");
-    return () => {};
-  }
-  const rec = new Ctor();
-  rec.lang = "en-US";
-  rec.continuous = true;
-  rec.interimResults = true;
-  rec.onresult = (e) => {
-    let interim = "";
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const r = e.results[i];
-      if (r.isFinal) finalText += `${r[0].transcript} `;
-      else interim += r[0].transcript;
-    }
-    onText(`${finalText}${interim}`.trim());
-  };
-  rec.onerror = (e) => {
-    if (e.error !== "no-speech" && e.error !== "aborted") onError?.(e.error);
-  };
-  rec.onend = () => finish(finalText);
-  try {
-    rec.start();
-  } catch {
-    onError?.("busy");
-    finish("");
-  }
-  return () => rec.stop();
+  startSegment();
+  return stop;
 }
 
 // ---------------- Hook ----------------

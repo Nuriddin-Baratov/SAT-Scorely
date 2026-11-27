@@ -1093,6 +1093,9 @@ export const uz = {
     next: "Keyingi",
     noRecognition: "Bu brauzer nutqni tanimaydi — faqat yozib olish ishlaydi. To'liq ishlashi uchun Chrome'da oching.",
     micDenied: "Mikrofonga ruxsat berilmadi. Brauzer yoki telefon sozlamalaridan ruxsat bering.",
+    network: "Nutqni tanish uchun internet kerak. Ulanishni tekshirib, qayta urining.",
+    noSpeech: "Ovoz eshitilmadi. Mikrofonga yaqinroq va balandroq gapiring.",
+    failed: "Nutqni tanib bo'lmadi. Qayta urinib ko'ring.",
     topic: {
       prep: "Tayyorgarlik",
       talk: "Gapiring",
