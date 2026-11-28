@@ -1063,7 +1063,7 @@ export const en: Dictionary = {
     back: "All lessons",
     done: "Completed",
     noVoice: "Text-to-speech doesn't work on this device. Open the site in Chrome or Safari.",
-    updateApp: "Install the latest app version to enable audio (Install app page).",
+    updateApp: "Install the new app version for audio and microphone — it installs over the old one and keeps your account.",
     dictation: {
       hint: "Listen to the sentence and type exactly what you hear. Replay as often as you like.",
       placeholder: "Type what you heard…",

@@ -11,7 +11,7 @@ import { Icon } from "@/shared/ui/icon";
 import { Badge, Card } from "@/shared/ui/primitives";
 
 import { useRecorder } from "../model/recorder";
-import { Tabs, WordDiff, levelTone } from "./shared";
+import { Tabs, UpdateAppNotice, WordDiff, levelTone } from "./shared";
 
 const PREP_SECONDS = 15;
 const TALK_SECONDS = { B1: 45, B2: 60, C1: 60 } as const;
@@ -274,7 +274,7 @@ function ReadAloud() {
       </div>
 
       <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:items-center">
-        <MicButton active={active} onClick={active ? stop : start} label={active ? t.speaking.stop : t.speaking.speak} />
+        <MicButton active={active} onClick={active ? stop : start} disabled={caps.outdatedApp} label={active ? t.speaking.stop : t.speaking.speak} />
         <div className="min-w-0 flex-1 text-center sm:text-left">
           <p className="font-semibold">{active ? t.speaking.listening : result ? t.speaking.accuracy(result.score) : t.speaking.speak}</p>
           {heard && <p className="mt-1 text-sm text-muted italic">“{heard}”</p>}
@@ -294,8 +294,14 @@ function ReadAloud() {
 
       {recorder.url && <audio controls src={recorder.url} className="mt-5 w-full" />}
       <div className="mt-5 space-y-3">
-        {!caps.listen && <Notice>{t.speaking.noRecognition}</Notice>}
-        {(error || recorder.state === "denied") && <Notice>{error ?? t.speaking.micDenied}</Notice>}
+        {caps.outdatedApp ? (
+          <UpdateAppNotice />
+        ) : (
+          <>
+            {!caps.listen && <Notice>{t.speaking.noRecognition}</Notice>}
+            {(error || recorder.state === "denied") && <Notice>{error ?? t.speaking.micDenied}</Notice>}
+          </>
+        )}
       </div>
       <div className="mt-6 flex flex-wrap gap-3 border-t border-border pt-5">
         {(result || recorder.url) && (
@@ -512,6 +518,7 @@ function TopicTalk() {
               <>
                 <Button
                   size="lg"
+                  disabled={caps.outdatedApp}
                   onClick={() => {
                     setLeft(PREP_SECONDS);
                     setPhase("prep");
@@ -520,7 +527,7 @@ function TopicTalk() {
                   <Icon name="play" className="size-5" />
                   {tt.start}
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => void beginTalk()}>
+                <Button size="lg" variant="outline" disabled={caps.outdatedApp} onClick={() => void beginTalk()}>
                   <Icon name="mic" className="size-5" />
                   {tt.skipPrep}
                 </Button>
@@ -590,8 +597,9 @@ function TopicTalk() {
           </Button>
         )}
         <div className="mt-5 space-y-3">
-          {recorder.state === "denied" && <Notice>{t.speaking.micDenied}</Notice>}
-          {recorder.state === "unsupported" && <Notice>{t.speaking.noRecognition}</Notice>}
+          {caps.outdatedApp && <UpdateAppNotice />}
+          {!caps.outdatedApp && recorder.state === "denied" && <Notice>{t.speaking.micDenied}</Notice>}
+          {!caps.outdatedApp && recorder.state === "unsupported" && <Notice>{t.speaking.noRecognition}</Notice>}
         </div>
       </Card>
 

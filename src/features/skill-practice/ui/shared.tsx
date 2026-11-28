@@ -2,7 +2,10 @@
 
 import type { ReactNode } from "react";
 
+import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
+import { buttonClass } from "@/shared/ui/button";
+import { Icon } from "@/shared/ui/icon";
 
 export function Tabs<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string; icon?: ReactNode }[] }) {
   return (
@@ -60,3 +63,27 @@ export function WordDiff({ words }: { words: { word: string; ok: boolean }[] }) 
 }
 
 export const levelTone = { B1: "success", B2: "accent", C1: "gold" } as const;
+
+/**
+ * Eski ilova (ovoz ko'prigi yo'q) — yangi APK'ni yuklab olish.
+ * Eski ilova ichida fayl yuklab bo'lmaydi, shuning uchun havola Chrome'da (intent orqali) ochiladi.
+ * Faqat brauzerda chiziladi (`outdatedApp` serverda doim `false`).
+ */
+export function UpdateAppNotice() {
+  const { t } = useI18n();
+  const host = window.location.host;
+  const apk = `https://${host}/download/SAT-Pro.apk`;
+  const intent = `intent://${host}/download/SAT-Pro.apk#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(apk)};end`;
+  return (
+    <div className="rounded-2xl bg-warning-soft px-4 py-3 text-sm text-warning">
+      <p className="flex items-start gap-2">
+        <Icon name="flag" className="mt-0.5 size-4 shrink-0" />
+        <span>{t.listening.updateApp}</span>
+      </p>
+      <a href={intent} className={buttonClass({ size: "sm" }, "mt-3 w-full sm:w-auto")}>
+        <Icon name="download" className="size-4" />
+        {t.install.downloadApk}
+      </a>
+    </div>
+  );
+}

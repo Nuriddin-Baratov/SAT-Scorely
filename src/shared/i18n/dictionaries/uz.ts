@@ -1063,7 +1063,7 @@ export const uz = {
     back: "Barcha darslar",
     done: "Ishlangan",
     noVoice: "Bu qurilmada ovozli o'qish ishlamayapti. Chrome yoki Safari brauzerida oching.",
-    updateApp: "Ovoz uchun ilovaning yangi versiyasini o'rnating (Ilovani o'rnatish sahifasi).",
+    updateApp: "Ovoz va mikrofon uchun ilovaning yangi versiyasini o'rnating — eski ilova ustidan o'rnatiladi, hisobingiz saqlanadi.",
     dictation: {
       hint: "Gapni tinglang va eshitganingizni aynan yozing. Xohlagancha qayta tinglash mumkin.",
       placeholder: "Eshitganingizni yozing…",

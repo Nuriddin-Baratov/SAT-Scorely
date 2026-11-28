@@ -11,7 +11,7 @@ import { Button } from "@/shared/ui/button";
 import { Icon } from "@/shared/ui/icon";
 import { Badge, Card } from "@/shared/ui/primitives";
 
-import { Pills, Tabs, WordDiff, levelTone } from "./shared";
+import { Pills, Tabs, UpdateAppNotice, WordDiff, levelTone } from "./shared";
 
 const SPEEDS = [0.75, 1, 1.25];
 
@@ -34,6 +34,8 @@ function useVoice() {
 function VoiceNotice() {
   const { t } = useI18n();
   const platform = usePlatform();
+  // Eski ilova — yangi APK'ni yuklab olish tugmasi bilan
+  if (useSpeechSupport().outdatedApp) return <UpdateAppNotice />;
   return (
     <div className="flex items-start gap-2 rounded-2xl bg-warning-soft px-4 py-3 text-sm text-warning">
       <Icon name="flag" className="mt-0.5 size-4 shrink-0" />

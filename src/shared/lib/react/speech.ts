@@ -255,16 +255,24 @@ export interface SpeechSupport {
   listen: boolean;
   /** Android ilova ichida (tizim ovozi/tanuvchisi) */
   nativeApp: boolean;
+  /** Eski ilova (1.2 va undan oldingi): ovoz ko'prigi va mikrofon ruxsati yo'q — yangilash kerak */
+  outdatedApp: boolean;
 }
 
 let support: SpeechSupport | undefined;
-const SERVER_SUPPORT: SpeechSupport = { speak: true, listen: true, nativeApp: false };
+const SERVER_SUPPORT: SpeechSupport = { speak: true, listen: true, nativeApp: false, outdatedApp: false };
 
 /** Qurilma imkoniyatlari; serverda va gidratsiyada — "bor" deb hisoblanadi */
 export function useSpeechSupport(): SpeechSupport {
   return useSyncExternalStore(
     () => () => {},
-    () => (support ??= { speak: canSpeak(), listen: canListen(), nativeApp: !!window.SATProApp }),
+    () =>
+      (support ??= {
+        speak: canSpeak(),
+        listen: canListen(),
+        nativeApp: !!window.SATProApp,
+        outdatedApp: !!window.SATProApp && typeof window.SATProApp.listen !== "function",
+      }),
     () => SERVER_SUPPORT,
   );
 }
